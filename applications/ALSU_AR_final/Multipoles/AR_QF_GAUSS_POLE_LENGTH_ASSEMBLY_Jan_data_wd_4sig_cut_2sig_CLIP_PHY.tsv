@@ -1,0 +1,43 @@
+# file: AR_QF_GAUSS_POLE_LENGTH_ASSEMBLY_Jan_data_wd_4sig_cut_2sig_CLIP_PHY.tsv
+# generated: 2019-05-22 17:29:01.390351
+# source file: AR_QF_GAUSS_POLE_LENGTH_ASSEMBLY_Jan_data_wd_4sig_cut_2sig_CLIP_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.015000
+# nominal order: 1
+# nominal type: 1
+# Original Header: 
+#># file: AR_QF_GAUSS_POLE_LENGTH_ASSEMBLY_Jan_data_wd_4sig_cut_2sig_CLIP_ENG.tsv
+#># generated: 2019-05-22 17:29:00.302499
+#># source file: AR_QF_GAUSS_POLE_LENGTH_ASSEMBLY_Jan_data_wd_4sig_cut_2sig_ENG.tsv
+#># nominal strength [gauss]: -2.146209960e+03
+#># threshold: 0
+#># Original Header: 
+#>#># file: AQF_GAUSS_POLE_LENGTH_ASSEMBLY.tsv
+#>#># generated: 2019-05-08 10:37:44
+#>#># source file: AQF.py
+#>#># nominal order: 2
+#>#># main field [Gauss]: -2146.20996
+#>#># main circuit current [Amp-turns]: 1760.0
+#>#># reference radius [m]: 0.015
+#>#># units: Gauss
+#>#># pole profile tolerance width  ( RD AZ ROT ) [um]: 40
+#>#># pole length tolerance width (per pole) [um]: 50
+#>#># power supply stability width (per circuit) [ppm]: 0
+#>#># assembly tolerance width [um]: 50
+#>#
+#
+01	+1.073066531e-05	+1.058749173e-05
+02	+8.419457225e-04	+1.000533516e-03
+03	+4.001219392e-02	+4.005636669e-02
+04	-9.533943961e-01	+1.978684626e+00
+05	-6.355962641e+01	-6.355962641e+01
+06	-4.237308427e+03	-4.237308427e+03
+07	-2.824872285e+05	-2.824872285e+05
+08	-1.883248190e+07	-1.883248190e+07
+09	-1.255498793e+09	-1.255498793e+09
+10	-8.369991955e+10	-8.369991955e+10
+11	-5.579994637e+12	-5.579994637e+12
+12	-3.719996424e+14	-3.719996424e+14
+13	-2.479997616e+16	-2.479997616e+16
+14	-1.653331744e+18	-1.653331744e+18
+15	-1.102221163e+20	-1.102221163e+20

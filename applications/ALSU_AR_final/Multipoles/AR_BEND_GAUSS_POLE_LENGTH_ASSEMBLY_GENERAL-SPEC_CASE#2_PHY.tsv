@@ -1,0 +1,39 @@
+# file: AR_BEND_GAUSS_POLE_LENGTH_ASSEMBLY_GENERAL-SPEC_CASE#2_PHY.tsv
+# generated: 2019-05-23 15:13:21.382640
+# source file: AR_BEND_GAUSS_POLE_LENGTH_ASSEMBLY_GENERAL-SPEC_CASE#2_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.009000
+# nominal order: 0
+# nominal type: 1
+# Original Header: 
+#># file: ABEND_GAUSS_POLE_LENGTH_ASSEMBLY_GENERAL-SPEC_CASE#3.tsv
+#># generated: 2019-05-23 (manually by thellert)
+#># source file: Exel Sheet 190514_ABEND_Test_04.xlsm
+#># Reference Windchill Document AL-1158-7461
+#># Baseline multipoles from January 2019 - Factor = 3
+#># nominal order: 1
+#># main field [Gauss]: 12609.342
+#># main circuit current [Amp-turns]: 11210
+#># reference radius [m]: 0.009
+#># units: Gauss
+#># Bottom X amplitude offset "+/-" [um]: 75							
+#># Top x amplitude offset "+/-" [um]: 75						
+#># Gap  amplitude offset  "+/-" [um]: 75					
+#># Bottom Pole Shape Rotation Z axis  amplitude offset "+/-" at edge of pole [um]: 75 							
+#># Top Pole Shape Rotation Z axis  amplitude offset "+/-" at edge of pole [um]: 75 							
+#># Bottom Rotation on amplitude on Y axis offset "+/-" [uRad]: 75							
+#># Top Rotation on amplitude on Y axis offset "+/-" [uRad]: 75	
+#># A1 errors are not corrected	
+#># Models B2 errors shimmed out to ~ 10 um resolution in gap 
+#># Models B1 error corrections as ~ 50% of local error					
+#
+01	+8.995502249e-05	+2.998500750e-04
+02	+1.665833750e-03	+2.498750625e-03
+03	+2.036019028e-02	+2.776389583e-01
+04	+6.375413116e+00	+6.375413116e+00
+05	+7.083792352e+02	+7.083792352e+02
+06	+7.870880391e+04	+7.870880391e+04
+07	+8.745422656e+06	+8.745422656e+06
+08	+9.717136285e+08	+9.717136285e+08
+09	+1.079681809e+11	+1.079681809e+11
+10	+1.199646455e+13	+1.199646455e+13
