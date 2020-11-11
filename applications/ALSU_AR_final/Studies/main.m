@@ -246,21 +246,10 @@ for FOO=0 % FAKE Loop. Just something to ``break'' out of if there is a fatal er
 	% Dispersion scaling
 	scaleDisp = 1E8;
 	% Get response matrix
-	MCO = SCgetRespMat(SC,5E-5,SC.ORD.BPM,SC.ORD.CM);
-	if any(isnan(MCO(:))) || any(isinf(MCO(:)))
-		MCO = SCgetModelRM(SC,SC.ORD.BPM,SC.ORD.CM,'trackMode','ORB');
-		if any(isnan(MCO(:)))
-			MCO = SCgetModelRM(SC.IDEALRING,SC.ORD.BPM,SC.ORD.CM,'trackMode','ORB');
-		end
-	end
+	MCO = SCgetModelRM(SC,SC.ORD.BPM,SC.ORD.CM,'trackMode','ORB');			
 	% Get dispersion
-	eta = SCgetDispersion(SC,1E3);
-	if any(isnan(eta(:)))
-		eta = SCgetModelDispersion(SC,SC.ORD.BPM,SC.ORD.Cavity);
-		if any(isnan(eta(:)))
-			eta = SCgetModelDispersion(SC,SC.ORD.BPM,SC.ORD.Cavity,'useIdealRing',1);
-		end
-	end	
+	eta = SCgetModelDispersion(SC,SC.ORD.BPM,SC.ORD.Cavity,'useIdealRing',1);
+	
 
 	% Define regularization loop parameters
 	alphaVec = [30 15 10:-1:1];
