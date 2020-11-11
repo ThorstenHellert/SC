@@ -13,8 +13,8 @@ function SCplotLattice(SC,varargin)
 %
 % DESCRIPTION
 % -----------
-% This function plots the overall offsets of all magnets, as well as the individual contributions
-% from different support structures (if registered) and the BPM offset resulting from these offsets.
+% This function plots the lattice functions as well as the distribution of registered magnets 
+% including CMs and BPMs.
 %
 %
 % INPUTS
