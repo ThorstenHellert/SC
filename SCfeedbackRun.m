@@ -43,7 +43,7 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 % `'eps'` (`1e-5`)::
 %	break, if the coefficient of variation of the RMS BPM reading is below
 %	this value
-% `'R0'` (zeros)::
+% `'R0'` (zeros(size(Mplus,2),1))::
 %	target orbit in the format `[x_1 ... x_n y_1 ...y_n]`, where
 %	`[x_i,y_i]` is the target position at the i-th BPM.
 % `'scaleDisp'` (0)::
@@ -52,6 +52,9 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 %   List of CM ordinates to be used for correction
 % `'BPMords'` (`SC.ORD.BPM`):: 
 %   List of BPM ordinates at which the reading should be evaluated
+% `'weight'` (ones(size(Mplus,2),1))::
+%	weighting vector to be used in the CM step calculation in the format `[x_1 ... x_n y_1 ...y_n]`, where
+%	`[x_i,y_i]` is the weight at the i-th BPM.
 % `'verbose'` (0)::
 %	If true, debug information is printed.
 %
@@ -102,6 +105,7 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 	addOptional(p,'scaleDisp',0);
 	addOptional(p,'CMords',SC.ORD.CM);
 	addOptional(p,'BPMords',SC.ORD.BPM);
+	addOptional(p,'weight',ones(size(Mplus,2),1));
 	addOptional(p,'verbose',0);
 	parse(p,varargin{:});
 	par=p.Results;
@@ -177,7 +181,9 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 			% reading is prepended to 'hist'.
 			R = [B(1,:)'; B(2,:)'];
 			R(isnan(R))=0;
-			dphi = Mplus * (R-par.R0);
+			
+			dphi = Mplus * ((R-par.R0).*par.weight);
+		
 			if par.scaleDisp~=0
 				SC = SCsetCavs2SetPoints(SC,SC.ORD.Cavity,'Frequency',-par.scaleDisp*dphi(end),'add');
 				dphi = dphi(1:end-1);
