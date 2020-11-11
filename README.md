@@ -21,6 +21,8 @@ $ git clone https://github.com/ThorstenHellert/SC.git
 >> atpath
 ```
 
+4. You're good to go. Please take a look at the [usage example](https://sc.lbl.gov/main.html#sec:example) or at the more complex [ALS-U Accumulator Ring scripts](https://sc.lbl.gov/ALSU_AR_final.zip) to get startet.
+
 Online documentation
 --------------------
 
