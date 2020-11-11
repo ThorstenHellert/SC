@@ -246,7 +246,7 @@ for FOO=0 % FAKE Loop. Just something to ``break'' out of if there is a fatal er
 	% Dispersion scaling
 	scaleDisp = 1E8;
 	% Get response matrix
-	MCO = SCgetModelRM(SC,SC.ORD.BPM,SC.ORD.CM,'trackMode','ORB');			
+	MCO = SCgetModelRM(SC,SC.ORD.BPM,SC.ORD.CM,'trackMode','ORB','useIdealRing',1);			
 	% Get dispersion
 	eta = SCgetModelDispersion(SC,SC.ORD.BPM,SC.ORD.Cavity,'useIdealRing',1);
 	
