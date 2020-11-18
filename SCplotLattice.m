@@ -35,6 +35,10 @@ function SCplotLattice(SC,varargin)
 %   If `'oList'` is empty, `'nSectors'` can be used to plot only the first fraction of the lattice
 % `'plotIdealRing'` (1)::
 %   Specify if 'SC.IDEALRING' should be used to plot twiss functions, otherwise 'SC.RING'.
+% `'plotMagNames'` (0)::
+%   Specify if magnet names should be printed next to the magnets. Note: since Matlab is not able to 
+%   find the best placement of text annotations, it is likely required that the corresponding lines
+%   are adjusted to the users discretion.
 % `'fontSize'` (16)::
 %   Figure font size.
 %
@@ -63,6 +67,7 @@ function SCplotLattice(SC,varargin)
 	addOptional(p,'oList',[]);
 	addOptional(p,'plotIdealRing',1);
 	addOptional(p,'sRange',[]);
+	addOptional(p,'plotMagNames',0);
 	addOptional(p,'fontSize',16);
 	parse(p,varargin{:});
 	par = p.Results;
@@ -212,21 +217,25 @@ function SCplotLattice(SC,varargin)
 	% Draw octupole magnets
 	for nM=1:length(OCT)
 		rectangle('Position',[sPos(OCT(nM)),-scale,sPos(OCT(nM)+1)-sPos(OCT(nM)),scale ],'FaceColor',tmpCol(6,:));
+		if par.plotMagNames; text(sPos(OCT(nM)), -(1.2 + 0.1*(-1)^(nM) )   * scale ,SC.RING{OCT(nM)}.FamName);end
 		if nM==1;legStr{end+1}='Oct';legVec(end+1)=bar(-1,0,'FaceColor',tmpCol(6,:));end
 	end
 	% Draw sextupole magnets
 	for nM=1:length(SEXT)
 		rectangle('Position',[sPos(SEXT(nM)),0,sPos(SEXT(nM)+1)-sPos(SEXT(nM)),scale ],'FaceColor',tmpCol(5,:));
+		if par.plotMagNames; text(sPos(SEXT(nM)), (1.2 + 0.1*(-1)^(nM) )   * scale ,SC.RING{SEXT(nM)}.FamName);end
 		if nM==1;legStr{end+1}='Sext';legVec(end+1)=bar(-1,0,'FaceColor',tmpCol(5,:));end
 	end
 	% Draw dipole magnets
 	for nM=1:length(DIP)
 		rectangle('Position',[sPos(DIP(nM)),0,sPos(DIP(nM)+1)-sPos(DIP(nM)),scale/2 ],'FaceColor',[0 0 0]);
+		if par.plotMagNames; text(sPos(DIP(nM)),  (-.7 + 0.1*(-1)^(nM) )  * scale ,SC.RING{DIP(nM)}.FamName); end
 		if nM==1;legStr{end+1}='Dip';legVec(end+1)=bar(-1,0,'k');end
 	end
 	% Draw quadrupole magnets
 	for nM=1:length(QUAD)
 		rectangle('Position',[sPos(QUAD(nM)),-scale/2,sPos(QUAD(nM)+1)-sPos(QUAD(nM)),scale/2 ],'FaceColor',tmpCol(3,:));
+		if par.plotMagNames; text(sPos(QUAD(nM)),  (-.7 + 0.1*(-1)^(nM) )  * scale ,SC.RING{QUAD(nM)}.FamName); end
 		if nM==1;legStr{end+1}='Quad';legVec(end+1)=bar(-1,0,'FaceColor',tmpCol(3,:));end
 	end
 
