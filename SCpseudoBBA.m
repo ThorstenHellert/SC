@@ -73,23 +73,20 @@ function SC = SCpseudoBBA(SC,BPMords,MagOrds,postBBAoffset,varargin)
 	end
 	
 	if length(postBBAoffset)==1
-		postBBAoffset = repmat(postBBAoffset,2,length(BPMords));
+		postBBAoffset = repmat(postBBAoffset,2,size(BPMords,2));
 	end
 	
 	
 	
 	% Loop over BPMs
-	for jBPM=1:length(BPMords) % jBPM: Index of BPM adjacent to quad for BBA
+	for nBPM=1:size(BPMords,2)
 
 		% Horizontal/vertical
 		for nDim=1:2
-
-			% Define ordinate of quadrupole for BBA
-			qOrd = MagOrds(nDim,jBPM);
-			
-			% Write new BPM offset
-			SC.RING{BPMords(jBPM)}.Offset(nDim) = SC.RING{qOrd}.MagnetOffset(nDim) + postBBAoffset(nDim,jBPM) * SCrandnc(p.Results.sigma);
-			
+		
+			% Write new BPM offset		
+			SC.RING{BPMords(nDim,nBPM)}.Offset(nDim) = SC.RING{MagOrds(nDim,nBPM)}.MagnetOffset(nDim) + SC.RING{MagOrds(nDim,nBPM)}.SupportOffset(nDim) - SC.RING{BPMords(nDim,nBPM)}.SupportOffset(nDim) + postBBAoffset(nDim,nBPM) * SCrandnc(p.Results.sigma);
+		
 		end
 	end
 	
