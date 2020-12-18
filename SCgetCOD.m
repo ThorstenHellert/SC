@@ -53,6 +53,7 @@ function COD = SCgetCOD(SC,varargin)
 	T = findorbit6(SC.RING,par.ords);
 	if any(isnan(T))
 		warning('Closed orbit could not be found.')
+		COD = nan(2,length(par.ords));
 		return
 	end
 
@@ -69,10 +70,11 @@ function COD = SCgetCOD(SC,varargin)
 
 	% Plot results?
 	if par.plot	
+		
+		% Get s-positions
 		sPos = findspos(SC.RING,par.ords);
 		
 		ylabelStr = {'$\Delta x$ [mm]','$\Delta y$ [mm]'};
-		
 		figure(784);clf
 		for nDim=1:2
 			ax(nDim) = subplot(2,1,nDim);hold on
