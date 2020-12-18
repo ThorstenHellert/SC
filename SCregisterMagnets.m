@@ -230,8 +230,8 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 		SC.RING{ord}.RollAngle   = 0;
 
 		% Initialize T1 and T2 fields (not done in AT2.0 by default anymore)
-		SC.RING{ord}.T1 = zeros(1,6);
-		SC.RING{ord}.T2 = zeros(1,6);
+		SC.RING{ord}.T1 = zeros(6,1);
+		SC.RING{ord}.T2 = zeros(6,1);
 
 		% Set optional attributes
 		SC = setOptional(SC,ord,MAGords,varargin{:});
