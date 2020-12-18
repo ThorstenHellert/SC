@@ -152,9 +152,9 @@ function varargout = SClocoLib(funName,varargin)
 % LOCOmeasData =  SClocoLib('getMeasurement',SC,1E-4,1E3);
 % ------------------------------------------------------------------
 % Get the orbit response matrix and the dispersion measurement using a BPM variation
-% of 0.1mm and an rf frequency step of 1kHz, respectively.
+% of 0.1mm and an rf frequency step of 1kHz, respectively and save the used CM steps.
 % ------------------------------------------------------------------
-% LOCOmeasData =  SClocoLib('getMeasurement',SC,1E-4,1E3,'mode','fixedOffset');
+% [LOCOmeasData, CMsteps] =  SClocoLib('getMeasurement',SC,1E-4,1E3,'mode','fixedOffset');
 % ------------------------------------------------------------------
 %
 % >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -488,7 +488,6 @@ function varargout = SClocoLib(funName,varargin)
 		LOCOmodel.Lattice           = SC.IDEALRING;
 		
 		% Calculate disturbed lattice properties and save initial machine state
-		Init         = SCcalcLatticeProperties(SC);
 		Init.SC      = SC;
 
 		% Define LOCO parameters
@@ -526,31 +525,20 @@ function varargout = SClocoLib(funName,varargin)
 		BPMData.BPMIndex          = SC.ORD.BPM(:);
 		BPMData.HBPMIndex         = [1:length(SC.ORD.BPM)]';
 		BPMData.VBPMIndex         = [1:length(SC.ORD.BPM)]';
-		BPMData.HBPMGain          = ones(size(BPMData.HBPMIndex));
-		BPMData.VBPMGain          = ones(size(BPMData.VBPMIndex));
-		BPMData.HBPMCoupling      = zeros(size(BPMData.HBPMIndex));
-		BPMData.VBPMCoupling      = zeros(size(BPMData.VBPMIndex));
 		BPMData.FitGains          = 'No';
 
 		% Default CM data
 		CMData.FamName          = 'CM';
 		CMData.HCMIndex         = SC.ORD.CM{1}(:);
 		CMData.VCMIndex         = SC.ORD.CM{2}(:);
-		CMData.HCMCoupling      = zeros(size(CMData.HCMIndex));
-		CMData.VCMCoupling      = zeros(size(CMData.VCMIndex));
 		CMData.FitKicks         = 'No';
-		% If CM step is given as single number, expand to the right dimensions
-		if isnumeric(CMsteps) && length(CMsteps)==1
-			CMsteps = {repmat(CMsteps,length(CMData.HCMIndex),1),repmat(CMsteps,length(CMData.VCMIndex),1)};
-		end
-		CMData.CMsteps = CMsteps;
 		
 		% Set name/pair-values in BPM/CM data structure
 		for i=1:(length(varargin))
 			switch varargin{i}{1}
 				case 'CMords'
-					CMData.HCMIndex = varargin{i}{2}(:);
-					CMData.VCMIndex = varargin{i}{3}(:);
+					CMData.HCMIndex     = varargin{i}{2}(:);
+					CMData.VCMIndex     = varargin{i}{3}(:);
 				case 'BPMords'
 					BPMData.BPMIndex  = unique([varargin{i}{2}(:),varargin{i}{3}(:)]);
 					BPMData.HBPMIndex = find(ismember(BPMData.BPMIndex,varargin{i}{2}));
@@ -563,6 +551,21 @@ function varargout = SClocoLib(funName,varargin)
 					error('Unsuported type.')
 			end
 		end
+		
+		
+		% If CM step is given as single number, expand to the right dimensions
+		if isnumeric(CMsteps) && length(CMsteps)==1
+			CMsteps = {repmat(CMsteps,length(CMData.HCMIndex),1),repmat(CMsteps,length(CMData.VCMIndex),1)};
+		end
+		CMData.CMsteps = CMsteps;
+
+		% Set other default values
+		BPMData.HBPMGain      = ones(size(BPMData.HBPMIndex));
+		BPMData.VBPMGain      = ones(size(BPMData.VBPMIndex));
+		BPMData.HBPMCoupling  = zeros(size(BPMData.HBPMIndex));
+		BPMData.VBPMCoupling  = zeros(size(BPMData.VBPMIndex));
+		CMData.HCMCoupling    = zeros(size(CMData.HCMIndex));
+		CMData.VCMCoupling    = zeros(size(CMData.VCMIndex));
 		
 		
 		% Set CM kicks in LOCO structure
@@ -589,28 +592,16 @@ function varargout = SClocoLib(funName,varargin)
 		CMsteps = cellfun(@transpose,cellfun(@max,cellfun(@abs,CMsteps,'UniformOutput',false),'UniformOutput',false),'UniformOutput',false);
 		
 		LocoMeasData.M      = 2*1000* repmat([CMsteps{1};CMsteps{2}]',size(RM,1),1) .* RM;
-% 		LocoMeasData.M      = 2*1000*CMstep*RM;
 % 		LocoMeasData.BPMSTD = Err;
 		
-		LocoMeasData.Eta = LocoMeasData.DeltaRF*1000 * SCgetDispersion(SC,LocoMeasData.DeltaRF,'BPMords',BPMords);
+		LocoMeasData.Eta = LocoMeasData.DeltaRF*1000 * SCgetDispersion(SC,LocoMeasData.DeltaRF,'BPMords',BPMords,'nSteps',3);
 
 		% Define output arguments
 		varargout{1} = LocoMeasData;
 		varargout{2} = CMsteps;
 
-
 	end
 
-
-
-
-	
-	
-	
-	
-	
-	
-	
 	
 	% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -853,6 +844,7 @@ function varargout = SClocoLib(funName,varargin)
 		p = inputParser;
 		addOptional(p,'targetChrom',[]);
 		addOptional(p,'verbose',0);
+		addOptional(p,'InitStepSize',[2 2]);
 		addOptional(p,'TolX',1E-4);
 		addOptional(p,'TolFun',1E-3);
 		addOptional(p,'sepTunesWithOrds',[]);
@@ -891,7 +883,7 @@ function varargout = SClocoLib(funName,varargin)
 		fun = @(x) fitFunction(SC,sOrds,x,SP0,par.targetChrom);
 		
 		% Run solver
-		sol = fminsearch(fun,[2 2],optimset('TolX',par.TolX,'TolFun',par.TolFun));
+		sol = fminsearch(fun,par.InitStepSize,optimset('TolX',par.TolX,'TolFun',par.TolFun));
 		
 		% Apply solution
 		SC = applySetpoints(SC0,sOrds,sol,SP0);
@@ -963,7 +955,7 @@ function varargout = SClocoLib(funName,varargin)
 				SP0{nFam}(n) = SC.RING{qOrds{nFam}(n)}.SetPointB(2);
 			end
 		end
-		
+
 		% Define fit function
 		fun = @(x) fitFunction(SC,qOrds,x,SP0,par.targetTune,par.FitInteger);
 		
