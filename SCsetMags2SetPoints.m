@@ -120,7 +120,7 @@ function SC = SCsetMags2SetPoints(SC,MAGords,type,order,setpoints,varargin)
 		setpoints(i) = checkClipping(SC,ord,type,order,setpoints(i));
 
 		% Compensate for bending kick difference.
-		if par.dipCompensation
+		if par.dipCompensation && order==2
 			SC = dipCompensation(SC,ord,setpoints(i));
 		end
 
@@ -148,7 +148,7 @@ function inputCheck(SC,MAGords,type,order,setpoints,par)
 		error('Function not specified for CMs. Use ''SCsetCMs2SetPoints'' instead.')
 	end
 	if par.dipCompensation && order~=2
-		error('Dipole compensation only works for quadrupoles.')
+		warning('Dipole compensation only works for quadrupoles.')
 	end
 	for ord=MAGords(:)'
 		if ~isfield(SC.RING{ord},'SetPointB')
