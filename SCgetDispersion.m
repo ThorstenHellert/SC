@@ -27,7 +27,13 @@ function eta = SCgetDispersion(SC,RFstep,varargin)
 % -------
 % The following options can be given as name/value-pairs:
 %
-% `'BPMords'` (`SC.ORD.BPM`):: List of BPM ordinates at which the dispersion should be returned
+% `'BPMords'` (`SC.ORD.BPM`)::
+%    List of BPM ordinates at which the dispersion should be returned
+% `'CAVords'` (`SC.ORD.CAV`)::
+%    List of cavity ordinates with which the dispersion should be measrued
+% `'nSteps'` (2):: 
+%    Number of RF steps (1st RF step is considered the reference). If more than 2 steps are 
+%    specified, the measurement is bi-directional
 %
 % RETURN VALUE
 % ------------
@@ -45,19 +51,53 @@ function eta = SCgetDispersion(SC,RFstep,varargin)
 % --------
 % *SCsetCavs2SetPoints*
 
+
+
+warning('TODO: needs to be updated!')
+
+
 % Parse optional arguments
 p = inputParser;
 addOptional(p,'BPMords',SC.ORD.BPM);
+addOptional(p,'CAVords',SC.ORD.Cavity);
+addOptional(p,'nSteps',2);
 parse(p,varargin{:});
+par = p.Results;
+
+
+% Define RF steps
+for nCav=1:length(par.CAVords)
+	RFsteps(nCav,:) = SC.RING{par.CAVords(nCav)}.FrequencySetPoint + linspace(-RFstep,RFstep,par.nSteps);
+end
+
 
 % Get reference BPM reading
-Bref = reshape(SCgetBPMreading(SC,'BPMords',p.Results.BPMords)',[],1);
+Bref = reshape(SCgetBPMreading(SC,'BPMords',par.BPMords)',[],1);
 
-% Change RF frequency
-SC = SCsetCavs2SetPoints(SC,SC.ORD.Cavity,'Frequency',RFstep,'add');
+if par.nSteps==2
+	% Change RF frequency
+	SC = SCsetCavs2SetPoints(SC,par.CAVords,'Frequency',RFstep,'add');
+	
+	% Calculate second BPM reading
+	B = reshape(SCgetBPMreading(SC,'BPMords',par.BPMords)',[],1);
+	
+	% Calculate dispersion
+	eta = (B-Bref)/RFstep;
+else
+	% Loop over frequency setpoints
+	for nStep=1:par.nSteps
+		
+		% Change RF frequency
+		SC = SCsetCavs2SetPoints(SC,par.CAVords,'Frequency',RFsteps(:,nStep),'abs');
+		
+		% Calculate BPM reading differences
+		dB(nStep,:) = reshape(SCgetBPMreading(SC,'BPMords',par.BPMords)',[],1) - Bref;
+	end
+	
+	% Linear regression
+	eta = linspace(-RFstep,RFstep,par.nSteps)'\dB;
+	
+end
 
-% Get second BPM reading
-B = reshape(SCgetBPMreading(SC,'BPMords',p.Results.BPMords)',[],1);
 
-% Calculate dispersion
-eta = (B-Bref)/RFstep;
+
