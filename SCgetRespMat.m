@@ -45,7 +45,8 @@ function [RM,Err,CMsteps] = SCgetRespMat(SC,Amp,BPMords,CMords,varargin)
 % `'mode'` (`'fixedKick'`):: 
 %    Measurement mode, either `'fixedKick'` or `'fixedOffset'`
 % `'nSteps'` (2):: 
-%    Number of CM steps
+%    Number of CM steps (1st CM step is considered the reference). If more than 2 steps are 
+%    specified, the measurement is bi-directional
 % `'fit'` (`'linear'`):: 
 %    Fit method, either `'linear'` or `'quadratic'`
 % `'verbose'` (0)::
