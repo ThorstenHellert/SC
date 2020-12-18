@@ -48,7 +48,7 @@ function SC = SCpseudoBBA(SC,BPMords,MagOrds,postBBAoffset,varargin)
 % --------
 %
 % Assuming that each QF, QD and QFA magnet is accompanied by one BPM, the following assumes a 
-% sucessful BBA routine and assigns a 50um BPM offset. 
+% sucessful BBA routine and assigns a 50um BPM offset w.r.t. the magnet centers. 
 % ------------------------------------------------------------------
 % QuadOrds = repmat(SCgetOrds(SC.RING,'QF|QD|QFA'),2,1);
 % SC = SCpseudoBBA(SC,SC.ORD.BPM,QuadOrds,50E-6);
@@ -69,7 +69,7 @@ function SC = SCpseudoBBA(SC,BPMords,MagOrds,postBBAoffset,varargin)
 		fprintf('No BPM offset defined. NO BBA PERFORMED!.\n')
 		return
 	else
-		fprintf('Performing pseudo BBA with stored beam. New BPM offset is %.0fum (rms) w.r.t. quadrupole centers.\n',1E6*sqrt(mean(postBBAoffset(:).^2)))
+		fprintf('Performing pseudo BBA. New BPM offset is %.0fum (rms) w.r.t. magnet centers.\n',1E6*sqrt(mean(postBBAoffset(:).^2)))
 	end
 	
 	if length(postBBAoffset)==1
