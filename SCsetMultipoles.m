@@ -21,33 +21,52 @@ function RING = SCsetMultipoles(RING,ords,AB,varargin)
 % ------
 % `RING`::  Lattice cell structure.
 % `ords`::  Ordinates of the considered magnets.
-% `AB`::    [N x 2] array of multipole errors.
+% `AB`::    [N x 2] array of PolynomA/B multipole errors.
 %
 %
 % OPTIONS
 % -------
 % The following options can be given as name/value-pairs:
 %
-% `'method'` (`'scaleRnd'`)::
+% `'method'` (`'rnd'`)::
 %   Specifies which multipole error method should be applied. Possible are
-%   * `'relToNom'`: Applies the multipoles relative to the design primary field component defined by option
-%                   `'order'` and `'type'`. The multipole table entry of the primary component is set to zero.
-%                   This option is intended for normalized systematic multipole error tables.
-%   * `'sysRnd'`:   Scales the multipoles with a random number within the defined range specified by
-% 			        `'scale'` and zeros the primary field component defined by option `'order'`
-%                   and `'type'`. This option is intended for normalized systematic multipole error tables
-%                   and accounts, e.g. for systematic multipole errors of CMs or skew quadrupoles without
-%                   using their actual setpoint to calculate the multipoles. It is assumed that a rms
-%                   value of the CM setpoints is sufficient to describe the effect of CM multipole errors
-%                   on the lattice.
-%   * `'scaleRnd'`: Randomly scales each entry of the multipole error table within the defined range
-%                   specified by `'scale'`. This option is intended for random multipole errors of magnets.
-% `'scale'` ([])::
-%   Defines the scaling range of the multipoles.
+%   * `'sys'`:   This option is intended for normalized systematic multipole error tables. It sets 
+%                the systematic multipoles of the field component defined by option `'order'`
+%                and `'type'`. It is required that the `AB` entries are normalized by that component,
+%                e.g. `AB(2,1)=1` for skew-quadrupole systematic multipoles. The systematic 
+%                multipoles are from now on scaled with the current magnet excitation and added to the 
+%                PolynomA/B fields.
+%   * `'rnd'`:   This option is intended for random multipole error tables. It randomly generates
+%                multipole components with a 2-sigma truncated Gaussian distribution from each of
+%                the `AB` entries. The final multipole errors are stored in the PolynomA/BOffset of
+%                the lattice elements.
 % `'order'` ([])::
 %   Numeric value defining the order of the considered magnet: [1,2,3,...] => [dip,quad,sext,...]
 % `'type'` ([])::
 %   Numeric value defining the type of the considered magnet: [1,2] => [normal/skew]
+%
+%
+% EXAMPLES
+% --------
+% Defines random multipole components for the 'QF' magnet and adds it to the field offsets of all 
+% magnets named 'QF'.
+% ------------------------------------------------------------------
+% ords = SCgetOrds(SC.RING,'QF');
+% AB = [0 1E-5;...
+%       0 1E-4;...
+%       0 0;...
+%       0 1E-2];
+% RING = SCsetMultipoles(RING,ords,AB,'method','rnd');
+% ------------------------------------------------------------------
+%
+% Reads the normalized systematic multipole components for the skew quadrupole excitation of the 'SF'
+% magnet from table 'SF_skew_quad_AT_norm.tsv' and assigns it to all magnets named 'SF'. Note that 
+% the data table in 'SF_skew_quad_AT_norm.tsv' must be 1.0 for the skew quadrupole component.
+% ------------------------------------------------------------------
+% ords = SCgetOrds(SC.RING,'SF');
+% [AB,order,type] = SCmultipolesRead('SF_skew_quad_AT_norm.tsv');
+% RING = SCsetMultipoles(RING,ords,AB,'method','sys','order',order,'type',type);
+% ------------------------------------------------------------------
 %
 %
 % SEE ALSO
@@ -55,80 +74,65 @@ function RING = SCsetMultipoles(RING,ords,AB,varargin)
 % *SCmultipolesRead*, *SCupdateMagnets*
 
 
+
 	p = inputParser;
-	addParameter(p,'method','scaleRnd');
-	addOptional(p,'scale',[]);
+	addParameter(p,'method','rnd');
 	addOptional(p,'order',[]);
 	addOptional(p,'type',[]);
 	parse(p,varargin{:});
 	par = p.Results;
+	
+	inputCheck(par);
 
-	checkInput(par);
 
 	% Loop over magnets
 	for ord=ords
 		% Check which multipole error method should be applied
-		switch p.Results.method
-			% Relative to the specified main component
-			case 'relToNom'
+		switch par.method
+			case 'sys'
 
-				% Identify coefficient for scaling HOMs
-				if par.type==1 % Skew
-					coeff = RING{ord}.NomPolynomA(par.order);
-				elseif par.type==2 % Normal
-					coeff = RING{ord}.NomPolynomB(par.order);
-				end
+				% Apply multipole errros to lattice
+				RING = applySysMultipoles(RING,ord,AB,par.order,par.type);
 
-				% Scale entries according to nominal coefficent
-				addAB = coeff * AB;
+			case 'rnd'
 
-				% Set nominal coefficent to zero (we dont want to add to it)
-				addAB(par.order,par.type) = 0;
+				% Generate random multipoles 
+				addAB = SCrandnc(2,size(AB)) .* AB;
 
-			case 'sysRnd'
-
-				% Scale all HOMs with the same random number generated within user supplied range
-				addAB = par.scale * SCrandnc(2,1,1) * AB;
-
-				% Set nominal coefficent to zero (we dont want to add to it)
-				addAB(par.order,par.type) = 0;
-
-			case 'scaleRnd'
-
-				% Scale all HOMs randomly within user supplied range
-				addAB = par.scale * SCrandnc(2,size(AB)) .* AB;
-
+				% Apply multipole errros to lattice
+				RING = applyRndMultipoles(RING,ord,addAB);
 		end
-		% Apply multipole errros to lattice
-		RING = applyMultipoles(RING,ord,addAB);
 	end
 end
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Auxiliary functions
 
-% Check if input looks reasonable
-function checkInput(par)
-	switch par.method
-		case 'relToNom'
-			if isempty(par.order) || isempty(par.type)
-				error('Options ''order'' and ''type'' must be specified for method %s.',par.method)
-			end
-		case 'sysRnd'
-			if isempty(par.scale) || isempty(par.order) || isempty(par.type)
-				error('Options ''scale'', ''order'' and ''type'' must be specified for method %s.',par.method)
-			end
-		case 'scaleRnd'
-			if isempty(par.scale)
-				error('Option ''scale'' must be specified for method %s.',par.method)
-			end
-		otherwise
-			error('Unsupported multipole type. Allowed are ''relToNom'', ''sysRnd'' or ''scaleRnd''.')
+
+% Applies the systematic multipole to the lattice element
+function RING = applySysMultipoles(RING,ord,AB,order,type)
+
+	% Set nominal coefficent to zero (we dont want to add to it)
+	AB(order,type) = 0;
+
+	if type==1
+		% Add systmatic PolynomA entries for coil A('order')
+		RING{ord}.SysPolAFromA{order} = AB(:,1)';
+		% Add systmatic PolynomB entries for coil A('order')
+		RING{ord}.SysPolBFromA{order} = AB(:,2)';
+	else
+		% Add systmatic PolynomA entries for coil B('order')
+		RING{ord}.SysPolAFromB{order} = AB(:,1)';
+		% Add systmatic PolynomB entries for coil B('order')
+		RING{ord}.SysPolBFromB{order} = AB(:,2)';
 	end
+	
 end
 
-% Applies the multipole to the lattice element
-function RING = applyMultipoles(RING,ord,AB)
+
+
+% Applies the random multipole to the lattice element
+function RING = applyRndMultipoles(RING,ord,AB)
 	if isfield(RING{ord},'PolynomAOffset')
 		RING{ord}.PolynomAOffset = addPadded(RING{ord}.PolynomAOffset, AB(:,1)');
 	else
@@ -141,10 +145,9 @@ function RING = applyMultipoles(RING,ord,AB)
 		RING{ord}.PolynomBOffset = AB(:,2)';
 	end
 
-% 	RING{ord}.MaxOrder=length(RING{ord}.PolynomBOffset)-1;
 end
 
-% Auziliary function to add unequally long arrays (zero padding)
+% Auxiliary function to add unequally long arrays (zero padding)
 function v = addPadded(v1,v2)
 	if ~((iscolumn(v1)&&iscolumn(v2))||(isrow(v1)&&isrow(v2)))
 		error('Wrong dimensions.');
@@ -154,4 +157,18 @@ function v = addPadded(v1,v2)
 	if l2>l1; v1(l2)=0; end
 	if l1>l2; v2(l1)=0; end
 	v=v1+v2;
+end
+
+% Check if input looks reasonable
+function inputCheck(par)
+	switch par.method
+		case 'sys'
+			if isempty(par.order) || isempty(par.type)
+				error('Options ''order'' and ''type'' must be specified for method %s.',par.method)
+			end
+		case 'rnd'
+			
+		otherwise
+			error('Unsupported multipole method. Allowed are ''sys'' or ''rnd''.')
+	end
 end
