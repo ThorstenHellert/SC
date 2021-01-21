@@ -39,8 +39,8 @@ function [DA,RMAXs,thetas] = SCdynamicAperture(RING,dE,varargin)
 %	number of turns used to determine whether a particle is stable.
 % `'thetas'` (`linspace(0,2*pi,16)`)::
 %	angles at which the maximum radii are evaluated.
-% `'accuracy'` (`1e-4`)::
-%	is the accuracy to which the dynamic aperture is determined.
+% `'accuracy'` (`1e-6`)::
+%	is the accuracy to which the dynamic aperture radii are determined [m].
 % `'launchOnOrbit'` (0)::
 %	If true, particles are launched on closed orbit (findorbit4), otherwise on axis
 % `'centerOnOrbit'` (1)::
@@ -75,7 +75,7 @@ function [DA,RMAXs,thetas] = SCdynamicAperture(RING,dE,varargin)
 	addOptional(p,'nturns',1000);
 	addOptional(p,'nsteps',0);
 	addOptional(p,'thetas',linspace(0,2*pi,16));
-	addOptional(p,'accuracy',1e-4);
+	addOptional(p,'accuracy',1e-6);
 	addOptional(p,'launchOnOrbit',0);
 	addOptional(p,'centerOnOrbit',1);
 	addOptional(p,'auto',0);
@@ -135,13 +135,13 @@ function [DA,RMAXs,thetas] = SCdynamicAperture(RING,dE,varargin)
 		end
 
 		% Refine boundaries until requested accuracy is reached
-		while abs((bounds(2)-bounds(1))/max(bounds)) > par.accuracy
+		while abs(bounds(2)-bounds(1)) > par.accuracy 
 			bounds = refine_bounds(RING,ZCO,nturns,theta,bounds);
 			if par.verbose; fprintf('Refined: %e %e\n',bounds(1),bounds(2)); end;
 		end
-
+		
 		RMAXs(cntt)=mean(bounds); % Store mean of final boundaries
-
+		
 	end
 	if par.plot
 		figure(6232);
@@ -157,7 +157,7 @@ function [DA,RMAXs,thetas] = SCdynamicAperture(RING,dE,varargin)
 	DA = sum(sin(dthetas) .* r0' .* r1' / 2.);
 
 	% Center DA around closed orbit
-	if par.centerOnOrbit
+	if par.centerOnOrbit 
 		tmp = findorbit4(RING,0,1);
 		if ~isnan(tmp(1))
 			[x,y] = pol2cart(thetas,RMAXs');
