@@ -15,8 +15,11 @@ function SC = SCupdateMagnets(SC,varargin)
 % -----------
 % Updates the magnets specified in `RING` as specified in `ords`. If no ordinates are given
 % explicitly, all registered magnets defined in `SC.ORD.Magnet` are updated. For each magnet the
-% setpoints (`SetPointA/B`) and calibration errors (`CalErrorA/B`) are evaluated and field offsets
-% (`PolynomA/BOffset`) are added.
+% setpoints (`SetPointA/B`) and calibration errors (`CalErrorA/B`) are evaluated.
+% If systematic multipole components are specified, e.g. in `SysPolBFromB` for systematic 
+% PolynomB-multipoles induced by PolynomB entries, the corresponding multipole components are scaled 
+% by the current magnet excitation and added, as well as static field offsets (if specified in 
+% `PolynomA/BOffset`). 
 % If the considered magnet has a bending angle, the corresponding horizontal dipole magnetic field
 % is calculated. Thereafter, the fields induced by a roll error are calculated. Finally the fields
 % described by the design bending angle (if present) are subtracted from the `PolynomA/B` terms. It is
@@ -47,7 +50,7 @@ function SC = SCupdateMagnets(SC,varargin)
 	for ord=ords
 		SC = updateMagnets(SC,ord,ord);
 
-		% Check for Master/Child magnets and update childs
+		% Check for Master/Child magnets and update children
 		if isfield(SC.RING{ord},'MasterOf')
 			for childOrd=SC.RING{ord}.MasterOf
 				SC = updateMagnets(SC,ord,childOrd);
@@ -66,15 +69,81 @@ function SC = updateMagnets(SC,source,target)
 	SC.RING{target}.PolynomB = SC.RING{source}.SetPointB .* addPadded(ones(size(SC.RING{source}.SetPointB)),SC.RING{source}.CalErrorB);
 	SC.RING{target}.PolynomA = SC.RING{source}.SetPointA .* addPadded(ones(size(SC.RING{source}.SetPointA)),SC.RING{source}.CalErrorA);
 
-	% Add bending angle errors
-	if isfield(SC.RING{source},'BendingAngleError')
-		SC.RING{target}.PolynomB(1) = SC.RING{target}.PolynomB(1) + SC.RING{source}.BendingAngleError * SC.RING{target}.BendingAngle/SC.RING{target}.Length;
+	% Initialize temporary systematic multipole arrays
+	sysPolynomB = [];
+	sysPolynomA = [];
+	
+	% Check for any systematic PolynomB multipole errors from PolynomB entrys
+	if isfield(SC.RING{target},'SysPolBFromB')
+		for n=1:length(SC.RING{target}.SysPolBFromB)
+			if ~isempty(SC.RING{target}.SysPolBFromB{n})
+				% Scale PolynomB multipoles by current PolynomB magnet excitation
+				sysPolynomB{end+1} = SC.RING{target}.PolynomB(n) * SC.RING{target}.SysPolBFromB{n};
+			end
+		end
 	end
-
-	% Check for multipole errors of 'write' magnet
+	% Check for any systematic PolynomB multipole errors from PolynomA entrys
+	if isfield(SC.RING{target},'SysPolBFromA')
+		for n=1:length(SC.RING{target}.SysPolBFromA)
+			if ~isempty(SC.RING{target}.SysPolBFromA{n})
+				% Scale PolynomB multipoles by current PolynomA magnet excitation
+				sysPolynomB{end+1} = SC.RING{target}.PolynomA(n) * SC.RING{target}.SysPolBFromA{n};
+			end
+		end
+	end
+	
+	% Check for any systematic PolynomA multipole errors from PolynomB entrys
+	if isfield(SC.RING{target},'SysPolAFromB')
+		for n=1:length(SC.RING{target}.SysPolAFromB)
+			if ~isempty(SC.RING{target}.SysPolAFromB{n})
+				% Scale PolynomA multipoles by current PolynomB magnet excitation
+				sysPolynomA{end+1} = SC.RING{target}.PolynomB(n) * SC.RING{target}.SysPolAFromB{n};
+			end
+		end
+	end
+	% Check for any systematic PolynomA multipole errors from PolynomA entrys
+	if isfield(SC.RING{target},'SysPolAFromA')
+		for n=1:length(SC.RING{target}.SysPolAFromA)
+			if ~isempty(SC.RING{target}.SysPolAFromA{n})
+				% Scale PolynomA multipoles by current PolynomA magnet excitation
+				sysPolynomA{end+1} = SC.RING{target}.PolynomA(n) * SC.RING{target}.SysPolAFromA{n};
+			end
+		end
+	end
+	
+	
+	% Add systematic multipoles for PolynomA
+	if ~isempty(sysPolynomA)
+		% Sum up all individual contributions...
+		for n=1:length(sysPolynomA)-1
+			sysPolynomA{n+1} = addPadded(sysPolynomA{n+1},sysPolynomA{n});
+		end
+		% ...and add them to PolynomA field
+		SC.RING{target}.PolynomA = addPadded(SC.RING{target}.PolynomA, sysPolynomA{end});
+	end
+	% Add systematic multipoles for PolynomB
+	if ~isempty(sysPolynomB)
+		% Sum up all individual contributions...
+		for n=1:length(sysPolynomB)-1
+			sysPolynomB{n+1} = addPadded(sysPolynomB{n+1},sysPolynomB{n});
+		end
+		% ...and add them to PolynomB field
+		SC.RING{target}.PolynomB = addPadded(SC.RING{target}.PolynomB, sysPolynomB{end});
+	end
+	
+	
+	
+	
+		
+	% Check for static multipole errors of target magnet
 	if isfield(SC.RING{target},'PolynomBOffset')
 		SC.RING{target}.PolynomB = addPadded(SC.RING{target}.PolynomB,SC.RING{target}.PolynomBOffset);
 		SC.RING{target}.PolynomA = addPadded(SC.RING{target}.PolynomA,SC.RING{target}.PolynomAOffset);
+	end
+
+	% Add bending angle errors
+	if isfield(SC.RING{source},'BendingAngleError')
+		SC.RING{target}.PolynomB(1) = SC.RING{target}.PolynomB(1) + SC.RING{source}.BendingAngleError * SC.RING{target}.BendingAngle/SC.RING{target}.Length;
 	end
 
 	% Include bending angle temporarily in PolynomB field
