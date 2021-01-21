@@ -43,6 +43,8 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 %   Support structure roll (if support structure is registered).
 % `RollAngle`::
 %   Magnet roll wrt. the design coordinate frame (used for field calculations).
+% `BendingAngleError` (optional)::
+%   Error of the main bending field (corresponding uncertainty defined with `BendingAngle`).
 % `CF` (optional)::
 %   Flag identifying the corresponding magnet as a combined function dipole/quadrupole.
 % `HCM` (optional)::
