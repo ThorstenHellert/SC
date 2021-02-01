@@ -20,10 +20,10 @@ function SC = SCupdateMagnets(SC,varargin)
 % PolynomB-multipoles induced by PolynomB entries, the corresponding multipole components are scaled 
 % by the current magnet excitation and added, as well as static field offsets (if specified in 
 % `PolynomA/BOffset`). 
-% If the considered magnet has a bending angle, the corresponding horizontal dipole magnetic field
-% is calculated. Thereafter, the fields induced by a roll error are calculated. Finally the fields
-% described by the design bending angle (if present) are subtracted from the `PolynomA/B` terms. It is
-% thereby assured that a rotation of dipole magnet doesn't alter the coordinate system.
+% If the considered magnet has a bending angle error (from pure bending angle eror or due to a 
+% combined function magnet), the corresponding horizontal dipole magnetic field is calculated and
+% added to the PolynomB(1) term. It is thereby assured that a dipole error doesn't alter the
+% coordinate system.
 %
 % If the considered magnet is registered as a slpit magnet (`'MasterOf'`), the errors and setpoints 
 % of the master magnet are applied to the fields of the child magnets. Note that split quadrupole
@@ -146,7 +146,7 @@ function SC = updateMagnets(SC,source,target)
 		SC.RING{target}.PolynomB(1) = SC.RING{target}.PolynomB(1) + SC.RING{source}.BendingAngleError * SC.RING{target}.BendingAngle/SC.RING{target}.Length;
 	end
 
-	% Include bending angle temporarily in PolynomB field
+	% Include bending angle error from combinded function magnets
 	if isfield(SC.RING{source},'BendingAngle')
 		% Check if magnet is registered as combined function (bending angle depends on quad component)
 		if isfield(SC.RING{source},'CombinedFunction') && SC.RING{source}.CombinedFunction==1
@@ -154,25 +154,13 @@ function SC = updateMagnets(SC,source,target)
 			alpha_act = SC.RING{source}.SetPointB(2) * (1+SC.RING{source}.CalErrorB(2)) / SC.RING{source}.NomPolynomB(2);
 			% Compute effective bending angle
 			effBendingAngle = alpha_act * SC.RING{target}.BendingAngle;
-		else
-			effBendingAngle = SC.RING{target}.BendingAngle;
+		
+			% Add bending angle difference to PolynomB field
+			SC.RING{target}.PolynomB(1) = SC.RING{target}.PolynomB(1) + (effBendingAngle - SC.RING{target}.BendingAngle) / SC.RING{target}.Length;
 		end
-		% Add bending angle to field
-		SC.RING{target}.PolynomB(1) = SC.RING{target}.PolynomB(1) + effBendingAngle / SC.RING{target}.Length;
 	end
 
-	% Apply roll errors. See Accelerator Handbook p445.
-	C = cos(SC.RING{source}.RollAngle * [1:length(SC.RING{target}.PolynomB)]);
-	S = sin(SC.RING{source}.RollAngle * [1:length(SC.RING{target}.PolynomB)]);
-	PolynomBprime = SC.RING{target}.PolynomB .* C - SC.RING{target}.PolynomA .* S;
-	PolynomAprime = SC.RING{target}.PolynomB .* S + SC.RING{target}.PolynomA .* C;
-	SC.RING{target}.PolynomB = PolynomBprime;
-	SC.RING{target}.PolynomA = PolynomAprime;
-
-	% Remove bending angle from PolynomB field
-	if isfield(SC.RING{target},'BendingAngle')
-		SC.RING{target}.PolynomB(1) = SC.RING{target}.PolynomB(1) - SC.RING{target}.BendingAngle / SC.RING{target}.Length;
-	end
+	
 
 	% Deal with CorrectorPass
 	if strcmp(SC.RING{source}.PassMethod,'CorrectorPass')

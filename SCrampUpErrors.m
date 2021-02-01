@@ -84,9 +84,10 @@ function [SC,ERROR] = SCrampUpErrors(SC,varargin)
 	par = p.Results;
 
 	% Define fields which are to be ramped up
-	errFieldsMag = {'CalErrorB','CalErrorA','RollAngle','T1','T2','PolynomAOffset','PolynomBOffset','MagnetOffset','MagnetRoll','SupportRoll','SupportOffset'};
-	errFieldsBPM = {'Noise','NoiseCO','Offset','GirderOffset','Roll','CalError'};
-	errFieldsRF  = {'Frequency','TimeLag','Voltage'};
+	errFieldsMag = {'CalErrorB','CalErrorA','PolynomAOffset','PolynomBOffset','MagnetOffset','MagnetRoll'};
+	errFieldsSup = {'Roll','Offset'};
+	errFieldsBPM = {'Noise','NoiseCO','Offset','SupportOffset','Roll','SupportRoll','CalError'};
+	errFieldsRF  = {'Offset','CalError'};
 
 	% Store SC structure with initial errors
 	SC0 = SC;
@@ -103,7 +104,9 @@ function [SC,ERROR] = SCrampUpErrors(SC,varargin)
 		% Print information
  		if par.verbose;fprintf('Ramping up errors with scaling factor %.2f.\n',scale);end
 
-
+		% Scale support structures
+		SC = scaleSupport(SC,SC0,errFieldsSup,scale);		
+		
 		% Scale magnet errors
 		SC = scaleMagnets(SC,SC0,errFieldsMag,scale);
 
@@ -119,6 +122,8 @@ function [SC,ERROR] = SCrampUpErrors(SC,varargin)
 		% Scale circumference error
 		SC = scaleCircumference(SC,SC0,scale);
 
+		global plotFunctionFlag;plotFunctionFlag=1;
+		
 		% Run feedback
 		[CUR,ERROR] = SCfeedbackRun(SC,Mplus,'target',par.target,'maxsteps',par.maxsteps,'eps',par.eps,'verbose',par.verbose);
 		if ~ERROR
@@ -137,6 +142,27 @@ function [SC,ERROR] = SCrampUpErrors(SC,varargin)
 	end
 end
 
+% Scale support structures errors
+function SC = scaleSupport(SC,SC0,fields,scale)
+	supports = {'Girder','Plinth','Section'};
+	% Loop over support type
+	for type=supports
+		if isfield(SC.ORD,type{1})
+			% Loop over elements
+			for ordPair=SC.ORD.(type{1})
+				% Loop over fields
+				for field=fields
+					for se=1:2
+						if isfield(SC.RING{ordPair(se)},[type{1} field{1}])
+							SC.RING{ordPair(se)}.([type{1} field{1}]) = scale * SC0.RING{ordPair(se)}.([type{1} field{1}]);
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
 % Scale magnet errors
 function SC = scaleMagnets(SC,SC0,fields,scale)
 	% Loop over magnets
@@ -148,22 +174,36 @@ function SC = scaleMagnets(SC,SC0,fields,scale)
 			end
 		end
 	end
+
+	% Update support structre
+	SC = SCupdateSupport(SC);
 	% Update magnets
 	SC = SCupdateMagnets(SC);
 end
 
 % Scale BPM errors
 function SC = scaleBPMs(SC,SC0,fields,scale)
-	for field=fields
-		SC.BPM.(field{1}) = scale * SC0.BPM.(field{1});
+	
+	% Loop over BPMs
+	for ord=SC.ORD.BPM
+		% Loop over fields
+		for field=fields
+			if isfield(SC.RING{ord},field{1})
+				SC.RING{ord}.(field{1}) = scale * SC0.RING{ord}.(field{1});
+			end
+		end
 	end
 end
 
 % Scale RF errors
 function SC = scaleRF(SC,SC0,fields,scale)
-	for field=fields
-		for ord=SC.ORD.Cavity
-			SC.RING{ord}.(field{1}) = SC.IDEALRING{ord}.(field{1}) + scale * ( SC0.RING{ord}.(field{1}) - SC.IDEALRING{ord}.(field{1}) );
+	rfTypes = {'Frequency','Voltage','TimeLag'};
+	% Loop over support type
+	for type=rfTypes
+		for field=fields
+			for ord=SC.ORD.Cavity
+				SC.RING{ord}.([type{1} field{1}]) = scale * SC0.RING{ord}.([type{1} field{1}]);
+			end
 		end
 	end
 end

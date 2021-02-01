@@ -15,7 +15,7 @@ function SC = SCupdateSupport(SC,varargin)
 % -----------
 % This function updates the offsets and rolls of the elements in `SC.RING`
 % based on the current support errors, by setting the lattice fields `T1`, `T2`, and
-% `RollAngle` in the elements.
+% `R1`, `R2` for magnets and the fields `SupportOffset` and `SupportRoll` for BPMs.
 %
 %
 % INPUT
@@ -52,7 +52,7 @@ function SC = SCupdateSupport(SC,varargin)
 			ords    = unique([SC.ORD.Magnet]);
 			s       = findspos(SC.RING,ords);
 			offsets = SCgetSupportOffset(SC,s);
-
+			
 			for i=1:length(ords)
 				ord = ords(i);
 				off = offsets(:,i)';
@@ -60,20 +60,6 @@ function SC = SCupdateSupport(SC,varargin)
 				% Update support offset
 				SC.RING{ord}.SupportOffset = off;
 
-				% Update magnet offset
-				T = zeros(6,1);
-				T([1,3]) = SC.RING{ord}.SupportOffset + SC.RING{ord}.MagnetOffset;
-				SC.RING{ord}.T1 = -T;
-				SC.RING{ord}.T2 = +T;
-
-				% Check for Master/Child magnets and copy error
-				if isfield(SC.RING{ord},'MasterOf')
-					for childOrd=SC.RING{ord}.MasterOf
-						SC.RING{childOrd}.T1=SC.RING{ord}.T1;
-						SC.RING{childOrd}.T2=SC.RING{ord}.T2;
-					end
-				end
-				
 				% Get girder rolls for magnets
 				if isfield(SC.ORD,'Girder')
 					% Find girder index of magnet
@@ -83,10 +69,46 @@ function SC = SCupdateSupport(SC,varargin)
 						SC.RING{ord}.SupportRoll = SC.RING{SC.ORD.Girder(1,gInd)}.GirderRoll;
 					end
 				end
+
+				% Get length of magnet 
+				magLength   = SC.RING{ord}.Length;
 				
-				% Update overall magnet roll error
-				SC.RING{ord}.RollAngle = SC.RING{ord}.MagnetRoll + SC.RING{ord}.SupportRoll;
+				% Get bending angle of magnet 
+				if isfield(SC.RING{ord},'BendingAngle')
+					magTheta = SC.RING{ord}.BendingAngle;
+				else
+					magTheta = 0;
+				end
 				
+				% Magnet horizontal, vertical and longitudinal offset
+				dx = SC.RING{ord}.SupportOffset(1) + SC.RING{ord}.MagnetOffset(1);
+				dy = SC.RING{ord}.SupportOffset(2) + SC.RING{ord}.MagnetOffset(2);
+				dz = SC.RING{ord}.SupportOffset(3) + SC.RING{ord}.MagnetOffset(3);
+				% Magnet roll around z-, x- and yaxis
+				az = SC.RING{ord}.MagnetRoll(1) + SC.RING{ord}.SupportRoll(1);
+				ax = SC.RING{ord}.MagnetRoll(2) + SC.RING{ord}.SupportRoll(2);
+				ay = SC.RING{ord}.MagnetRoll(3)+ SC.RING{ord}.SupportRoll(3);
+
+				% Calculate magnet transformations 
+				[T1,T2,R1,R2] = SCgetTransformation(dx,dy,dz,ax,ay,az,magTheta,magLength);
+				
+				% Set fields in lattice element
+				SC.RING{ord}.T1 = T1;
+				SC.RING{ord}.T2 = T2;
+				SC.RING{ord}.R1 = R1;
+				SC.RING{ord}.R2 = R2;
+				
+				
+				% Check for Master/Child magnets and copy error
+				if isfield(SC.RING{ord},'MasterOf')
+					for childOrd=SC.RING{ord}.MasterOf
+						SC.RING{childOrd}.T1=SC.RING{ord}.T1;
+						SC.RING{childOrd}.T2=SC.RING{ord}.T2;
+						% TODO: Adjust following lines to properly manage split longitudinal gradient dipoles
+						SC.RING{childOrd}.R1=SC.RING{ord}.R1;
+						SC.RING{childOrd}.R2=SC.RING{ord}.R2;
+					end
+				end
 			end
 		else
 			warning('SC: No magnets have been registered!')
@@ -104,7 +126,7 @@ function SC = SCupdateSupport(SC,varargin)
 			
 			for i=1:length(ords)
 				ord = ords(i);
-				off = offsets(:,i)';
+				off = offsets(1:2,i)'; % Longitudinal BPM offsets not yet implemented
 			
 				% Update support offset
 				SC.RING{ord}.SupportOffset = off;
@@ -115,7 +137,7 @@ function SC = SCupdateSupport(SC,varargin)
 					gInd = intersect(find(ord>SC.ORD.Girder(1,:)),find(ord<SC.ORD.Girder(2,:)));
 					if ~isempty(gInd)
 						% Write girder roll in BPM element
-						SC.RING{ord}.SupportRoll = SC.RING{SC.ORD.Girder(1,gInd)}.GirderRoll;
+						SC.RING{ord}.SupportRoll(1) = SC.RING{SC.ORD.Girder(1,gInd)}.GirderRoll(1);
 					end
 				end
 				

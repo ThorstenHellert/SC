@@ -34,15 +34,18 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 % `PolynomAOffset` (optional)::
 %   Offset error of the `PolynomA` fields wrt. the corresponding setpoints.
 % `MagnetOffset`::
-%   [1 x 2] array of horizontal and vertical magnet offsets (wrt. the support structure).
-% `SupportOffset` (optional)::
-%   [1 x 2] array of horizontal and vertical support structure offsets (if support structure is registered).
+%   [1 x 3] array of horizontal, vertical and longitudinal magnet offsets (wrt. the support
+%   structure).
+% `SupportOffset`::
+%   [1 x 3] array of horizontal, vertical and longitudinal  support structure offsets (if
+%   support structure is registered).
 % `MagnetRoll`::
-%   Magnet roll (wrt. the support structure).
-% `SupportRoll` (optional)::
-%   Support structure roll (if support structure is registered).
-% `RollAngle`::
-%   Magnet roll wrt. the design coordinate frame (used for field calculations).
+%   [1x3] array [az,ax,ay] defineing magnet roll (around z-axis), pitch (roll around x-axis)
+%   and yaw (roll around y-axis); all wrt. the support structure.
+% `SupportRoll`::
+%   [1x3] array [az,ax,ay] defineing support structure roll (around z-axis), pitch (roll
+%   around x-axis) and yaw (roll around y-axis); all wrt. the design coordinate frame (if
+%   support structure is registered).
 % `BendingAngleError` (optional)::
 %   Error of the main bending field (corresponding uncertainty defined with `BendingAngle`).
 % `CF` (optional)::
@@ -125,10 +128,27 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 % ------------------------------------------------------------------
 %
 % Register the magnets specified in `ords` in `SC` and set the uncertainty of
-% the quadrupole component to 1E-3.
+% the quadrupole component to 1E-3 and 30um horizontal and vertical offset.
 % ----------------------------------------------------------------------------
 % SC = SCregisterMagnets(SC,ords, ...
-%	'CalErrorB',[0 1E-3]);
+%	'CalErrorB',[0 1E-3],...
+%	'MagnetOffset',[30E-6 30E-6 0]);
+% ----------------------------------------------------------------------------
+%
+% Register the magnets specified in `ords` in `SC` and set the uncertainty of
+% the quadrupole component to 1E-3, 30um horizontal and vertical offset and 
+% 100um longitudinal offset.
+% ----------------------------------------------------------------------------
+% SC = SCregisterMagnets(SC,ords, ...
+%	'CalErrorB',[0 1E-3],...
+%	'MagnetOffset',[30E-6 30E-6 100E-6]);
+% ----------------------------------------------------------------------------
+%
+% Register the magnets specified in `ords` in `SC` and set the uncertainty of
+% the roll, pitch and yaw angle to 100urad.
+% ----------------------------------------------------------------------------
+% SC = SCregisterMagnets(SC,ords, ...
+%	'Roll',[100E-6 100E-6 100E-6]);
 % ----------------------------------------------------------------------------
 %
 % Register split magnets.
@@ -223,13 +243,13 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 		SC.RING{ord}.CalErrorA = zeros(size(SC.RING{ord}.PolynomA));
 
 		% Set magnet and support offset
-		SC.RING{ord}.MagnetOffset  = [0 0];
-		SC.RING{ord}.SupportOffset = [0 0];
+		SC.RING{ord}.MagnetOffset  = [0 0 0];
+		SC.RING{ord}.SupportOffset = [0 0 0];
 
 		% Set magnet, support and overall roll angle
-		SC.RING{ord}.MagnetRoll  = 0;
-		SC.RING{ord}.SupportRoll = 0;
-		SC.RING{ord}.RollAngle   = 0;
+		SC.RING{ord}.MagnetRoll  = [0 0 0];
+		SC.RING{ord}.SupportRoll = [0 0 0];
+		
 
 		% Initialize T1 and T2 fields (not done in AT2.0 by default anymore)
 		SC.RING{ord}.T1 = zeros(6,1);
@@ -256,6 +276,11 @@ function [nvpairs] = getSigmaPairs(keywords,varargin)
 	nvpairs={};
 	for n=1:2:length(varargin)
 		if ~any(strcmp(varargin{n},keywords))
+			% Check if outdated offset is provided
+			if strcmp(varargin{n},'MagnetOffset') && length(varargin{n+1})==2
+				warning('New error model requires ''MagnetOffset'' to be a 1x3 array of [dx,dy,dz]. dz=0 added. This warning will be removed in future updates. Please update your code. Thanks!')
+				varargin{n+1}(3) = 0;
+			end
 			% Write input argument in sigma name/value-pair
 			nvpairs = horzcat(nvpairs,varargin{n},varargin{n+1});
 		end

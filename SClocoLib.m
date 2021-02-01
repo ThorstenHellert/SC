@@ -1042,7 +1042,7 @@ function varargout = SClocoLib(funName,varargin)
 				else
 					CMcal{nDim}(i)  = 1 + Init.SC.RING{ord}.CalErrorA(1);
 				end
-				CMroll{nDim}(i) = Init.SC.RING{ord}.RollAngle;
+				CMroll{nDim}(i) = Init.SC.RING{ord}.MagnetRoll(1) + Init.SC.RING{ord}.SupportRoll(1);
 				i=i+1;
 			end			
 			BPMcal{nDim} = atgetfieldvalues(Init.SC.RING(BPMData.BPMIndex(BPMData.([fields{nDim} 'BPMIndex']))),'CalError',{1,nDim})';

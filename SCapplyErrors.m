@@ -189,6 +189,39 @@ function SC = applySupportAlignmentError(SC)
 			end
 		end
 	end
+	
+	% Get girder pitch and yaw angles
+	if isfield(SC.ORD,'Girder')
+		% Loop over girders
+		for ordPair=SC.ORD.Girder
+			% Get girder length
+			gLength = abs(diff(findspos(SC.RING,ordPair)));
+			
+			% Check if pitch and yaw errors are given explicitly
+			if length(SC.RING{ordPair(1)}.GirderRoll)==3 && (SC.RING{ordPair(1)}.GirderRoll(2)~=0 || SC.RING{ordPair(1)}.GirderRoll(3)~=0)
+				% Check if girder start- and endpoints have individual offset uncertainties
+				if length(SC.SIG.Support)>=ordPair(2) && ~isempty(SC.SIG.Support{ordPair(2)}) && isfield(SC.SIG.Support{ordPair(2)},'GirderOffset')
+					error('Pitch or yaw angle errors can not be given explicitly if girder start and endpoints each have offset uncertainties.')
+				end
+				
+				% Adjust girder startpoint vertcial offset
+				SC.RING{ordPair(1)}.GirderOffset(2) = SC.RING{ordPair(1)}.GirderOffset(2) - SC.RING{ordPair(1)}.GirderRoll(2)*gLength;
+				% Adjust girder endpoint vertcial offset
+				SC.RING{ordPair(2)}.GirderOffset(2) = SC.RING{ordPair(2)}.GirderOffset(2) + SC.RING{ordPair(1)}.GirderRoll(2)*gLength;
+				% Adjust girder startpoint horizontal offset
+				SC.RING{ordPair(1)}.GirderOffset(1) = SC.RING{ordPair(1)}.GirderOffset(1) - SC.RING{ordPair(1)}.GirderRoll(3)*gLength;
+				% Adjust girder endpoint horizontal offset
+				SC.RING{ordPair(2)}.GirderOffset(1) = SC.RING{ordPair(2)}.GirderOffset(1) + SC.RING{ordPair(1)}.GirderRoll(3)*gLength;
+				
+			else
+				% Get girder pitch from horizontal start- and endpoint offsets
+				SC.RING{ordPair(1)}.GirderRoll(2) = (SC.RING{ordPair(2)}.GirderOffset(1) - SC.RING{ordPair(1)}.GirderOffset(1))/gLength;
+				% Get girder yaw from vertical start- and endpoint offsets
+				SC.RING{ordPair(1)}.GirderRoll(3) = (SC.RING{ordPair(2)}.GirderOffset(2) - SC.RING{ordPair(1)}.GirderOffset(2))/gLength;
+				
+			end
+		end
+	end
 end
 
 
