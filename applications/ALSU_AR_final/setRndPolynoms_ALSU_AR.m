@@ -21,5 +21,5 @@ function RING = applyScaledRandom(RING,re,scale,fname)
 	[AB,order,type] = SCmultipolesRead(fname);
 		
 	% Apply multipole errors to magnets
-	RING = SCsetMultipoles(RING,ords,AB,'method','scaleRnd','order',order,'type',type,'scale',scale);
+	RING = SCsetMultipoles_ALSU_AR(RING,ords,AB,'method','scaleRnd','order',order,'type',type,'scale',scale);
 end

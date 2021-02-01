@@ -22,5 +22,5 @@ function RING = applyRelative(RING,re,fname)
 	% Set dipole component to zero
 	if order~=1; AB(1,:)=0; end
 	% Apply multipole errors to magnets
-	RING = SCsetMultipoles(RING,ords,AB,'method','relToNom','order',order,'type',type);
+	RING = SCsetMultipoles_ALSU_AR(RING,ords,AB,'method','relToNom','order',order,'type',type);
 end
