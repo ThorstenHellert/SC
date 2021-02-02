@@ -52,23 +52,26 @@ function SC = SCupdateSupport(SC,varargin)
 			ords    = unique([SC.ORD.Magnet]);
 			s       = findspos(SC.RING,ords);
 			offsets = SCgetSupportOffset(SC,s);
+			rolls   = SCgetSupportRoll(SC,s);
 			
 			for i=1:length(ords)
 				ord = ords(i);
-				off = offsets(:,i)';
 
 				% Update support offset
-				SC.RING{ord}.SupportOffset = off;
+				SC.RING{ord}.SupportOffset = offsets(:,i)';
 
-				% Get girder rolls for magnets
-				if isfield(SC.ORD,'Girder')
-					% Find girder index of magnet
-					gInd = intersect(find(ord>SC.ORD.Girder(1,:)),find(ord<SC.ORD.Girder(2,:)));
-					if ~isempty(gInd)
-						% Write girder roll in magnet element
-						SC.RING{ord}.SupportRoll = SC.RING{SC.ORD.Girder(1,gInd)}.GirderRoll;
-					end
-				end
+				% Update support roll angles
+				SC.RING{ord}.SupportRoll = rolls(:,i)';
+
+% % 				% Get girder rolls for magnets
+% % 				if isfield(SC.ORD,'Girder')
+% % 					% Find girder index of magnet
+% % 					gInd = intersect(find(ord>SC.ORD.Girder(1,:)),find(ord<SC.ORD.Girder(2,:)));
+% % 					if ~isempty(gInd)
+% % 						% Write girder roll in magnet element
+% % 						SC.RING{ord}.SupportRoll = SC.RING{SC.ORD.Girder(1,gInd)}.GirderRoll;
+% % 					end
+% % 				end
 
 				% Get length of magnet 
 				magLength   = SC.RING{ord}.Length;
@@ -87,7 +90,7 @@ function SC = SCupdateSupport(SC,varargin)
 				% Magnet roll around z-, x- and yaxis
 				az = SC.RING{ord}.MagnetRoll(1) + SC.RING{ord}.SupportRoll(1);
 				ax = SC.RING{ord}.MagnetRoll(2) + SC.RING{ord}.SupportRoll(2);
-				ay = SC.RING{ord}.MagnetRoll(3)+ SC.RING{ord}.SupportRoll(3);
+				ay = SC.RING{ord}.MagnetRoll(3) + SC.RING{ord}.SupportRoll(3);
 
 				% Calculate magnet transformations 
 				[T1,T2,R1,R2] = SCgetTransformation(dx,dy,dz,ax,ay,az,magTheta,magLength);
@@ -122,24 +125,27 @@ function SC = SCupdateSupport(SC,varargin)
 			ords    = unique([SC.ORD.BPM]);
 			s       = findspos(SC.RING,ords);
 			offsets = SCgetSupportOffset(SC,s);
+			rolls   = SCgetSupportRoll(SC,s);
 			
 			
 			for i=1:length(ords)
 				ord = ords(i);
-				off = offsets(1:2,i)'; % Longitudinal BPM offsets not yet implemented
 			
 				% Update support offset
-				SC.RING{ord}.SupportOffset = off;
+				SC.RING{ord}.SupportOffset = offsets(1:2,i)'; % Longitudinal BPM offsets not yet implemented
 
-				% Get girder rolls for BPMs
-				if isfield(SC.ORD,'Girder')
-					% Find girder index of BPM
-					gInd = intersect(find(ord>SC.ORD.Girder(1,:)),find(ord<SC.ORD.Girder(2,:)));
-					if ~isempty(gInd)
-						% Write girder roll in BPM element
-						SC.RING{ord}.SupportRoll(1) = SC.RING{SC.ORD.Girder(1,gInd)}.GirderRoll(1);
-					end
-				end
+				% Update support roll angles
+				SC.RING{ord}.SupportRoll = rolls(1,i)'; % BPM pitch and yaw angles not yet implemented
+
+% % 				% Get girder rolls for BPMs
+% % 				if isfield(SC.ORD,'Girder')
+% % 					% Find girder index of BPM
+% % 					gInd = intersect(find(ord>SC.ORD.Girder(1,:)),find(ord<SC.ORD.Girder(2,:)));
+% % 					if ~isempty(gInd)
+% % 						% Write girder roll in BPM element
+% % 						SC.RING{ord}.SupportRoll(1) = SC.RING{SC.ORD.Girder(1,gInd)}.GirderRoll(1);
+% % 					end
+% % 				end
 				
 			end
 		else
