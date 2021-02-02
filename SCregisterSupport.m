@@ -155,26 +155,14 @@ function SC = SCregisterSupport(SC,varargin)
 		
 		if any(strcmp(varargin,{'Offset'}))
 			offset = varargin{find(strcmp(varargin,{'Offset'}))+1};
-			if any(strcmp(varargin{1},{'Plinth','Section'}))
-				if size(offset,2)~=3
-					error('Support structure offset uncertainty of ''%s'' must be given as [dx,dy,dz] array.',varargin{1})
-				elseif size(offset,1)~=1
-					fprintf('Note: Magnet pitch and yaw angles from tilted ''%s'' resulting from offset errors of start- and endpoints are currently ignored in the toolkit.',varargin{1})
-				end
-			else
-				if size(offset,2)~=3 || (size(offset,1)~=1 && size(offset,1)~=2)
-					error('Support structure offset uncertainty of ''Girder'' must be given as [1x3] or [2x3] array.')
-				end
+			if size(offset,2)~=3 || (size(offset,1)~=1 && size(offset,1)~=2)
+				error('Support structure offset uncertainty of ''%s'' must be given as [1x3] (start end endpoints get same offset errors) or [2x3] (start end endpoints get independent offset errors) array.',varargin{1})
 			end
 		end
 		
 		if any(strcmp(varargin,{'Roll'}))
-			if any(strcmp(varargin{1},{'Plinth','Section'}))
-				error('''Plinth'' and ''Section'' can not be registered with roll uncertainties.')
-			else
-				if length(varargin{find(strcmp(varargin,{'Roll'}))+1})~=3
-					error('''Girder'' roll uncertainty must be [1x3] array [az,ax,ay] of roll (around z-axis), pitch (roll around x-axis) and yaw (roll around y-axis) angle.')
-				end
+			if length(varargin{find(strcmp(varargin,{'Roll'}))+1})~=3
+				error('''%s'' roll uncertainty must be [1x3] array [az,ax,ay] of roll (around z-axis), pitch (roll around x-axis) and yaw (roll around y-axis) angle.',varargin{1})
 			end
 		end
 	end
