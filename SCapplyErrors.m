@@ -187,38 +187,44 @@ function SC = applySupportAlignmentError(SC)
 					SC.RING{ordPair(2)}.(field{1}) = SC.RING{ordPair(1)}.(field{1});
 				end
 			end
-		end
-	end
-	
-	% Get girder pitch and yaw angles
-	if isfield(SC.ORD,'Girder')
-		% Loop over girders
-		for ordPair=SC.ORD.Girder
-			% Get girder length
-			gLength = abs(diff(findspos(SC.RING,ordPair)));
 			
-			% Check if pitch and yaw errors are given explicitly
-			if length(SC.RING{ordPair(1)}.GirderRoll)==3 && (SC.RING{ordPair(1)}.GirderRoll(2)~=0 || SC.RING{ordPair(1)}.GirderRoll(3)~=0)
-				% Check if girder start- and endpoints have individual offset uncertainties
-				if length(SC.SIG.Support)>=ordPair(2) && ~isempty(SC.SIG.Support{ordPair(2)}) && isfield(SC.SIG.Support{ordPair(2)},'GirderOffset')
-					error('Pitch or yaw angle errors can not be given explicitly if girder start and endpoints each have offset uncertainties.')
+			% Get support structure length
+			if diff(ordPair)>=0
+				structLength = abs(diff(findspos(SC.RING,ordPair)));
+			else
+				structLength = findspos(SC.RING,ordPair(2)) + diff(findspos(SC.RING,[ordPair(1) length(SC.RING)+1]));
+			end
+			
+			% Check if support structure pitch errors are given explicitly
+			if SC.RING{ordPair(1)}.([type{1} 'Roll'])(2)~=0 
+				% Check if structure start- and endpoints have individual offset uncertainties
+				if length(SC.SIG.Support)>=ordPair(2) && ~isempty(SC.SIG.Support{ordPair(2)}) && isfield(SC.SIG.Support{ordPair(2)},[type{1} 'Offset'])
+					error('Pitch angle errors can not be given explicitly if ''%s'' start and endpoints each have offset uncertainties.',type{1})
 				end
 				
-				% Adjust girder startpoint vertcial offset
-				SC.RING{ordPair(1)}.GirderOffset(2) = SC.RING{ordPair(1)}.GirderOffset(2) - SC.RING{ordPair(1)}.GirderRoll(2)*gLength;
-				% Adjust girder endpoint vertcial offset
-				SC.RING{ordPair(2)}.GirderOffset(2) = SC.RING{ordPair(2)}.GirderOffset(2) + SC.RING{ordPair(1)}.GirderRoll(2)*gLength;
-				% Adjust girder startpoint horizontal offset
-				SC.RING{ordPair(1)}.GirderOffset(1) = SC.RING{ordPair(1)}.GirderOffset(1) - SC.RING{ordPair(1)}.GirderRoll(3)*gLength;
-				% Adjust girder endpoint horizontal offset
-				SC.RING{ordPair(2)}.GirderOffset(1) = SC.RING{ordPair(2)}.GirderOffset(1) + SC.RING{ordPair(1)}.GirderRoll(3)*gLength;
-				
+				% Adjust support structure startpoint vertcial offset
+				SC.RING{ordPair(1)}.([type{1} 'Offset'])(2) = SC.RING{ordPair(1)}.([type{1} 'Offset'])(2) - SC.RING{ordPair(1)}.([type{1} 'Roll'])(2)*structLength;
+				% Adjust support structure endpoint vertcial offset
+				SC.RING{ordPair(2)}.([type{1} 'Offset'])(2) = SC.RING{ordPair(2)}.([type{1} 'Offset'])(2) + SC.RING{ordPair(1)}.([type{1} 'Roll'])(2)*structLength;
 			else
-				% Get girder pitch from horizontal start- and endpoint offsets
-				SC.RING{ordPair(1)}.GirderRoll(2) = (SC.RING{ordPair(2)}.GirderOffset(1) - SC.RING{ordPair(1)}.GirderOffset(1))/gLength;
-				% Get girder yaw from vertical start- and endpoint offsets
-				SC.RING{ordPair(1)}.GirderRoll(3) = (SC.RING{ordPair(2)}.GirderOffset(2) - SC.RING{ordPair(1)}.GirderOffset(2))/gLength;
+				% Get support structure pitch angle from horizontal start- and endpoint offsets
+				SC.RING{ordPair(1)}.([type{1} 'Roll'])(2) = (SC.RING{ordPair(2)}.([type{1} 'Offset'])(1) - SC.RING{ordPair(1)}.([type{1} 'Offset'])(1))/structLength;
+			end
+			
+			% Check if support structure yaw errors are given explicitly
+			if SC.RING{ordPair(1)}.([type{1} 'Roll'])(3)~=0
+				% Check if structure start- and endpoints have individual offset uncertainties
+				if length(SC.SIG.Support)>=ordPair(2) && ~isempty(SC.SIG.Support{ordPair(2)}) && isfield(SC.SIG.Support{ordPair(2)},[type{1} 'Offset'])
+					error('Yaw angle errors can not be given explicitly if ''%s'' start and endpoints each have offset uncertainties.',type{1})
+				end
 				
+				% Adjust support structure startpoint horizontal offset
+				SC.RING{ordPair(1)}.([type{1} 'Offset'])(1) = SC.RING{ordPair(1)}.([type{1} 'Offset'])(1) - SC.RING{ordPair(1)}.([type{1} 'Roll'])(3)*structLength;
+				% Adjust support structure endpoint horizontal offset
+				SC.RING{ordPair(2)}.([type{1} 'Offset'])(1) = SC.RING{ordPair(2)}.([type{1} 'Offset'])(1) + SC.RING{ordPair(1)}.([type{1} 'Roll'])(3)*structLength;
+			else
+				% Get support structure yaw angle from vertical start- and endpoint offsets
+				SC.RING{ordPair(1)}.([type{1} 'Roll'])(3) = (SC.RING{ordPair(2)}.([type{1} 'Offset'])(2) - SC.RING{ordPair(1)}.([type{1} 'Offset'])(2))/structLength;
 			end
 		end
 	end
