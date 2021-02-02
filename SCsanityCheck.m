@@ -52,7 +52,8 @@ function SCsanityCheck(SC)
 	if ~isfield(SC.ORD,'Girder') && (isfield(SC.ORD,'Plinth') || isfield(SC.ORD,'Section'))
 		warning('Girders must be registered for other support structure misalingments to work.')
 	end
-
+	
+	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Check if CMs are registered
 	if ~isfield(SC.ORD,'CM')
@@ -123,8 +124,8 @@ function SCsanityCheck(SC)
 						warning('Field in SC.SIG.Mag doesn''t match lattice element (Magnet ord: %d)',ord)
 					end
 					if strcmp(field{1},'MagnetOffset')
-						if length(SC.SIG.Mag{ord}.(field{1}))~=2
-							warning('SC.SIG.Mag{%d}.MagnetOffset should be a [1x2] array.',ord)
+						if length(SC.SIG.Mag{ord}.(field{1}))~=3
+							warning('SC.SIG.Mag{%d}.MagnetOffset should be a [1x3] (dx,dy,dz) array.',ord)
 						end
 					end
 				end
