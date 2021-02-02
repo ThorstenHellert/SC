@@ -68,21 +68,21 @@ SC = SCinit(RING);
 % stored beam noise.
 ords = SCgetOrds(SC.RING,'BPM');
 SC = SCregisterBPMs(SC,ords,...
-	'CalError',5E-2 * [1 1],... % relative
-	'Offset',500E-6 * [1 1],... % [m]
-	'Noise',10E-6 * [1 1],...   % [m]
-	'NoiseCO',1E-6 * [1 1],...  % [m]
-	'Roll',1E-3);               % [rad]
+	'CalError',5E-2 * [1 1],... % x and y, relative
+	'Offset',500E-6 * [1 1],... % x and y, [m]
+	'Noise',10E-6 * [1 1],...   % x and y, [m]
+	'NoiseCO',1E-6 * [1 1],...  % x and y, [m]
+	'Roll',1E-3);               % az, [rad]
 
 % Identify the QFs in the lattice structure and register them as horizontal
 % corrector magnets with a limit of 1mrad and include uncertainties of the CM
 % calibration factor, quadrupole strength error, magnet offset and magnet roll.
 ords = SCgetOrds(SC.RING,'QF');
 SC = SCregisterMagnets(SC,ords,...
-	'HCM',1E-3,...                    % [rad]
-	'CalErrorB',[5E-2 1E-3],...       % relative
-	'MagnetOffset',200E-6 * [1 1],... % x and y, [m]
-	'MagnetRoll',200E-6);             % [rad]
+	'HCM',1E-3,...                      % [rad]
+	'CalErrorB',[5E-2 1E-3],...         % relative
+	'MagnetOffset',200E-6 * [1 1 0],... % x, y and z, [m]
+	'MagnetRoll',200E-6* [1 0 0]);      % az, ax and ay, [rad]
 
 % Identify the QDs in the lattice structure and register them as vertical
 % corrector magnets with a limit of 1mrad and include uncertainties of the CM
@@ -90,19 +90,19 @@ SC = SCregisterMagnets(SC,ords,...
 % roll.
 ords = SCgetOrds(SC.RING,'QD');
 SC = SCregisterMagnets(SC,ords,...
-	'VCM',1E-3,...                    % [rad]
-	'CalErrorA',[5E-2 0],...          % relative
-	'CalErrorB',[0 1E-3],...          % relative
-	'MagnetOffset',200E-6 * [1 1],... % x and y, [m]
-	'MagnetRoll',200E-6);             % [rad]
+	'VCM',1E-3,...                      % [rad]
+	'CalErrorA',[5E-2 0],...            % relative
+	'CalErrorB',[0 1E-3],...            % relative
+	'MagnetOffset',200E-6 * [1 1 0],... % x, y and z, [m]
+	'MagnetRoll',200E-6* [1 0 0]);      % az, ax and ay, [rad]
 
 % Identify the BENDs in the lattice structure and register them with a relative
 % bending angle error and magnet offset and magnet roll.
 ords = SCgetOrds(SC.RING,'BEND');
 SC = SCregisterMagnets(SC,ords,...
-	'BendingAngle',1E-3,...           % relative
-	'MagnetOffset',200E-6 * [1 1],... % x and y, [m]
-	'MagnetRoll',200E-6);             % [rad]
+	'BendingAngle',1E-3,...             % relative
+	'MagnetOffset',200E-6 * [1 1 0],... % x, y and z, [m]
+	'MagnetRoll',200E-6* [1 0 0]);      % az, ax and ay, [rad]
 
 % Identify the SF&SD in the lattice structure and register them as skew
 % quadrupole corrector magnets with a K value limit of 0.1 and include
@@ -110,11 +110,11 @@ SC = SCregisterMagnets(SC,ords,...
 % magnet offset and magnet roll.
 ords = SCgetOrds(SC.RING,'SF|SD');
 SC = SCregisterMagnets(SC,ords,...
-	'SkewQuad',0.1,...                 % [1/m]
-	'CalErrorA',[0 1E-3 0],...         % relative
-	'CalErrorB',[0 0 1E-3],...         % relative
-	'MagnetOffset',200E-6 * [1 1],...  % x and y, [m]
-	'MagnetRoll',200E-6);              % [rad]
+	'SkewQuad',0.1,...                   % [1/m]
+	'CalErrorA',[0 1E-3 0],...           % relative
+	'CalErrorB',[0 0 1E-3],...           % relative
+	'MagnetOffset',200E-6 * [1 1 0 ],... % x, y and z, [m]
+	'MagnetRoll',200E-6* [1 0 0]);       % az, ax and ay, [rad]
 
 %Identify the cavity in the lattice structure and register it including
 %uncertainties for the frequency [Hz], voltage [V] and phase offset [m]
@@ -125,19 +125,19 @@ SC = SCregisterCAVs(SC,ords,...
 	'TimeLagOffset',0.5);     % [m]
 
 % Identify girder start and end ordinates in lattice structure and register
-% them including uncertainties for the offset in x and y [m] and roll [rad]
+% them including uncertainties for the offset in x, y and z [m] and roll [rad]
 ords = [SCgetOrds(SC.RING,'GirderStart');SCgetOrds(SC.RING,'GirderEnd')];
 SC = SCregisterSupport(SC,...
 	'Girder',ords,...
-	'Offset',100E-6 * [1 1],... % x and y, [m]
-	'Roll',200E-6);             % [rad]
+	'Offset',100E-6 * [1 1 0],... % x, y and z, [m]
+	'Roll',200E-6* [1 0 0]);      % az, ax and ay, [rad]
 
 % Identify section start and end ordinates in lattice structure and register
-% them including uncertainties for the offset in x and y [m]
+% them including uncertainties for the offset in x, y and z [m]
 ords = [SCgetOrds(SC.RING,'SectionStart');SCgetOrds(SC.RING,'SectionEnd')];
 SC = SCregisterSupport(SC,...
 	'Section',ords,...
-	'Offset',100E-6 * [1 1]); % x and y, [m]
+	'Offset',100E-6 * [1 1 0]); % x, y and z, [m]
 
 % As a last registration step we define the 6x6 beam sigma matrix, random
 % shot-to-shot injection variation and the uncertainty of the systematic
@@ -325,7 +325,8 @@ MCO = SCgetModelRM(SC,SC.ORD.BPM,SC.ORD.CM,'trackMode','ORB');
 eta = SCgetModelDispersion(SC,SC.ORD.BPM,SC.ORD.Cavity);
 
 quadOrds = repmat(SCgetOrds(SC.RING,'QF|QD'),2,1);
-SC       = SCpseudoBBA(SC,SC.ORD.BPM,quadOrds,50E-6);
+BPMords  = repmat(SC.ORD.BPM,2,1);
+SC       = SCpseudoBBA(SC,BPMords,quadOrds,50E-6);
 
 % Run orbit feedback in a loop with decreasing Tikhonov regularization
 % parameter `alpha` until no further improvment is achieved. Dispersion [m/Hz]
