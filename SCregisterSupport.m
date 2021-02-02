@@ -149,13 +149,17 @@ function SC = SCregisterSupport(SC,varargin)
 			error('Optional input must be given as name-value pairs.')
 		end
 		
+		if any(diff(varargin{2},1)<0)
+			fprintf('%d ''%s'' endpoint(s) might be upstream of startpoint(s).',sum(diff(varargin{2},1)<0),varargin{1})
+		end
+		
 		if any(strcmp(varargin,{'Offset'}))
 			offset = varargin{find(strcmp(varargin,{'Offset'}))+1};
 			if any(strcmp(varargin{1},{'Plinth','Section'}))
 				if size(offset,2)~=3
 					error('Support structure offset uncertainty of ''%s'' must be given as [dx,dy,dz] array.',varargin{1})
 				elseif size(offset,1)~=1
-					warning('Note: pitch and yaw angles resulting from tilted ''%s'' resulting from offset errors of start- and endpoints are currently ignored in the toolkit.',varargin{1})
+					fprintf('Note: Magnet pitch and yaw angles from tilted ''%s'' resulting from offset errors of start- and endpoints are currently ignored in the toolkit.',varargin{1})
 				end
 			else
 				if size(offset,2)~=3 || (size(offset,1)~=1 && size(offset,1)~=2)
