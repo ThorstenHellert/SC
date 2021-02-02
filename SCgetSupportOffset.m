@@ -34,7 +34,7 @@ function off = SCgetSupportOffset(SC,s)
 %
 % SEE ALSO
 % --------
-% *SCregisterSupport*, *SCplotSupport*
+% *SCregisterSupport*, *SCupdateSupport*, *SCgetSupportRoll*, *SCplotSupport*
 
 	% Initialize output
 	off = zeros(3,length(s));
