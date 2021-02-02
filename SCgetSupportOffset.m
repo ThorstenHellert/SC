@@ -1,4 +1,4 @@
-function res = SCgetSupportOffset(SC,s)
+function off = SCgetSupportOffset(SC,s)
 % SCgetSupportOffset
 % ==================
 %
@@ -8,17 +8,17 @@ function res = SCgetSupportOffset(SC,s)
 %
 % SYNOPSIS
 % --------
-% `res = SCgetSupportOffset(SC, s)`
+% `off = SCgetSupportOffset(SC, s)`
 %
 %
 % DESCRIPTION
 % -----------
 % This function evaluates the total offset of the support structures that have
 % been defined via *SCregisterSupport* at the longitudinal positions `s` by linearly interpolating 
-% between girder start- and endpoints (which may be mounted on sections and plinths).
-% Note that hereby longitudinal offsets of support structures are only correctly calculated in the 
-% case of straight girders (no magnet with bending angle on it) and with equal longitudinal offsets
-% at their start- and endpoints.
+% between support structure start- and endpoints (girder + sections + plinths, if registered).
+% Note that this calculation may not provide the proper values if magnets with non-zero bending
+% angle are within the support structure because it does not account for the rotation of the
+% local coordinate system along the beam trajectory.
 %
 % INPUTS
 % ------
@@ -29,171 +29,76 @@ function res = SCgetSupportOffset(SC,s)
 %
 % RETURN VALUE
 % ------------
-% `res`::
-%	`[3,length(s)]`-array containing the x/y/z offsets at `s`.
+% `off`::
+%	`[3,length(s)]`-array containing the [dx/dy/dz] total support structure offsets at `s`.
 %
 % SEE ALSO
 % --------
 % *SCregisterSupport*, *SCplotSupport*
 
-	% TODO: inlcude longitudinal support structure offsets
-
-	% No girders -> no cookies
-	if ~isfield(SC.ORD,'Girder')
-		res=zeros(2,length(s));
-		return;
-	end
-
+	% Initialize output
+	off = zeros(3,length(s));
+	
 	% Read elemet lengths from RING
-	lengths = nan(1,length(SC.RING));
-	for ord=1:length(SC.RING)
-		if isfield(SC.RING{ord},'Length')
-			lengths(ord)=SC.RING{ord}.Length;
-		else
-			lengths(ord)=0.0;
-		end
-	end
+	lengths = getcellstruct(SC.RING,'Length',1:length(SC.RING));
 
+	% Circumference
+	C = sum(lengths);    
+	% s-sposition of element center (needed if support structure is defined at element with non-zero length)
+	sposMID = cumsum(lengths)-lengths./2; 
 
-	C=sum(lengths); % Circumference
-	N=length(SC.RING); % Number of elements
-	sposEND=cumsum(lengths); % s-position of element end points
-	sposMID=sposEND-lengths./2; % s-sposition of element middles
-
-
-	% Generate arrays containing the x/y/z-offsets of
-	% the beginning/end of the girders
-	aG=SC.ORD.Girder(1,:); % Beginning ordinates
-	bG=SC.ORD.Girder(2,:); % End ordinates
-	sGa=sposMID(aG);
-	sGb=sposMID(bG);
-	for i=1:length(aG) % Read girder offsets from elements
-		xGa(i)=SC.RING{aG(i)}.GirderOffset(1);
-		yGa(i)=SC.RING{aG(i)}.GirderOffset(2);
-		xGb(i)=SC.RING{bG(i)}.GirderOffset(1);
-		yGb(i)=SC.RING{bG(i)}.GirderOffset(2);
-		zGa(i)=SC.RING{aG(i)}.GirderOffset(3);
-		zGb(i)=SC.RING{bG(i)}.GirderOffset(3);
-	end
-
-
-	% Add the Plinth-offsets to the girder offsets
-	if isfield(SC.ORD,'Plinth')
-		aP=SC.ORD.Plinth(1,:); % Beginning ordinates
-		bP=SC.ORD.Plinth(2,:); % End ordinates
-
-	
-		% Plinth s-positions
-		sPa=sposMID(aP);
-		sPb=sposMID(bP);
-
-		% A/B are matrices:
-		% 1: if mod(aG_i,N) \in [aP_j,bP_j]
-		% 0: else
-		A=mod_int_cont(aG,N,aP,bP);
-		B=mod_int_cont(bG,N,aP,bP);
-		
-		% Read section offsets from elements
-		for i=1:length(aP) 
-			xPa(i) = SC.RING{aP(i)}.PlinthOffset(1);
-			yPa(i) = SC.RING{aP(i)}.PlinthOffset(2);
-			zPa(i) = SC.RING{aP(i)}.PlinthOffset(3);
-			xPb(i) = SC.RING{bP(i)}.PlinthOffset(1);
-			yPb(i) = SC.RING{bP(i)}.PlinthOffset(2);
-			zPb(i) = SC.RING{bP(i)}.PlinthOffset(3);
-		end
+	% Loop over support structure types
+	for type = {'Section','Plinth','Girder'}
+		% Check if support structure is registered
+		if isfield(SC.ORD,type{1})
+			% Ordinates
+			ord1=SC.ORD.(type{1})(1,:); % Beginning ordinates
+			ord2=SC.ORD.(type{1})(2,:); % End ordinates
 			
-		% Interpolate between plinth start- and endpoints and add offset to girders which are on plinths
-		xGa = xGa + limp(sGa,C,sPa,xPa,sPb,xPb)';
-		xGb = xGb + limp(sGb,C,sPa,xPa,sPb,xPb)';
-		yGa = yGa + limp(sGa,C,sPa,yPa,sPb,yPb)';
-		yGb = yGb + limp(sGb,C,sPa,yPa,sPb,yPb)';
-		zGa = zGa + limp(sGa,C,sPa,zPa,sPb,zPb)';
-		zGb = zGb + limp(sGb,C,sPa,zPa,sPb,zPb)';
-	end
-	
-
-
-	% Add the section-offsets to the girder(+plinth) offsets
-	if isfield(SC.ORD,'Section')
-		aS=SC.ORD.Section(1,:); % Beginning ordinates
-		bS=SC.ORD.Section(2,:); % End ordinates
-		% Section s-positions
-		sSa=sposMID(aS);
-		sSb=sposMID(bS);
-
-		% Read section offsets from elements
-		for i=1:length(aS) 
-			xSa(i) = SC.RING{aS(i)}.SectionOffset(1);
-			ySa(i) = SC.RING{aS(i)}.SectionOffset(2);
-			zSa(i) = SC.RING{aS(i)}.SectionOffset(3);
-			xSb(i) = SC.RING{bS(i)}.SectionOffset(1);
-			ySb(i) = SC.RING{bS(i)}.SectionOffset(2);
-			zSb(i) = SC.RING{bS(i)}.SectionOffset(3);
-		end
+			% s-positions
+			s1=sposMID(ord1);
+			s2=sposMID(ord2);
 			
-		% Interpolate between section start- and endpoints and add offset of sections to girders (+plinths)
-		xGa = xGa + limp(sGa,C,sSa,xSa,sSb,xSb)';
-		xGb = xGb + limp(sGb,C,sSa,xSa,sSb,xSb)';
-		yGa = yGa + limp(sGa,C,sSa,ySa,sSb,ySb)';
-		yGb = yGb + limp(sGb,C,sSa,ySa,sSb,ySb)';
-		zGa = zGa + limp(sGa,C,sSa,zSa,sSb,zSb)';
-		zGb = zGb + limp(sGb,C,sSa,zSa,sSb,zSb)';
+			% Read support structure offsets from elements
+			tmpoff1=zeros(3,length(ord1));tmpoff2=zeros(3,length(ord2));
+			for i=1:length(ord1)
+				tmpoff1(:,i) = SC.RING{ord1(i)}.([type{1} 'Offset']);
+				tmpoff2(:,i) = SC.RING{ord2(i)}.([type{1} 'Offset']);
+			end
+			
+			% Interpolate between support structure start- and endpoints and add offset to elements which are on structure
+			off(1,:) = off(1,:) + limp(s,C,s1,tmpoff1(1,:),s2,tmpoff2(1,:))';
+			off(2,:) = off(2,:) + limp(s,C,s1,tmpoff1(2,:),s2,tmpoff2(2,:))';
+			off(3,:) = off(3,:) + limp(s,C,s1,tmpoff1(3,:),s2,tmpoff2(3,:))';
+		end
 	end
-
-
-	% Calculate final offset at s, by interpolating
-	% over the total girder offsets
-	dx = limp(s,C,sGa,xGa,sGb,xGb)';
-	dy = limp(s,C,sGa,yGa,sGb,yGb)';
-	dz = limp(s,C,sGa,zGa,sGb,zGb)';
-	res = [dx;dy;dz];
-	
 end
 
 
-function res = mod_int_cont(x,C,a,b)
-	x=x(:);
-	a=a(:)';
-	b=b(:)';
-	x=mod(x-a,C); % 1-based indexing
-	b=mod(b-a,C);
-	res = x<b;
-end
-
-% function res = limp(x,C,a1,f1,a2,f2)
+function out = limp(x,C,a1,f1,a2,f2)
 	% _L_inear _I_nterpolation in _M_odulo space / _P_iecewise
-% 	x =x(:);
-% 	a1=a1(:)';
-% 	f1=f1(:)';
-% 	a2=a2(:)';
-% 	f2=f2(:)';
-% 	x =mod( x-a1,C);
-% 	a2=mod(a2-a1,C);
-% 
-% 	res = f1+(f2-f1)./a2.*x;
-% 	res = res .* (x<a2);
-% end
 
-function res = limp(x,C,a1,f1,a2,f2)
-	% _L_inear _I_nterpolation in _M_odulo space / _P_iecewise
-	x =x(:)';
-	a1=a1(:)';
-	f1=f1(:)';
-	a2=a2(:)';
-	f2=f2(:)';
-	res = zeros(length(x),1);
+	% Uniform input
+	x  = x(:)'; % Evaluation points
+	a1 = a1(:)'; % 1st sampling point
+	f1 = f1(:)'; % 1st function value
+	a2 = a2(:)'; % 2nd sampling point
+	f2 = f2(:)'; % 2nd function value
+	% Initialize output
+	out = zeros(length(x),1);
 	
+	% Loop over evaluation points
 	for n=1:length(a1)
+		
+		% Check if injection is within sampling points
 		if a1(n)<a2(n)
 			ind = intersect(find(x>=a1(n)),find(x<=a2(n)));
-			res(ind) = interp1([a1(n) a2(n)],[f1(n) f2(n)],x(ind));
+			out(ind) = interp1([a1(n) a2(n)],[f1(n) f2(n)],x(ind));
 		else
 			ind1 = find(x<=a2(n));
 			ind2 = find(x>=a1(n));
-			res(ind1) = interp1([a1(n) a2(n)+C],[f1(n) f2(n)],C+x(ind1));
-			res(ind2) = interp1([a1(n) a2(n)+C],[f1(n) f2(n)],x(ind2));
+			out(ind1) = interp1([a1(n) a2(n)+C],[f1(n) f2(n)],C+x(ind1));
+			out(ind2) = interp1([a1(n) a2(n)+C],[f1(n) f2(n)],x(ind2));
 		end
 	end
-
 end
