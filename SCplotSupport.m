@@ -40,6 +40,7 @@ function SCplotSupport(SC,varargin)
 	p = inputParser;
 	addOptional(p,'fontSize',12);
 	addOptional(p,'shiftAxes',0.03);
+	addOptional(p,'xLim',[0 findspos(SC.RING,length(SC.RING)+1)]);
 	parse(p,varargin{:});
 	par = p.Results;
 	
@@ -141,8 +142,6 @@ function SCplotSupport(SC,varargin)
 		ax(3*(nDim-1)+1,1)=subplot(12,2,2*4*(nDim-1)+ [1 3]);hold on;
 		pVec=[];legStr=[];
 		
-		
-		
 		% Plot line of support offset
 		stairs(s,1E6*off(nDim,:));
 			
@@ -218,7 +217,7 @@ function SCplotSupport(SC,varargin)
 		
 		% Legend and axis stuff
 		legend(pVec,legStr);
-		set(gca,'xlim',[0 findspos(SC.RING,length(SC.RING)+1)],'box','on','XTickLabel','')
+		set(gca,'xlim',par.xLim,'box','on','XTickLabel','')
 		ylabel(yLabOffStr{nDim});
 		title(sprintf('%s Offsets',titleStr{nDim}))
 		
@@ -232,7 +231,7 @@ function SCplotSupport(SC,varargin)
 		
 		% Legend and axis stuff
 		legend('Overall magnet offset');
-		set(gca,'xlim',[0 findspos(SC.RING,length(SC.RING)+1)],'box','on','XTickLabel','')
+		set(gca,'xlim',par.xLim,'box','on','XTickLabel','')
 		ylabel(yLabOffStr{nDim});
 		
 		
@@ -247,7 +246,7 @@ function SCplotSupport(SC,varargin)
 		
 		% Legend and axis stuff
 		legend({'Random BPM offset','BPM support offset'});
-		set(gca,'xlim',[0 findspos(SC.RING,length(SC.RING)+1)],'box','on')%,'XTickLabel','')
+		set(gca,'xlim',par.xLim,'box','on')%,'XTickLabel','')
 		ylabel(yLabOffStr{nDim});
 		if nDim==3
 			xlabel('$s$ [m]')
@@ -288,7 +287,7 @@ function SCplotSupport(SC,varargin)
 		
 		% Legend and axis stuff
 		legend(pVec,legStr);
-		set(gca,'xlim',[0 findspos(SC.RING,length(SC.RING)+1)],'box','on','XTickLabel','','YAxisLocation','right')
+		set(gca,'xlim',par.xLim,'box','on','XTickLabel','','YAxisLocation','right')
 		ylabel(yLabRollStr{nDim});
 		title(rollStr{nDim})
 		
@@ -302,7 +301,7 @@ function SCplotSupport(SC,varargin)
 		
 		% Legend and axis stuff
 		legend('Overall magnet roll');
-		set(gca,'xlim',[0 findspos(SC.RING,length(SC.RING)+1)],'box','on','XTickLabel','','YAxisLocation','right')
+		set(gca,'xlim',par.xLim,'box','on','XTickLabel','','YAxisLocation','right')
 		ylabel(yLabRollStr{nDim});
 		
 			
@@ -317,7 +316,7 @@ function SCplotSupport(SC,varargin)
 		
 		% Legend and axis stuff
 		legend({'Random BPM roll','BPM support roll'});
-		set(gca,'xlim',[0 findspos(SC.RING,length(SC.RING)+1)],'box','on','YAxisLocation','right')
+		set(gca,'xlim',par.xLim,'box','on','YAxisLocation','right')
 		ylabel(yLabRollStr{nDim});
 		if nDim==3
 			xlabel('$s$ [m]')
