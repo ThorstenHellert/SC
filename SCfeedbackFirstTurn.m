@@ -80,6 +80,8 @@ function [SC,ERROR] = SCfeedbackFirstTurn(SC,Mplus,varargin)
 % 	All fine.
 % `1`::
 %	'maxsteps' was reached, without producing full transmission.
+% `2`::
+%	No BPM readings to beginn with.
 %
 % SEE ALSO
 % --------
@@ -111,6 +113,10 @@ function [SC,ERROR] = SCfeedbackFirstTurn(SC,Mplus,varargin)
 	for i=1:par.maxsteps
 
 		B = SCgetBPMreading(SC,'BPMords',par.BPMords); % Inject...
+		
+		% Abort if no beam transmission at all
+		if all(isnan(B(:)));if par.verbose; fprintf('SCfeedbackFirstTurn: FAIL (no BPM reading to begin with)\n'); end; ERROR = 2; return;end
+	
 		correctionStep(); % call correction subroutine.
 
 		if isRepro(hist,5) && isTransmit(hist)
