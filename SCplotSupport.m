@@ -30,6 +30,8 @@ function SCplotSupport(SC,varargin)
 %   Figure font size.
 % `'shiftAxes'` (0.03)::
 %   Axes are reanranged for grouping. Depending on screen resolution this value may be adjusted.
+% `'xLim'` ([0 findspos(SC.RING,length(SC.RING)+1)])::
+%   Plot limits.
 %
 %
 % SEE ALSO
@@ -98,13 +100,13 @@ function SCplotSupport(SC,varargin)
 	sBPM         = findspos(SC.RING,SC.ORD.BPM);
 	offBPM       = cell2mat(atgetfieldvalues(SC.RING(SC.ORD.BPM),'Offset'));
 	offBPMStruct = cell2mat(atgetfieldvalues(SC.RING(SC.ORD.BPM),'SupportOffset'));
-	offBPM(      :,3) = 0;
-	offBPMStruct(:,3) = 0;
+	offBPM(      :,3) = 0; % Longitudinal offsets not supported for BPMs
+	offBPMStruct(:,3) = 0; % Longitudinal offsets not supported for BPMs
 	% BPM rolls
 	rollBPM       = atgetfieldvalues(SC.RING(SC.ORD.BPM),'Roll',{1,1});
 	rollBPMStruct = atgetfieldvalues(SC.RING(SC.ORD.BPM),'SupportRoll',{1,1});
-	rollBPM(      :,2:3) = 0;
-	rollBPMStruct(:,2:3) = 0;
+	rollBPM(      :,2:3) = 0; % Pitch and yaw not supported for BPMs
+	rollBPMStruct(:,2:3) = 0; % Pitch and yaw not supported for BPMs
 	
 	
 	% Create figure
@@ -169,7 +171,7 @@ function SCplotSupport(SC,varargin)
 		
 		% Legend and axis stuff
 		legend(pVec,legStr);
-		set(gca,'xlim',par.xLim,'box','on')%,'XTickLabel','')
+		set(gca,'xlim',par.xLim,'box','on')
 		ylabel(yLabOffStr{nDim});
 		title(titlteOffStr{nDim})
 		
@@ -183,7 +185,7 @@ function SCplotSupport(SC,varargin)
 		
 		% Legend and axis stuff
 		legend('Overall magnet offset');
-		set(gca,'xlim',par.xLim,'box','on')%,'XTickLabel','')
+		set(gca,'xlim',par.xLim,'box','on')
 		ylabel(yLabOffStr{nDim});
 		
 		
@@ -198,17 +200,12 @@ function SCplotSupport(SC,varargin)
 		
 		% Legend and axis stuff
 		legend({'Random BPM offset','BPM support offset'});
-		set(gca,'xlim',par.xLim,'box','on')%,'XTickLabel','')
+		set(gca,'xlim',par.xLim,'box','on')
 		ylabel(yLabOffStr{nDim});
 		if nDim==3
 			xlabel('$s$ [m]')
-		else
-% 			set(gca,'XTickLabel','')
 		end
 
-		
-		
-		
 		
 		% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		% Plot individual roll contributions
@@ -254,16 +251,14 @@ function SCplotSupport(SC,varargin)
 				pVec(end+1)=plot([-2 -1],[0 0],lineSpec.(type{1}){:});legStr{end+1}=sprintf('Individual %s',type{1});
 			end
 		end
-		
 
-		
 		% Legend and axis stuff
 		legend(pVec,legStr);
 		set(gca,'xlim',par.xLim,'box','on','YAxisLocation','right')%,'XTickLabel',''
 		ylabel(yLabRollStr{nDim});
 		title(titlteRollStr{nDim})
+	
 		
-				
 		% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		% Plot overall magnet roll
 		ax(3*(nDim-1)+2,2)=subplot(12,2,2*4*(nDim-1)+ 6);hold on
@@ -292,8 +287,7 @@ function SCplotSupport(SC,varargin)
 		ylabel(yLabRollStr{nDim});
 		if nDim==3
 			xlabel('$s$ [m]')
-		end
-		
+		end	
 	end
 	
 	% Link x-axis
