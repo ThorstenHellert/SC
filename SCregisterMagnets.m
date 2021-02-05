@@ -279,6 +279,10 @@ function [nvpairs] = getSigmaPairs(keywords,varargin)
 			% Check if outdated offset is provided
 			if strcmp(varargin{n},'MagnetOffset') && length(varargin{n+1})==2
 				warning('New error model requires ''MagnetOffset'' to be a 1x3 array of [dx,dy,dz]. dz=0 added. This warning will be removed in future updates. Please update your code. Thanks!')
+				varargin{n+1}(:,3) = 0;
+			end
+			if strcmp(varargin{n},'MagnetRoll') && length(varargin{n+1})~=3
+				warning('New error model requires ''MagnetRoll'' to be a 1x3 array of [az,ax,ay]. ax=ay=0 added. This warning will be removed in future updates. Please update your code. Thanks!')
 				varargin{n+1}(3) = 0;
 			end
 			% Write input argument in sigma name/value-pair

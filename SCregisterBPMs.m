@@ -29,9 +29,9 @@ function SC = SCregisterBPMs(SC,BPMords,varargin)
 %   [1 x 2] array of hor./ver. BPM offsets which result from the corresponding girder offset at
 %   the location of the BPMs, see *SCupdateSupport*.
 % `Roll`::
-%   BPM roll w.r.t. the girder
+%   BPM roll around z-axis w.r.t. the support structure
 % `SupportRoll`::
-%   BPM roll which result from the corresponding girder roll (support structure) at
+%   BPM roll around z-axis which results from the corresponding support structure roll at
 %   the location of the BPMs, see *SCupdateSupport*.
 %
 %

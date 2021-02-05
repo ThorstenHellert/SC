@@ -55,8 +55,7 @@ function SC = SCregisterSupport(SC,varargin)
 %   true in case of large sections and/or longitudinal offsets.
 % `'Roll'`::
 %   [1x3] array [az,ax,ay] defineing roll (around z-axis), pitch (roll around x-axis) and yaw (roll
-%   around y-axis) angle uncertainties. Note that currently roll angles of sections and plinths are 
-%   not supported.
+%   around y-axis) angle uncertainties.
 %
 % EXAMPLES
 % --------
