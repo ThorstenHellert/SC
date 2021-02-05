@@ -14,7 +14,7 @@ function [T1,T2,R1,R2] = SCgetTransformation(dx,dy,dz,ax,ay,az,magTheta,magLengt
 % DESCRIPTION
 % -----------
 % This function calculates AT's linear rotation and translation elements `T1`, `T2`, and
-% `R1`, `R2` for magnets with aribtrary horizontal, vertical and longitudinal offsets `[dx,dy,dz]`
+% `R1`, `R2` for magnets with arbitrary horizontal, vertical and longitudinal offsets `[dx,dy,dz]`
 % and roll `az` (roll around z-axis), pitch `ax` (roll around x-axis) and yaw `ay` (roll around
 % y-axis), see Tech-Note XXX for more details. By default all errors are defined in the midpoint of
 % a straight line connecting the ideal entrance and exit point of the magnet.
@@ -58,6 +58,10 @@ function [T1,T2,R1,R2] = SCgetTransformation(dx,dy,dz,ax,ay,az,magTheta,magLengt
 %	[6x6] array of entrance rotation matrix to use in lattice element.
 % `R2` ::
 %	[6x6] array of exit rotation matrix to use in lattice element.
+%
+% SEE ALSO
+% --------
+% *SCupdateSupport*
 
 	% Parse optional arguments
 	p = inputParser;
