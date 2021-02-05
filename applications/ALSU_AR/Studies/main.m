@@ -14,9 +14,9 @@ results=struct('States',[]);runtime=tic;
 mainDir = '~/sc';
 addpath(mainDir);
 % Set ALS-U AR paths
-addpath(fullfile(mainDir,'applications/ALSU_AR_final/Multipoles'));
-addpath(fullfile(mainDir,'applications/ALSU_AR_final/Lattices'));
-addpath(fullfile(mainDir,'applications/ALSU_AR_final'));
+addpath(fullfile(mainDir,'applications/ALSU_AR/Multipoles'));
+addpath(fullfile(mainDir,'applications/ALSU_AR/Lattices'));
+addpath(fullfile(mainDir,'applications/ALSU_AR'));
 % Set AT paths
 addpath('~/at/atmat');
 addpath('~/MML/applications/loco');
