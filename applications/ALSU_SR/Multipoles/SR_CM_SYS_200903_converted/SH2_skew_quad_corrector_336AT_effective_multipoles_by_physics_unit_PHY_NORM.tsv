@@ -1,0 +1,32 @@
+# file: SH2_skew_quad_corrector_336AT_effective_multipoles_by_physics_unit_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:38.454694
+# source file: SH2_skew_quad_corrector_336AT_effective_multipoles_by_physics_unit_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 1
+# nominal type: 0
+# Original Header: 
+#># SH2 (SHB)		
+#># pole tip radius [mm]: 12			
+#># reference radius [mm]: 5
+#># skew quad corrector : 336 A-T	
+#># effective multipoles using Leff for N=3 term from sextupole when energized
+#># units: Gauss		
+#># pole to pole gap [mm] : 9.4
+#># pole nose length [mm] : 20		
+#
+01	+0.000000000e+00	-9.469425000e-06
+02	+1.000000000e+00	+4.153420000e-04
+03	-5.882980000e-02	+1.315586000e-01
+04	-4.924137880e+03	-8.250640000e+00
+05	+1.364464000e+03	-2.594888000e+03
+06	+5.793856000e+05	+2.067136000e+05
+07	-2.521856000e+07	+3.377216000e+07
+08	-6.047347200e+10	-3.824153600e+09
+09	+4.687667200e+11	-6.967756800e+11
+10	+6.083865600e+14	+3.052595200e+13
+11	-8.617984000e+15	+1.655255040e+16
+12	-2.538014720e+18	+3.966740480e+17
+13	+3.948912640e+20	-2.299944960e+20
+14	+1.136726016e+23	+3.569582080e+22
+15	+1.406533632e+25	+2.044796928e+25

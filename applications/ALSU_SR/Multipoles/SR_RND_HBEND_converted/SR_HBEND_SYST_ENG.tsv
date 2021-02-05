@@ -1,0 +1,19 @@
+# Created by M. Venturini on 06/08/20
+# Data source file: "AL1327-8827 Physics Tol  Summary.xlsx", BLUE table; from C. Swenson
+# Design field component and systematic multipole errors 
+# Reference radius r = 0.003  m
+# Data structure n (order of multipole), A_n (skew component; Gauss), B_n (skew component; Gauss) 
+1	3.6   -32468.3
+2	0.4       45.2 
+3       1.4      -27.1 
+4      -1.3      -95.2 
+5       2.2      199.1
+6      -0.1       34.8
+7      -0.9      -44.3
+8       0.3      -13.5
+9       0.7      -11.9 
+10      0.04       3.9
+
+
+
+

@@ -1,0 +1,24 @@
+# file: SR_HBEND_RND_PHY.tsv
+# generated: 2021-01-12 11:25:37.579496
+# source file: SR_HBEND_RND_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.003000
+# nominal order: 0
+# nominal type: 0
+# Original Header: 
+#># Created by M. Venturini on  06/08/20
+#># Data source file: "AL1327-8827 Physics Tol  Summary.xlsx", from C. Swenson
+#># Random multipole errors (one sigma) 
+#># Reference radius r = 0.003  m
+#># Data structure n (order of multipole), A_n (skew component; Gauss), B_n (skew component; Gauss) 
+#
+01	+2.515742129e-04	+0.000000000e+00
+02	+3.448275862e-02	+3.248375812e-02
+03	+1.517574546e+01	+1.932367150e+01
+04	+1.415958687e+03	+4.275639958e+03
+05	+7.459233346e+05	+2.184093139e+06
+06	+1.092046569e+08	+1.480741111e+08
+07	+2.200545818e+10	+2.056584876e+10
+08	+3.016324485e+12	+5.484226337e+12
+09	+1.485311300e+15	+2.742113168e+15
+10	+2.894452789e+17	+6.855282921e+17

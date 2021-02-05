@@ -1,0 +1,27 @@
+# file: B2_dipole_corrector_1795AT_effective_multipoles_by_physics_unit_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:37.848388
+# source file: B2_dipole_corrector_1795AT_effective_multipoles_by_physics_unit_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 0
+# nominal type: 1
+# Original Header: 
+#># B2 (DIPB)		
+#># pole tip radius [mm]: 20			
+#># reference radius [mm]: 5
+#># reference x offset [mm]: -17.36
+#># By corrector : 1795 A-T		
+#># effective multipoles
+#># units: Gauss		
+#># pole nose length [mm] : 30		
+#
+01	+0.000000000e+00	+1.000000000e+00
+02	-2.300620000e-03	-3.284207480e+01
+03	+1.260732000e-03	+1.477978360e+03
+04	-7.276176000e-02	+5.419346400e+04
+05	-3.090560000e+00	-5.873152000e+05
+06	-1.718198400e+02	-1.644419200e+07
+07	+6.337235200e+04	+1.494316800e+10
+08	-1.309120000e+07	+2.631974400e+12
+09	-1.816337920e+09	+7.167436800e+14
+10	+2.146903040e+10	+7.428096000e+16

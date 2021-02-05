@@ -1,0 +1,27 @@
+# file: QF1_Bx_corrector_140AT_effective_multipoles_by_physics_unit_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:38.142730
+# source file: QF1_Bx_corrector_140AT_effective_multipoles_by_physics_unit_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 0
+# nominal type: 0
+# Original Header: 
+#># QF1 (QFA)		
+#># pole tip radius [mm]: 12			
+#># reference radius [mm]: 5
+#># Bx corrector : 140 A-T		
+#># effective multipoles using Leff for N=2 term from quadrupole when energized
+#># units: Gauss		
+#># pole to pole gap [mm] : 11.5
+#># pole nose length [mm] : 17		
+#
+01	+1.000000000e+00	+3.615890000e-05
+02	-1.353434000e-02	+1.071178000e-02
+03	+4.603028520e+03	-1.787172000e+00
+04	+4.046136000e+02	-4.404296000e+02
+05	-1.734864000e+06	+5.244896000e+04
+06	-4.883456000e+06	+4.591840000e+06
+07	-3.157721600e+10	-3.900140800e+09
+08	-3.929548800e+11	-6.069670400e+11
+09	+3.975603200e+13	-9.373568000e+13
+10	+7.614208000e+15	-2.558837760e+16

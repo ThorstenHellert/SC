@@ -1,0 +1,32 @@
+# file: SH1_skew_quad_corrector_334AT_effective_multipoles_by_physics_unit_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:38.453833
+# source file: SH1_skew_quad_corrector_334AT_effective_multipoles_by_physics_unit_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 1
+# nominal type: 0
+# Original Header: 
+#># SH1 (SHA)		
+#># pole tip radius [mm]: 12			
+#># reference radius [mm]: 5
+#># skew quad corrector : 334 A-T	
+#># effective multipoles using Leff for N=3 term from sextupole when energized
+#># units: Gauss		
+#># pole to pole gap [mm] : 9.4
+#># pole nose length [mm] : 20		
+#
+01	+0.000000000e+00	+1.458390000e-06
+02	+1.000000000e+00	+2.135120000e-05
+03	-1.472818000e-02	+9.533340000e-03
+04	-4.910419000e+03	-5.500200000e-01
+05	-1.005688000e+02	+2.105712000e+02
+06	+2.331408000e+05	-5.407408000e+04
+07	-4.836320000e+06	-1.799648000e+06
+08	-5.463648000e+10	+7.697472000e+07
+09	+2.129203200e+11	-1.119102720e+11
+10	+5.736883200e+14	-5.638758400e+13
+11	+4.862489600e+14	-1.371863040e+16
+12	+3.064657920e+18	+2.148382720e+18
+13	+3.211284480e+20	-2.915655680e+20
+14	-6.253813760e+22	-6.751232000e+22
+15	-2.625822720e+24	-1.542610944e+25

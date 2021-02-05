@@ -1,0 +1,30 @@
+# file: BEND2_SYS_fromAL1344-8997_PHY_NORM.tsv
+# generated: 2021-01-12 14:19:08.287779
+# source file: BEND2_SYS_fromAL1344-8997_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 1
+# nominal type: 1
+# Original Header: 
+#># Taken from: AL-1344-8997_SRV21_Lattice Magnets_Summary_WK_20210106.xlsx
+#># Sheet: BENDB Multipole
+#># Table: effective multipoles
+#># r=20 mm, half quad bend
+#># x= -1.736 cm calculated at r=5 mm
+#># pole : Vacoflux 50, yoke : 1006 steel
+#># no left yoke boundary offset
+#># quad current : 7708 Amp-turns
+#># 20 mm shorter pole
+#># Dipole values set to zero
+#>#
+#
+01	+0.000000000e+00	+0.000000000e+00
+02	-2.611162108e-13	+1.000000000e+00
+03	+9.340742499e-11	-4.285227383e-01
+04	-2.887138591e-08	-1.229859022e+02
+05	+6.487570245e-06	-4.396891292e+01
+06	-1.610004343e-03	-5.323754740e+05
+07	+3.043383738e-01	+2.002343571e+07
+08	-6.738921134e+01	-1.661004694e+10
+09	+1.081488150e+04	+4.343392818e+11
+10	-2.173845527e+06	-1.138520031e+14

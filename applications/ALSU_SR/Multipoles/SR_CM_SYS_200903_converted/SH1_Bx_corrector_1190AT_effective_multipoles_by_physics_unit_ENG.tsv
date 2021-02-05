@@ -1,0 +1,28 @@
+# SH1 (SHA)		
+# pole tip radius [mm]: 12			
+# reference radius [mm]: 5
+# Bx corrector : 1190 A-T		
+# effective multipoles using Leff for N=3 term from sextupole when energized
+# units: Gauss		
+# pole to pole gap [mm] : 9.4
+# pole nose length [mm] : 20		
+1	1	-0.000115727
+2	-8.1255E-05	-1.63766E-05
+3	2.43242E-05	-6.24274E-06
+4	-4.22332E-06	-3.74524E-06
+5	0.012773512	-2.55542E-06
+6	1.09453E-06	-1.97082E-06
+7	0.000389067	-3.14888E-06
+8	-2.91585E-06	-2.36631E-07
+9	8.11092E-07	1.99062E-06
+10	-7.28993E-06	1.52667E-06
+11	-3.09398E-05	-3.57566E-06
+12	3.22515E-06	2.91683E-06
+13	7.94059E-06	-5.95807E-06
+14	-4.44084E-06	2.19489E-06
+15	-4.89862E-07	4.53459E-07
+
+
+
+
+

@@ -1,0 +1,30 @@
+# file: QD3_SYS_fromAL1344-8997_PHY_NORM.tsv
+# generated: 2021-01-12 14:19:08.467918
+# source file: QD3_SYS_fromAL1344-8997_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 1
+# nominal type: 1
+# Original Header: 
+#># Taken from: AL-1344-8997_SRV21_Lattice Magnets_Summary_WK_20210106.xlsx
+#># Sheet: QD3 QDB Multipole
+#># Table: effective multipoles
+#># r=12 mm, L=118.54 mm quadrupole
+#># x=0, calculated at r=5 mm
+#># pole : Vacoflux 50 , yoke : 1006 steel
+#># current : 5910 Amp-turns
+#># 11.5 mm pole to pole gap
+#># 10 mm nose, no chamber
+#># Dipole values set to zero
+#>#
+#
+01	+0.000000000e+00	+0.000000000e+00
+02	+6.350811354e-17	+1.000000000e+00
+03	-3.100618585e-15	+2.392018993e-14
+04	-1.355571671e-13	+3.673448378e+00
+05	-2.609265840e-10	+1.170930780e-09
+06	+4.715491375e-08	-2.815289052e+06
+07	-2.163604929e-05	-9.978775696e-06
+08	+1.559002871e-03	+1.303698688e+09
+09	+1.521574327e+00	+4.529212132e-01
+10	-4.118583292e+01	-2.235349115e+13

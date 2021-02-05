@@ -1,0 +1,30 @@
+# file: QF4_SYS_fromAL1344-8997_PHY_NORM.tsv
+# generated: 2021-01-12 14:19:08.508425
+# source file: QF4_SYS_fromAL1344-8997_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 1
+# nominal type: 1
+# Original Header: 
+#># Taken from: AL-1344-8997_SRV21_Lattice Magnets_Summary_WK_20210106.xlsx
+#># Sheet: QF5 QFRC Multipole
+#># Table: effective multipoles
+#># r=12 mm, L=291.75 mm quadrupole
+#># x=0, calculated at r=5 mm
+#># pole : Vacoflux 50 , yoke : 1006 steel
+#># current : 6255 Amp-turns
+#># 11.5 mm pole to pole gap
+#># 20 mm nose, no chamber
+#># Dipole values set to zero
+#>#
+#
+01	-0.000000000e+00	-0.000000000e+00
+02	+6.014615338e-17	+1.000000000e+00
+03	-3.482454047e-16	+2.502028076e-14
+04	-2.272033721e-14	+1.770956122e+00
+05	-2.104878233e-10	+1.119333183e-09
+06	+6.105530986e-08	-2.735137710e+06
+07	-2.704203655e-05	-1.026493137e-05
+08	+1.496586454e-03	-2.284861039e+09
+09	+1.414482058e+00	+4.216628448e-01
+10	-4.132829125e+01	-1.270747566e+14

@@ -1,0 +1,30 @@
+# SF (SFA)		
+# pole tip radius [mm]: 12			
+# reference radius [mm]: 5
+# skew quad corrector : 240 A-T	
+# effective multipoles using Leff for N=3 term from sextupole when energized
+# units: Gauss		
+# pole to pole gap [mm] : 9.4
+# pole nose length [mm] : 20		
+1	0	-8.2855E-05
+2	1	1.199E-05
+3	9.56669E-06	-1.5934E-05
+4	-0.136611738	6.16698E-06
+5	-2.13771E-06	3.31E-06
+6	1.14893E-05	-3.14007E-06
+7	7.66058E-06	-9.8512E-06
+8	-0.000885983	8.84056E-06
+9	2.95801E-06	8.71297E-06
+10	0.000234625	1.735E-05
+11	7.99164E-07	5.556E-06
+12	4.73982E-06	-3.08472E-06
+13	7.39798E-07	5.60244E-06
+14	-4.3216E-06	-3.33718E-06
+15	8.90093E-06	-5.07487E-06
+
+
+
+
+
+
+

@@ -1,0 +1,29 @@
+# QF3 (QFRB)		
+# pole tip radius [mm]: 12			
+# reference radius [mm]: 5
+# By corrector : 215 A-T		
+# effective multipoles using Leff for N=2 term from quadrupole when energized
+# units: Gauss		
+# pole to pole gap [mm] : 11.5
+# pole nose length [mm] : 15		
+1	0	1
+2	-6.87646E-05	3.874E-05
+3	-0.000120054	0.107541781
+4	-4.84187E-05	4.45321E-05
+5	8.06207E-05	0.000901488
+6	-9.73467E-06	-2.17194E-05
+7	-9.25332E-05	-0.000548875
+8	3.56271E-06	-4.14612E-05
+9	-1.81597E-05	2.44415E-06
+10	1.52376E-05	-5.58296E-05
+
+
+
+
+
+
+
+
+
+
+

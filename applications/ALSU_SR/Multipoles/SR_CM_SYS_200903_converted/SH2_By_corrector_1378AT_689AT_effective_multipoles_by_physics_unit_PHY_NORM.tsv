@@ -1,0 +1,32 @@
+# file: SH2_By_corrector_1378AT_689AT_effective_multipoles_by_physics_unit_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:38.304864
+# source file: SH2_By_corrector_1378AT_689AT_effective_multipoles_by_physics_unit_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 0
+# nominal type: 1
+# Original Header: 
+#># SH2 (SHB)		
+#># pole tip radius [mm]: 12			
+#># reference radius [mm]: 5
+#># By corrector : 1378 A-T, 689 A-T		
+#># effective multipoles using Leff for N=3 term from sextupole when energized
+#># units: Gauss		
+#># pole to pole gap [mm] : 9.4
+#># pole nose length [mm] : 20		
+#
+01	+0.000000000e+00	+1.000000000e+00
+02	+3.232480000e-02	-8.309660000e-03
+03	+2.691656000e-01	+5.177760000e-01
+04	+3.085120000e+01	+3.788520000e+00
+05	+1.129881600e+04	+1.905844960e+07
+06	+3.545696000e+05	+6.992800000e+05
+07	-2.944793600e+07	-2.283628800e+10
+08	-7.513740800e+10	-4.964147200e+10
+09	+6.929894400e+12	+2.386954240e+12
+10	+1.870295040e+14	-1.049533440e+14
+11	+2.356797440e+17	-3.004938240e+18
+12	-4.104826880e+19	+5.466583040e+19
+13	-1.284886528e+22	-1.106878464e+22
+14	-1.474240512e+24	+9.527050240e+22
+15	+3.852926976e+26	+3.026714624e+25

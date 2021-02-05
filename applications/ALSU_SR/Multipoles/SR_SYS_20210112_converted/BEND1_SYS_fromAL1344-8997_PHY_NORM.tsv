@@ -1,0 +1,34 @@
+# file: BEND1_SYS_fromAL1344-8997_PHY_NORM.tsv
+# generated: 2021-01-12 14:19:08.286901
+# source file: BEND1_SYS_fromAL1344-8997_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 1
+# nominal type: 1
+# Original Header: 
+#># Taken from: AL-1344-8997_SRV21_Lattice Magnets_Summary_WK_20210106.xlsx
+#># Sheet: BENDA Multipole
+#># Table: effective multipoles
+#># 25 mm gap, gradient dipole		
+#># pole : 1006 steel , yoke : 1006 steel		
+#># multipoles calculated at r=5 mm		
+#># current : 10955 Amp-turns
+#># effective dipole length (cm) : 36.3171654
+#># pole tip using 11270 G and 21.2 Tm
+#># effective gradient length (cm): 34.0019569
+#># 1.5865 deg rotated
+#># bending angle (deg) :	3.336040549
+#># 30 mm nose
+#># Dipole values set to zero
+#>#							
+#
+01	+0.000000000e+00	+0.000000000e+00
+02	+1.918327084e-15	+1.000000000e+00
+03	+6.933953108e-13	+3.099442269e-01
+04	+1.742480435e-10	-1.888367024e+01
+05	+3.532919047e-08	-2.669359020e+03
+06	+5.818925490e-06	+1.912772552e+05
+07	+6.937949622e-04	-5.100785422e+07
+08	+1.796833036e-02	-1.319924754e+10
+09	-2.122948640e+01	+1.230219412e+12
+10	-8.389483783e+03	-1.244489093e+14

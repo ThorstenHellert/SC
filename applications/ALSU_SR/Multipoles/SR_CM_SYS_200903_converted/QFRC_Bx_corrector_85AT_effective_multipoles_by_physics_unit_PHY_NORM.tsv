@@ -1,0 +1,27 @@
+# file: QFRC_Bx_corrector_85AT_effective_multipoles_by_physics_unit_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:38.145712
+# source file: QFRC_Bx_corrector_85AT_effective_multipoles_by_physics_unit_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 0
+# nominal type: 0
+# Original Header: 
+#># QFRC		
+#># pole tip radius [mm]: 12			
+#># reference radius [mm]: 5
+#># Bx corrector : 85 A-T		
+#># effective multipoles using Leff for N=2 term from quadrupole when energized
+#># units: Gauss		
+#># pole to pole gap [mm] : 11.5
+#># pole nose length [mm] : 20		
+#
+01	+1.000000000e+00	-5.476060000e-05
+02	+2.718940000e-03	-6.191100000e-03
+03	+4.889615880e+03	-2.452652000e-02
+04	-1.471912000e+01	+1.799504000e+02
+05	-1.994884800e+06	+7.999296000e+04
+06	-1.563340800e+07	+1.637692800e+07
+07	-3.492748800e+10	+1.421868800e+08
+08	-3.090662400e+10	-1.663488000e+11
+09	+1.130391040e+14	+5.053875200e+12
+10	-1.515166720e+15	-1.757091840e+16

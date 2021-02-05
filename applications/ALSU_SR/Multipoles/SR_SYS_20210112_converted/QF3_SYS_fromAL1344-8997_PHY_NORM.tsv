@@ -1,0 +1,30 @@
+# file: QF3_SYS_fromAL1344-8997_PHY_NORM.tsv
+# generated: 2021-01-12 14:19:08.507626
+# source file: QF3_SYS_fromAL1344-8997_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 1
+# nominal type: 1
+# Original Header: 
+#># Taken from: AL-1344-8997_SRV21_Lattice Magnets_Summary_WK_20210106.xlsx
+#># Sheet: QF3 QFRB Multipole
+#># Table: effective multipoles
+#># r=12 mm, L=100.28 mm quadrupole
+#># x=0, calculated at r=5 mm
+#># pole : Vacoflux 50 , yoke : 1006 steel
+#># current : 4190 Amp-turns
+#># 11.5 mm pole to pole gap
+#># 15 mm nose, no chamfer
+#># Dipole values set to zero
+#>#
+#
+01	-0.000000000e+00	-0.000000000e+00
+02	+1.079449751e-11	+1.000000000e+00
+03	+5.964888526e-15	+2.660067125e-14
+04	+1.269723079e-06	+5.188246001e+00
+05	-2.431886784e-10	+1.123306035e-09
+06	+8.122811248e-02	-2.890345685e+06
+07	-2.189649898e-05	-1.076575065e-05
+08	+4.263939812e+03	+7.218785316e+08
+09	+1.442781228e+00	+4.021244067e-01
+10	+2.003011327e+08	-2.291115430e+14

@@ -1,0 +1,26 @@
+# QF1 (QFA)		
+# pole tip radius [mm]: 12			
+# reference radius [mm]: 5
+# By corrector : 140 A-T		
+# effective multipoles using Leff for N=2 term from quadrupole when energized
+# units: Gauss		
+# pole to pole gap [mm] : 11.5
+# pole nose length [mm] : 17		
+1	0	1
+2	-4.0894E-05	0.000112354
+3	1.49061E-06	0.116193054
+4	2.35159E-05	-2.45969E-05
+5	5.86561E-05	0.00105733
+6	1.24838E-05	2.85922E-05
+7	-3.86439E-05	-0.00062483
+8	-7.88816E-06	-2.7117E-05
+9	-8.76266E-06	2.33935E-05
+10	1.76464E-05	-2.33912E-05
+
+
+
+
+
+
+
+

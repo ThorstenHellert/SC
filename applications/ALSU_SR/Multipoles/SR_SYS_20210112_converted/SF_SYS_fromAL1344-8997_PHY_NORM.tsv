@@ -1,0 +1,35 @@
+# file: SF_SYS_fromAL1344-8997_PHY_NORM.tsv
+# generated: 2021-01-12 14:19:08.816069
+# source file: SF_SYS_fromAL1344-8997_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 2
+# nominal type: 1
+# Original Header: 
+#># Taken from: AL-1344-8997_SRV21_Lattice Magnets_Summary_WK_20210106.xlsx
+#># Sheet: SF Multipole
+#># Table: effective multipoles at nominal point
+#># r=12 mm, L=272 mm, sextupole
+#># calculated at r=5 mm
+#># Vacoflux 50 pole, 1006 steel yoke
+#># 9.4 mm pole to pole gap
+#># sextupole : 2635 Amp-turns
+#># 20 mm nose, no chamfer
+#># Dipole and quadrupole values set to zero
+#>#
+#
+01	-0.000000000e+00	-0.000000000e+00
+02	-0.000000000e+00	-0.000000000e+00
+03	-2.310709619e-05	+1.000000000e+00
+04	-2.826585338e-03	+4.890578718e-03
+05	-5.019479712e-01	-5.030184070e-01
+06	+9.887050031e+01	-1.856887814e+02
+07	+2.526946461e+04	-4.714494138e+04
+08	+8.554259113e+05	-1.255534793e+06
+09	-5.324462345e+08	-8.507527777e+10
+10	-1.001090745e+11	-1.736798869e+11
+11	-7.425146130e+12	+4.805074607e+13
+12	-1.652022498e+16	-3.943689489e+15
+13	-8.081986086e+17	+1.361244186e+18
+14	-5.539272617e+20	-8.615787826e+19
+15	-6.160076362e+22	+9.079170744e+22

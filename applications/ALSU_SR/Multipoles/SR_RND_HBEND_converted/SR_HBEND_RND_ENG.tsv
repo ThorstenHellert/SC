@@ -1,0 +1,16 @@
+# Created by M. Venturini on  06/08/20
+# Data source file: "AL1327-8827 Physics Tol  Summary.xlsx", from C. Swenson
+# Random multipole errors (one sigma) 
+# Reference radius r = 0.003  m
+# Data structure n (order of multipole), A_n (skew component; Gauss), B_n (skew component; Gauss) 
+1  16.78  0
+2  6.9    6.5
+3  9.11   11.6
+4  2.55   7.7
+5  4.03   11.8
+6  1.77   2.4
+7  1.07   1.0
+8  0.44   0.8 
+9  0.65   1.2
+10 0.38   0.9
+

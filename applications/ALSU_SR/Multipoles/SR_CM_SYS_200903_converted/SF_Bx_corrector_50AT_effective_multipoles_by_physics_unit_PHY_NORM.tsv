@@ -1,0 +1,32 @@
+# file: SF_Bx_corrector_50AT_effective_multipoles_by_physics_unit_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:38.147690
+# source file: SF_Bx_corrector_50AT_effective_multipoles_by_physics_unit_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 0
+# nominal type: 0
+# Original Header: 
+#># SF (SFA)		
+#># pole tip radius [mm]: 12			
+#># reference radius [mm]: 5
+#># Bx corrector : 50 A-T		
+#># effective multipoles using Leff for N=3 term from sextupole when energized
+#># units: Gauss		
+#># pole to pole gap [mm] : 9.4
+#># pole nose length [mm] : 20		
+#
+01	+1.000000000e+00	+1.312930000e-04
+02	-8.385660000e-04	+5.666080000e-04
+03	+2.110712000e-01	-8.948960000e-02
+04	-1.783864000e+01	+7.999328000e+00
+05	+2.835191040e+07	-2.323232000e+03
+06	+4.742464000e+05	-2.271024000e+05
+07	+2.717593600e+10	-6.807296000e+06
+08	+9.781900800e+09	+9.605363200e+09
+09	+2.731699200e+11	-1.186936320e+12
+10	+4.166681600e+14	-4.902522880e+14
+11	-3.926917120e+18	+1.508638720e+17
+12	+2.165493760e+19	-2.603663360e+19
+13	+2.904350720e+22	+7.199006720e+21
+14	-1.259855872e+24	-8.877670400e+23
+15	-9.277833216e+25	+6.808469504e+25

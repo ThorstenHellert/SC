@@ -1,0 +1,27 @@
+# file: B3_dipole_corrector_1927AT_effective_multipoles_by_physics_unit_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:37.995967
+# source file: B3_dipole_corrector_1927AT_effective_multipoles_by_physics_unit_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 0
+# nominal type: 1
+# Original Header: 
+#># B3 (DIPC)		
+#># pole tip radius [mm]: 20			
+#># reference radius [mm]: 5
+#># reference x offset [mm]: -17.93
+#># By corrector : 1927 A-T		
+#># effective multipoles
+#># units: Gauss		
+#># pole nose length [mm] : 30		
+#
+01	+0.000000000e+00	+1.000000000e+00
+02	-2.272240000e-03	-3.384967820e+01
+03	+8.284640000e-04	+1.360413360e+03
+04	-2.422192000e-02	+5.385769600e+04
+05	-2.565920000e+00	-5.224048000e+05
+06	-2.023974400e+03	-7.619264000e+06
+07	+2.392313600e+05	+1.441836800e+10
+08	-8.876108800e+05	+2.822246400e+12
+09	+4.233856000e+09	+6.910208000e+14
+10	-1.950479360e+12	+7.779123200e+16

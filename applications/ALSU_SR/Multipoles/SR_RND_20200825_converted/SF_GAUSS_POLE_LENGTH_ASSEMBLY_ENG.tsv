@@ -1,0 +1,33 @@
+# file: SF_GAUSS_POLE_LENGTH_ASSEMBLY.tsv
+# generated: 2020-08-25 10:38:24
+# source file: SF.py
+# nominal order: 3
+# main field [Gauss]: -1563.99
+# main circuit current [Amp-turns]: 2580.0
+# reference radius [m]: 0.005
+# units: Gauss
+# pole profile tolerance width  ( RD AZ ROT ) [um]: 40
+# pole length tolerance width (per assembly) [um]: 100
+# power supply stability width (per circuit) [ppm]: 0
+# yoke pieces: 2
+# yoke assembly tolerance width - sliding  [um]: 50
+# yoke assembly tolerance width - gap      [um]: 0
+# yoke assembly tolerance width - rotation [uRad]: 0
+# pole assembly tolerance width - sliding  [um]: 50
+# pole assembly tolerance width - gap      [um]: 0
+# pole assembly tolerance width - rotation [uRad]: 0
+01	+4.479669571e+00	+3.277740240e+00
+02	+3.265631437e+00	+3.280208588e+00
+03	+2.972928047e+00	+1.016845345e+00
+04	+1.108530283e+00	+1.098698616e+00
+05	+4.397688806e-01	+4.427812994e-01
+06	+9.464362636e-03	+1.924972832e-01
+07	+2.943842299e-02	+2.953724749e-02
+08	+3.118323162e-03	+3.117583925e-03
+09	+2.033067169e-03	+4.286094918e-04
+10	+8.179098368e-04	+8.081006235e-04
+11	+2.446764265e-04	+2.465627331e-04
+12	+7.939112038e-06	+7.449202531e-05
+13	+1.131345925e-05	+1.135142975e-05
+14	+3.178189445e-06	+3.142768492e-06
+15	+1.932748773e-06	+2.728044990e-07

@@ -1,0 +1,27 @@
+# file: QD1_By_corrector_180AT_effective_multipoles_by_physics_unit_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:38.296805
+# source file: QD1_By_corrector_180AT_effective_multipoles_by_physics_unit_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 0
+# nominal type: 1
+# Original Header: 
+#># QD1 (QDA)		
+#># pole tip radius [mm]: 12			
+#># reference radius [mm]: 5
+#># By corrector : 180 A-T		
+#># effective multipoles using Leff for N=2 term from quadrupole when energized
+#># units: Gauss		
+#># pole to pole gap [mm] : 11.5
+#># pole nose length [mm] : 15		
+#
+01	+0.000000000e+00	+1.000000000e+00
+02	-3.002860000e-02	+6.867000000e-03
+03	-1.550328000e+00	+4.464665360e+03
+04	-1.281304000e+02	-2.964840000e+02
+05	+2.009008000e+04	+1.564580800e+06
+06	-1.071808000e+07	+1.625468800e+07
+07	+4.609516800e+09	-4.227923200e+10
+08	-4.080128000e+11	-9.272972800e+10
+09	+1.353999360e+14	-1.258744320e+14
+10	+7.580211200e+15	-8.562329600e+15

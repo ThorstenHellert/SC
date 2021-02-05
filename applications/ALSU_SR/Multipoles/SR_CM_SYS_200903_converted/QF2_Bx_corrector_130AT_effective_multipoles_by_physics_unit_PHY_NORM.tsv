@@ -1,0 +1,27 @@
+# file: QF2_Bx_corrector_130AT_effective_multipoles_by_physics_unit_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:38.143523
+# source file: QF2_Bx_corrector_130AT_effective_multipoles_by_physics_unit_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 0
+# nominal type: 0
+# Original Header: 
+#># QF2 (QFRA)		
+#># pole tip radius [mm]: 12			
+#># reference radius [mm]: 5
+#># Bx corrector : 130 A-T		
+#># effective multipoles using Leff for N=2 term from quadrupole when energized
+#># units: Gauss		
+#># pole to pole gap [mm] : 11.5
+#># pole nose length [mm] : 20		
+#
+01	+1.000000000e+00	-2.315750000e-04
+02	-1.192038000e-02	+8.786280000e-03
+03	+4.640561240e+03	+2.021132000e+00
+04	-4.219928000e+02	+3.952384000e+02
+05	-1.626142400e+06	-2.876656000e+04
+06	+8.352544000e+06	+2.921974400e+05
+07	-3.482374400e+10	+2.256038400e+09
+08	+4.693862400e+11	+7.629580800e+11
+09	+1.744990720e+13	+5.255859200e+13
+10	-7.128371200e+15	+5.197670400e+15

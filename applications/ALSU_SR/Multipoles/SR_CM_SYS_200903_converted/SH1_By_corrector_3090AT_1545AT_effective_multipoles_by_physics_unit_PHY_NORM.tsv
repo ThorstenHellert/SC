@@ -1,0 +1,32 @@
+# file: SH1_By_corrector_3090AT_1545AT_effective_multipoles_by_physics_unit_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:38.303967
+# source file: SH1_By_corrector_3090AT_1545AT_effective_multipoles_by_physics_unit_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 0
+# nominal type: 1
+# Original Header: 
+#># SH1 (SHA)		
+#># pole tip radius [mm]: 12			
+#># reference radius [mm]: 5
+#># By corrector : 3090 A-T, 1545 A-T		
+#># effective multipoles using Leff for N=3 term from sextupole when energized
+#># units: Gauss		
+#># pole to pole gap [mm] : 9.4
+#># pole nose length [mm] : 20		
+#
+01	+0.000000000e+00	+1.000000000e+00
+02	-3.612880000e-02	+1.569824000e-02
+03	+1.256880000e+00	-4.621880000e+00
+04	+1.570568000e+01	-5.746144000e+01
+05	-4.442768000e+03	+1.946096160e+07
+06	-8.074432000e+05	+3.327232000e+04
+07	+9.102464000e+06	-2.388051200e+10
+08	+3.404979200e+09	-5.008204800e+09
+09	-8.390707200e+12	+1.802867200e+13
+10	-7.049676800e+14	-2.759920640e+14
+11	+6.797260800e+17	-2.118850560e+18
+12	-8.189870080e+19	+3.999313920e+19
+13	+3.304062976e+20	+8.717352960e+21
+14	+4.118872064e+24	-2.393022464e+24
+15	-3.374284800e+26	+1.018119782e+27

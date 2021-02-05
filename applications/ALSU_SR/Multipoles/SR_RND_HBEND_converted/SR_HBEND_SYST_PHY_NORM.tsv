@@ -1,0 +1,24 @@
+# file: SR_HBEND_SYST_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:37.433065
+# source file: SR_HBEND_SYST_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.003000
+# nominal order: 0
+# nominal type: 1
+# Original Header: 
+#># Created by M. Venturini on 06/08/20
+#># Data source file: "AL1327-8827 Physics Tol  Summary.xlsx", BLUE table; from C. Swenson
+#># Design field component and systematic multipole errors 
+#># Reference radius r = 0.003  m
+#># Data structure n (order of multipole), A_n (skew component; Gauss), B_n (skew component; Gauss) 
+#
+01	-1.108773789e-04	+1.000000000e+00
+02	-4.106569587e-03	-4.640423634e-01
+03	-4.790997852e+00	+9.274002985e+01
+04	+1.482927907e+03	+1.085959513e+05
+05	-8.365234345e+05	-7.570537082e+07
+06	+1.267459749e+07	-4.410759927e+09
+07	+3.802379248e+10	+1.871615563e+12
+08	-4.224865831e+12	+1.901189624e+14
+09	-3.286006757e+15	+5.586211487e+16
+10	-6.259060490e+16	-6.102583978e+18

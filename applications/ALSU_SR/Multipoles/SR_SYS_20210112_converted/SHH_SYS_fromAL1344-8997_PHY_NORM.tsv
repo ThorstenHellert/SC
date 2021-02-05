@@ -1,0 +1,36 @@
+# file: SHH_SYS_fromAL1344-8997_PHY_NORM.tsv
+# generated: 2021-01-12 14:19:08.818222
+# source file: SHH_SYS_fromAL1344-8997_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 2
+# nominal type: 1
+# Original Header: 
+#># Taken from: AL-1344-8997_SRV21_Lattice Magnets_Summary_WK_20210106.xlsx
+#># Sheet: SH1 (SHA) Multipole
+#># Table: effective multipoles at nominal point
+#># r=12 mm, L=66.9 mm, sextupole
+#># calculated at r=5 mm
+#># Vacoflux 50 pole and yoke
+#># 9.4 mm pole to pole gap
+#># 140 Amp-turns
+#># 20 mm nose, no chamfer
+#># 10 mm longer pole
+#># Dipole and quadrupole values set to zero
+#>#
+#
+01	-0.000000000e+00	-0.000000000e+00
+02	-0.000000000e+00	-0.000000000e+00
+03	+1.142881427e-05	+1.000000000e+00
+04	-1.064160376e-02	-3.689649011e-03
+05	-6.894527754e-01	+9.028657879e-02
+06	+8.317014073e+01	-3.968878073e+02
+07	+5.493200353e+04	-1.965495036e+04
+08	-9.497957214e+06	+1.101793577e+07
+09	-2.185915654e+09	-8.563712699e+10
+10	+1.867277571e+11	+5.504640424e+11
+11	+8.991473103e+13	-3.837388533e+13
+12	-1.285999868e+16	+1.264344006e+16
+13	+1.146500078e+18	-3.650465212e+18
+14	+3.119292286e+20	-7.205945590e+19
+15	-1.478173930e+21	-9.698403489e+22

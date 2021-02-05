@@ -1,0 +1,30 @@
+# QD1 (QDA)		
+# pole tip radius [mm]: 12			
+# reference radius [mm]: 5
+# Bx corrector : 180 A-T		
+# effective multipoles using Leff for N=2 term from quadrupole when energized
+# units: Gauss		
+# pole to pole gap [mm] : 11.5
+# pole nose length [mm] : 15		
+1	1	5.95945E-05
+2	-4.79662E-05	-3.96074E-05
+3	0.110458168	8.93523E-05
+4	3.81056E-05	-1.26074E-05
+5	-0.000891739	-4.37983E-05
+6	-1.05094E-05	7.82217E-05
+7	-0.000427099	-5.21005E-05
+8	-6.89731E-05	-6.913E-07
+9	5.41853E-06	5.07979E-06
+10	-2.3367E-05	-4.87163E-05
+
+
+
+
+
+
+
+
+
+
+
+

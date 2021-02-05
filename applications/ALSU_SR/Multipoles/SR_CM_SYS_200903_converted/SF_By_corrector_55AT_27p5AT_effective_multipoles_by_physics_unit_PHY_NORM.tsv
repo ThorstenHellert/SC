@@ -1,0 +1,32 @@
+# file: SF_By_corrector_55AT_27p5AT_effective_multipoles_by_physics_unit_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:38.302696
+# source file: SF_By_corrector_55AT_27p5AT_effective_multipoles_by_physics_unit_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 0
+# nominal type: 1
+# Original Header: 
+#># SF (SFA)		
+#># pole tip radius [mm]: 12			
+#># reference radius [mm]: 5
+#># By corrector : 55 A-T, 27.5 A-T		
+#># effective multipoles using Leff for N=3 term from sextupole when energized
+#># units: Gauss		
+#># pole to pole gap [mm] : 9.4
+#># pole nose length [mm] : 20		
+#
+01	+0.000000000e+00	+1.000000000e+00
+02	+6.136860000e-03	-2.016160000e-03
+03	-6.743560000e-02	-2.698936000e-01
+04	+9.983120000e+00	-3.260152000e+01
+05	+6.362224000e+03	+2.841412640e+07
+06	+1.080284800e+05	-1.713606400e+06
+07	-1.385555200e+08	-2.719712000e+10
+08	-2.247206400e+10	+5.833459200e+09
+09	+5.210598400e+12	+3.350681600e+11
+10	-3.053706240e+14	+1.947084800e+15
+11	+3.496949760e+16	-4.274544640e+18
+12	+5.208289280e+19	-7.378944000e+18
+13	+5.942886400e+21	-2.842456064e+22
+14	-2.014633984e+24	-1.170751488e+24
+15	-4.767875072e+26	+1.251881779e+26

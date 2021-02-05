@@ -1,0 +1,33 @@
+# file: QF2_GAUSS_POLE_LENGTH_ASSEMBLY.tsv
+# generated: 2020-08-25 10:38:01
+# source file: QF2.py
+# nominal order: 2
+# main field [Gauss]: -3580.77
+# main circuit current [Amp-turns]: 4055.0
+# reference radius [m]: 0.005
+# units: Gauss
+# pole profile tolerance width  ( RD AZ ROT ) [um]: 40
+# pole length tolerance width (per assembly) [um]: 100
+# power supply stability width (per circuit) [ppm]: 0
+# yoke pieces: 2
+# yoke assembly tolerance width - sliding  [um]: 50
+# yoke assembly tolerance width - gap      [um]: 0
+# yoke assembly tolerance width - rotation [uRad]: 0
+# pole assembly tolerance width - sliding  [um]: 50
+# pole assembly tolerance width - gap      [um]: 0
+# pole assembly tolerance width - rotation [uRad]: 0
+01	+3.163025141e+00	+3.132610559e+00
+02	+2.750344038e+00	+1.917427897e+00
+03	+1.054812908e+00	+1.068926692e+00
+04	+6.001455709e-02	+4.329873919e-01
+05	+4.604747891e-02	+4.654874280e-02
+06	+9.726735763e-03	+4.929820541e-03
+07	+3.467699513e-03	+3.489438444e-03
+08	+3.425113100e-04	+8.793092566e-04
+09	+1.340062881e-04	+1.321127784e-04
+10	+5.934941146e-05	+2.126990512e-05
+11	+1.586790313e-05	+1.592468470e-05
+12	+2.145367034e-06	+4.739977157e-06
+13	+8.652382348e-07	+8.564547898e-07
+14	+3.787044704e-07	+1.268094678e-07
+15	+9.738525364e-08	+9.764754338e-08

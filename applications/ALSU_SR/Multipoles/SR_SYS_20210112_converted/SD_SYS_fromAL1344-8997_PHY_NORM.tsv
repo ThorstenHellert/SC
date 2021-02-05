@@ -1,0 +1,35 @@
+# file: SD_SYS_fromAL1344-8997_PHY_NORM.tsv
+# generated: 2021-01-12 14:19:08.815190
+# source file: SD_SYS_fromAL1344-8997_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 2
+# nominal type: 1
+# Original Header: 
+#># Taken from: AL-1344-8997_SRV21_Lattice Magnets_Summary_WK_20210106.xlsx
+#># Sheet: SD Multipole
+#># Table: effective multipoles at nominal point
+#># r=12 mm, L=272 mm, sextupole
+#># calculated at r=5 mm
+#># Vacoflux 50 pole, 1006 steel yoke
+#># 9.4 mm pole to pole gap
+#># sextupole : 2155 Amp-turns
+#># 20 mm nose, no chamfer
+#># Dipole and quadrupole values set to zero
+#>#
+#
+01	+0.000000000e+00	+0.000000000e+00
+02	+0.000000000e+00	+0.000000000e+00
+03	+3.650109319e-05	+1.000000000e+00
+04	-4.963878054e-03	-3.869670562e-03
+05	+8.192227958e-01	+2.183209036e-01
+06	+6.301409213e+01	-1.333445612e+02
+07	-1.849760343e+04	-7.365939321e+04
+08	-1.555702205e+06	-4.893680254e+06
+09	+8.441071762e+08	-8.634690925e+10
+10	-1.555200818e+11	-1.478511096e+11
+11	-5.088688794e+12	+2.441846815e+13
+12	+2.268540677e+15	-1.567777910e+14
+13	+1.282431148e+18	+7.090803159e+17
+14	+6.212617366e+20	+2.696771978e+20
+15	+7.082606914e+22	+7.185180611e+22

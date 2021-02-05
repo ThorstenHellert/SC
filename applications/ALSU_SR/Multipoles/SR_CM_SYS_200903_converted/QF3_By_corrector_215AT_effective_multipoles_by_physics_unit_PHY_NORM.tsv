@@ -1,0 +1,27 @@
+# file: QF3_By_corrector_215AT_effective_multipoles_by_physics_unit_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:38.299541
+# source file: QF3_By_corrector_215AT_effective_multipoles_by_physics_unit_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 0
+# nominal type: 1
+# Original Header: 
+#># QF3 (QFRB)		
+#># pole tip radius [mm]: 12			
+#># reference radius [mm]: 5
+#># By corrector : 215 A-T		
+#># effective multipoles using Leff for N=2 term from quadrupole when energized
+#># units: Gauss		
+#># pole to pole gap [mm] : 11.5
+#># pole nose length [mm] : 15		
+#
+01	+0.000000000e+00	+1.000000000e+00
+02	-1.375292000e-02	+7.748000000e-03
+03	-4.802160000e+00	+4.301671240e+03
+04	-3.873496000e+02	+3.562568000e+02
+05	+1.289931200e+05	+1.442380800e+06
+06	-3.115094400e+06	-6.950208000e+06
+07	-5.922124800e+09	-3.512800000e+10
+08	+4.560268800e+10	-5.307033600e+11
+09	-4.648883200e+13	+6.257024000e+12
+10	+7.801651200e+15	-2.858475520e+16

@@ -1,0 +1,42 @@
+# file: SH2_GAUSS_POLE_LENGTH_ASSEMBLY_PHY.tsv
+# generated: 2021-01-12 11:25:37.268948
+# source file: SH2_GAUSS_POLE_LENGTH_ASSEMBLY_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 2
+# nominal type: 1
+# Original Header: 
+#># file: SH2_GAUSS_POLE_LENGTH_ASSEMBLY.tsv
+#># generated: 2020-08-25 10:38:36
+#># source file: SH2.py
+#># nominal order: 3
+#># main field [Gauss]: 1157.19
+#># main circuit current [Amp-turns]: 1945.0
+#># reference radius [m]: 0.005
+#># units: Gauss
+#># pole profile tolerance width  ( RD AZ ROT ) [um]: 40
+#># pole length tolerance width (per assembly) [um]: 100
+#># power supply stability width (per circuit) [ppm]: 0
+#># yoke pieces: 6
+#># yoke assembly tolerance width - sliding  [um]: 100
+#># yoke assembly tolerance width - gap      [um]: 0
+#># yoke assembly tolerance width - rotation [uRad]: 0
+#># pole assembly tolerance width - sliding  [um]: 0
+#># pole assembly tolerance width - gap      [um]: 0
+#># pole assembly tolerance width - rotation [uRad]: 0
+#
+01	+9.071620330e-05	+9.010605190e-05
+02	+7.225494156e-03	+7.304501856e-03
+03	+1.627084912e+00	+4.556595117e-01
+04	+9.602207830e+01	+9.849775677e+01
+05	+7.933524416e+03	+7.909642524e+03
+06	+3.336756706e+04	+6.816608082e+05
+07	+2.146382203e+07	+2.134636067e+07
+08	+4.349879953e+08	+4.463664953e+08
+09	+6.228736315e+10	+1.232647958e+10
+10	+4.554936911e+12	+4.640576811e+12
+11	+2.853405484e+14	+2.862933516e+14
+12	+1.791368952e+15	+1.700925662e+16
+13	+5.428121052e+17	+5.457414568e+17
+14	+2.868053807e+19	+2.888217568e+19
+15	+3.789689229e+21	+5.021214841e+20

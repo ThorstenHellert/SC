@@ -1,0 +1,27 @@
+# file: QFRD_Bx_corrector_75AT_effective_multipoles_by_physics_unit_PHY_NORM.tsv
+# generated: 2021-01-12 11:25:38.146574
+# source file: QFRD_Bx_corrector_75AT_effective_multipoles_by_physics_unit_ENG.tsv
+# Rigidity [Tm]: 6.670000
+# reference radius [m]: 0.005000
+# nominal order: 0
+# nominal type: 0
+# Original Header: 
+#># QFRD		
+#># pole tip radius [mm]: 12			
+#># reference radius [mm]: 5
+#># Bx corrector : 75 A-T		
+#># effective multipoles using Leff for N=2 term from quadrupole when energized
+#># units: Gauss		
+#># pole to pole gap [mm] : 11.5
+#># pole nose length [mm] : 25		
+#
+01	+1.000000000e+00	+7.016190000e-07
+02	-1.472004000e-03	-6.633340000e-03
+03	+4.907902760e+03	+1.265832000e+00
+04	-1.007880000e+02	+1.164160000e+02
+05	-2.004267200e+06	+1.244009600e+04
+06	-7.776704000e+06	-2.744915200e+07
+07	-3.530048000e+10	+2.343046400e+08
+08	-4.014899200e+11	-1.790080000e+11
+09	+7.797606400e+13	+3.130675200e+13
+10	-2.302653440e+15	+1.976130560e+16
