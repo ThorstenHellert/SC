@@ -121,7 +121,7 @@ function SCsanityCheck(SC)
 			if isfield(SC.SIG,'Mag') && ~isempty(SC.SIG.Mag{ord})
 				for field=fieldnames(SC.SIG.Mag{ord})'
 					if ~isfield(SC.RING{ord},field)
-						warning('Field in SC.SIG.Mag doesn''t match lattice element (Magnet ord: %d)',ord)
+						warning(sprintf('Field ''%s'' in SC.SIG.Mag doesn''t match lattice element (Magnet ord: %d)',field{1},ord))
 					end
 					if strcmp(field{1},'MagnetOffset')
 						if length(SC.SIG.Mag{ord}.(field{1}))~=3
