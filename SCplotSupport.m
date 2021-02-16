@@ -15,7 +15,10 @@ function SCplotSupport(SC,varargin)
 % -----------
 % This function plots the overall offsets [dx,dy,dz] and rolls [az,ax,ay] of all magnets and BPMs,
 % as well as the individual contributions from different support structures (if registered).
-%
+% Please note that the apperance of the figure significanlty depends on the lattice (magnitude of
+% errors or lattice size) and the used computer (screen size, Matlab version). The user might have
+% to adjust plot apperance properties.
+% 
 %
 % INPUTS
 % ------
@@ -187,8 +190,7 @@ function SCplotSupport(SC,varargin)
 		legend('Overall magnet offset');
 		set(gca,'xlim',par.xLim,'box','on')
 		ylabel(yLabOffStr{nDim});
-		
-		
+				
 		% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		% Plot BPM offset
 		ax(3*(nDim-1)+3,1)=subplot(12,2,2*4*(nDim-1)+ 7);hold on
