@@ -37,8 +37,11 @@ function SC = SCupdateSupport(SC,varargin)
 % ------------
 % `SC` ::
 %	Base structure with updated `SC.RING`.
+%
+% SEE ALSO
+% --------
+% *SCregisterSupport*, *SCgetSupportOffset*, *SCgetSupportRoll*, *SCplotSupport*
 
-% TODO: Centralize `MasterOf` functionality
 
 	p = inputParser;
 	p.KeepUnmatched=true;
@@ -62,16 +65,6 @@ function SC = SCupdateSupport(SC,varargin)
 
 				% Update support roll angles
 				SC.RING{ord}.SupportRoll = rolls(:,i)';
-
-% % 				% Get girder rolls for magnets
-% % 				if isfield(SC.ORD,'Girder')
-% % 					% Find girder index of magnet
-% % 					gInd = intersect(find(ord>SC.ORD.Girder(1,:)),find(ord<SC.ORD.Girder(2,:)));
-% % 					if ~isempty(gInd)
-% % 						% Write girder roll in magnet element
-% % 						SC.RING{ord}.SupportRoll = SC.RING{SC.ORD.Girder(1,gInd)}.GirderRoll;
-% % 					end
-% % 				end
 
 				% Get length of magnet 
 				magLength   = SC.RING{ord}.Length;
@@ -136,17 +129,7 @@ function SC = SCupdateSupport(SC,varargin)
 
 				% Update support roll angles
 				SC.RING{ord}.SupportRoll = rolls(1,i)'; % BPM pitch and yaw angles not yet implemented
-
-% % 				% Get girder rolls for BPMs
-% % 				if isfield(SC.ORD,'Girder')
-% % 					% Find girder index of BPM
-% % 					gInd = intersect(find(ord>SC.ORD.Girder(1,:)),find(ord<SC.ORD.Girder(2,:)));
-% % 					if ~isempty(gInd)
-% % 						% Write girder roll in BPM element
-% % 						SC.RING{ord}.SupportRoll(1) = SC.RING{SC.ORD.Girder(1,gInd)}.GirderRoll(1);
-% % 					end
-% % 				end
-				
+		
 			end
 		else
 			warning('SC: No BPMs have been registered!')
