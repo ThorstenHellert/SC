@@ -170,10 +170,10 @@ function [T1,T2,R1,R2] = SCgetTransformation(dx,dy,dz,ax,ay,az,magTheta,magLengt
 			          0          , 0                   , 0              , 0                   , 1 , 0      ;
 			      -R(1,3)/R(3,3) , -LD*R(1,3)/R(3,3)^2 , -R(2,3)/R(3,3) , -LD*R(2,3)/R(3,3)^2 , 0 , 1      ];
 	
-		% Asign output
+		% Assign output
 		if face==1
 			R1 = LinMat;
-			T1 = T;
+			T1 = inv(R1)*T;
 		else
 			R2 = LinMat;
 			T2 = T;		

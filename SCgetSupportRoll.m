@@ -46,7 +46,7 @@ function roll = SCgetSupportRoll(SC,s)
 	roll0 = zeros(3,length(s0));
 	
 	% Read elemet lengths from RING
-	lengths = getcellstruct(SC.RING,'Length',1:length(SC.RING));
+	lengths = getcellstruct(SC.RING,'Length',1:length(SC.RING),1,1);
 
 	% Circumference
 	C = sum(lengths);    
