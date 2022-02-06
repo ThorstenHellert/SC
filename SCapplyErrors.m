@@ -8,7 +8,7 @@ function SC = SCapplyErrors(SC,varargin)
 %
 % SYNOPSIS
 % --------
-% `SC = SCapplyErrors(SC)`
+% `SC = SCapplyErrors(SC [, options])`
 %
 % INPUT
 % -----
@@ -21,11 +21,18 @@ function SC = SCapplyErrors(SC,varargin)
 % support structures and magnets if the corresponding uncertanties defined in
 % `SC.SIG` are set. For example, for a magnet with ordinate `ord` every field
 % defined in `SC.SIG.Mag{ord}` will be used to generate a random number using a
-% Gaussian distribution with a cutoff at `+/-2sigma` and `sigma` being the
+% Gaussian distribution with a cutoff (see option below) and `sigma` being the
 % value of the uncertainty field. The number will be stored in the
 % corresponding field of the lattice structure, thus `SC.RING{ord}`. An
 % exeption are bending angle errors which are stored in the `BendingAngleError`
 % field. See examples in the register functions for more details.
+%
+% OPTIONS
+% -------
+% The following options can be given as name/value-pairs:
+%
+% `'nSig'` (2)::
+%	Number of sigmas at which the Gaussian distribution of errors is truncated.
 %
 % RETURN VALUE
 % ------------
@@ -36,30 +43,38 @@ function SC = SCapplyErrors(SC,varargin)
 % --------
 % *SCregisterMagnets*, *SCregisterSupport*, *SCregisterBPMs*, *SCregisterCAVs*, *SCrampUpErrors*
 
+	% Parse optional arguments
+	p = inputParser;
+	addOptional(p,'nSig',2);
+	parse(p,varargin{:});
+	par=p.Results;
+
 	if ~isfield(SC,'SIG')
 		return;
 	end
 
+	
+	
 	% Apply cavity errors
-	SC = applyCavityError(SC);
+	SC = applyCavityError(SC,par);
 
 	% Apply injected beam errors
-	SC = applyInjectionError(SC);
+	SC = applyInjectionError(SC,par);
 
 	% Apply BPM errors
-	SC = applyBPMerrors(SC);
+	SC = applyBPMerrors(SC,par);
 
 	% Apply circumference error
-	SC = applyCircumferenceError(SC);
+	SC = applyCircumferenceError(SC,par);
 
 	% Apply magnet support errors
-	SC = applySupportAlignmentError(SC);
+	SC = applySupportAlignmentError(SC,par);
 
 	% Apply magnet errors
-	SC = applyMagnetError(SC);
+	SC = applyMagnetError(SC,par);
 
 	% Update magnet support model
-	SC = SCupdateSupport(SC,varargin{:});
+	SC = SCupdateSupport(SC);
 
 	% Update magnetic fields
 	if isfield(SC.ORD,'Magnet')
@@ -74,7 +89,7 @@ end
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Cavity errors
-function SC = applyCavityError(SC)
+function SC = applyCavityError(SC,par)
 	if isfield(SC.SIG,'RF')
 		for ord=SC.ORD.Cavity
 			
@@ -85,7 +100,7 @@ function SC = applyCavityError(SC)
 
 			% Loop over uncertainties
 			for field=fieldnames(SC.SIG.RF{ord})'
-				SC.RING{ord}.(field{1}) = SC.SIG.RF{ord}.(field{1}) * SCrandnc(2);
+				SC.RING{ord}.(field{1}) = SC.SIG.RF{ord}.(field{1}) * SCrandnc(par.nSig);
 			end
 		end
 	end
@@ -93,10 +108,10 @@ end
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Injected beam errors
-function SC = applyInjectionError(SC)
+function SC = applyInjectionError(SC,par)
 	if isfield(SC.SIG,'staticInjectionZ')
 		% Apply systematic injection error
-		SC.INJ.Z0               = SC.INJ.Z0ideal + SC.SIG.staticInjectionZ(:) .* SCrandnc(2,6,1);
+		SC.INJ.Z0               = SC.INJ.Z0ideal + SC.SIG.staticInjectionZ(:) .* SCrandnc(par.nSig,6,1);
 		fprintf('Static injection error applied.\n');
 	end
 	if isfield(SC.SIG,'randomInjectionZ')
@@ -109,7 +124,7 @@ end
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BPM errors
-function SC = applyBPMerrors(SC)
+function SC = applyBPMerrors(SC,par)
 	% Check if any uncertainties for the magnets are given
 	if ~isfield(SC.SIG,'BPM')
 		return;
@@ -130,7 +145,7 @@ function SC = applyBPMerrors(SC)
 			if regexp(field{1},'Noise')
 				SC.RING{ord}.(field{1}) = SC.SIG.BPM{ord}.(field{1});
 			else
-				SC.RING{ord}.(field{1}) = SC.SIG.BPM{ord}.(field{1}) .* SCrandnc(2,size(SC.SIG.BPM{ord}.(field{1})));
+				SC.RING{ord}.(field{1}) = SC.SIG.BPM{ord}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.BPM{ord}.(field{1})));
 			end
 		end
 	end
@@ -139,10 +154,10 @@ end
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Circumference error
-function SC = applyCircumferenceError(SC)
+function SC = applyCircumferenceError(SC,par)
 	if isfield(SC.SIG,'Circumference')
 		% Define circumference error
-		circScaling = 1 + SC.SIG.Circumference * SCrandnc(2,1,1);
+		circScaling = 1 + SC.SIG.Circumference * SCrandnc(par.nSig,1,1);
 		% Apply circumference error
 		SC.RING = SCscaleCircumference(SC.RING,circScaling,'rel');
 		fprintf('Circumference error applied.\n');
@@ -152,8 +167,8 @@ end
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Suport structure alignemt errors
-function SC = applySupportAlignmentError(SC)
-
+function SC = applySupportAlignmentError(SC,par)
+	
 	% Loop over different support types
 	for type = {'Girder','Plinth','Section'}
 		% Check if support type is registered
@@ -176,12 +191,12 @@ function SC = applySupportAlignmentError(SC)
 				end
 
 				% Generate random error for support structure beginning
-				SC.RING{ordPair(1)}.(field{1}) = SC.SIG.Support{ordPair(1)}.(field{1}) .* SCrandnc(2,size(SC.SIG.Support{ordPair(1)}.(field{1})));
+				SC.RING{ordPair(1)}.(field{1}) = SC.SIG.Support{ordPair(1)}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.Support{ordPair(1)}.(field{1})));
 
 				% Check if uncertanty is specified for endpoint
 				if length(SC.SIG.Support)>=ordPair(2) && isfield(SC.SIG.Support{ordPair(2)},field{1})
 					% Generate random error for support structure endpoint
-					SC.RING{ordPair(2)}.(field{1}) = SC.SIG.Support{ordPair(2)}.(field{1}) .* SCrandnc(2,size(SC.SIG.Support{ordPair(2)}.(field{1})));
+					SC.RING{ordPair(2)}.(field{1}) = SC.SIG.Support{ordPair(2)}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.Support{ordPair(2)}.(field{1})));
 				else
 					% Copy support structure endpoint from structure beginning
 					SC.RING{ordPair(2)}.(field{1}) = SC.RING{ordPair(1)}.(field{1});
@@ -233,7 +248,8 @@ end
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Magnet errors
-function SC = applyMagnetError(SC)
+function SC = applyMagnetError(SC,par)
+	
 	% Check if any uncertainties for the magnets are given
 	if ~isfield(SC.SIG,'Mag')
 		return;
@@ -246,11 +262,14 @@ function SC = applyMagnetError(SC)
 		for field=fieldnames(SC.SIG.Mag{ord})'
 			% Bending angle error gets applied differently
 			if strcmp(field{1},'BendingAngle')
-				SC.RING{ord}.BendingAngleError = SC.SIG.Mag{ord}.BendingAngle * SCrandnc(2,1,1);
+				SC.RING{ord}.BendingAngleError = SC.SIG.Mag{ord}.BendingAngle * SCrandnc(par.nSig,1,1);
+			elseif strcmp(field{1},'MagnetOffset')
+				SC.RING{ord}.(field{1}) = SC.SIG.Mag{ord}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.Mag{ord}.(field{1})));
 			else
-				SC.RING{ord}.(field{1}) = SC.SIG.Mag{ord}.(field{1}) .* SCrandnc(2,size(SC.SIG.Mag{ord}.(field{1})));
+				SC.RING{ord}.(field{1}) = SC.SIG.Mag{ord}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.Mag{ord}.(field{1})));
 			end
 		end
+		
 	end
 end
 
