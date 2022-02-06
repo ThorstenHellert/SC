@@ -37,8 +37,8 @@ function SCplotLattice(SC,varargin)
 %   Specify if 'SC.IDEALRING' should be used to plot twiss functions, otherwise 'SC.RING'.
 % `'plotMagNames'` (0)::
 %   Specify if magnet names should be printed next to the magnets. Note: since Matlab is not able to 
-%   find the best placement of text annotations, it is likely required that the corresponding lines
-%   are adjusted to the users discretion.
+%   find the best placement of text annotations automatically, it is likely required that the 
+%   corresponding lines in the code are adjusted to the users discretion.
 % `'fontSize'` (16)::
 %   Figure font size.
 %
@@ -229,7 +229,7 @@ function SCplotLattice(SC,varargin)
 	% Draw dipole magnets
 	for nM=1:length(DIP)
 		rectangle('Position',[sPos(DIP(nM)),0,sPos(DIP(nM)+1)-sPos(DIP(nM)),scale/2 ],'FaceColor',[0 0 0]);
-		if par.plotMagNames; text(sPos(DIP(nM)),  (-.7 + 0.1*(-1)^(nM) )  * scale ,SC.RING{DIP(nM)}.FamName); end
+% 		if par.plotMagNames; text(sPos(DIP(nM)),  (-.7 + 0.1*(-1)^(nM) )  * scale ,SC.RING{DIP(nM)}.FamName); end
 		if nM==1;legStr{end+1}='Dip';legVec(end+1)=bar(-1,0,'k');end
 	end
 	% Draw quadrupole magnets
