@@ -43,15 +43,20 @@ atpath()
 % For convinience, switch off back-tracing warning messages
 warning off backtrace
 
-
 % Set IDs
 results.IDs        = { 'COSMIC'          , 'LEDA'          , 'TENDER'           , 'U114' , 'XType'            ,'EPU35'               ,'EPU90'                 ,'EPU50'                };
 results.IDsect     = [   5               ,   9             ,    1               ,  10    ,    6               ,  4                   ,  3                     ,  11                   ];
 results.IDmap      = { 'CPShFCShFC.xls'  , 'Kickg4p2.xls'  ,  'TenderKick.xls'  ,  ''    ,  'XtypeIPKick.xls' ,'EPU35-shim6b-HR.prn' , 'EPU90-shim4b-g22.prn' , 'EPU50-good-shims-v1.prn' };
 
-
-% % Load lattice
+% Load lattice
 RING = ALS_U_v21_4raft_SB;
+
+% Remove first BPM after injection (space constraints)
+tmp = SCgetOrds(RING,'BPM1$');
+RING(tmp(1)) = [];
+% Remove last BPM before injection (space constraints)
+tmp = SCgetOrds(RING,'BPM19');
+RING(tmp(end)) = [];
 
 % Include IDs
 RING = IDlib_includeIDs(RING,results.IDs,'Section',results.IDsect);
