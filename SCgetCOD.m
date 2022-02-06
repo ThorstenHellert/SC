@@ -26,6 +26,8 @@ function COD = SCgetCOD(SC,varargin)
 %
 % `'ords'` (`SC.ORD.Magnet`):: 
 % List of magnet ordinates at which the orbit deviation should be evaluated.
+% `'plot'` (`0`):: 
+% Flag indicating if closed orbit deviation should be plotted.
 %
 % RETURN VALUES
 % -------------
