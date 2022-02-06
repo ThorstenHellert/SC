@@ -10,13 +10,16 @@ devrand=fopen('/dev/urandom','r'); rngseed= fread(devrand,1,'*uint32'); rng(rngs
 % Initialize results structure
 results=struct('States',[]);runtime=tic;
 
-% Set SC paths
-mainDir = '~/sc';
+% Define the main SC directory (the one where you put all the downloaded files)
+addpath('~/sc/');
+
+% Define main AR directory 
+mainDir = '~/sc/applications/ALSU_AR';
+% Include the folder where AR routines and scripts (e.g. AR error definitions) are stored
 addpath(mainDir);
-% Set ALS-U AR paths
-addpath(fullfile(mainDir,'applications/ALSU_AR/Multipoles'));
-addpath(fullfile(mainDir,'applications/ALSU_AR/Lattices'));
-addpath(fullfile(mainDir,'applications/ALSU_AR'));
+% Include the folder where all AR lattice files are stored
+addpath(fullfile(mainDir,'Multipoles'));
+addpath(fullfile(mainDir,'Lattices'));
 % Set AT paths
 addpath('~/at/atmat');
 addpath('~/MML/applications/loco');
@@ -82,8 +85,8 @@ SC.INJ.trackMode  = 'TBT';
 SC.INJ.nTurns     = 1;
 
 % Select if progress should be plotted
-plotFunctionFlag = []; % Plot every injection
-globPlotFlag     = 1; % Plot results at various stages
+plotFunctionFlag = 0; % Plot every injection
+globPlotFlag     = 0; % Plot results at various stages
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -238,7 +241,7 @@ for FOO=0 % FAKE Loop. Just something to ``break'' out of if there is a fatal er
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Beam based alignment %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	QuadOrds = getBPM2QuadPairing_ALSU_AR(SC);
-	SC       = SCpseudoBBA(SC,SC.ORD.BPM,QuadOrds,postBBAoffset);
+	SC       = SCpseudoBBA(SC,repmat(SC.ORD.BPM,2,1),QuadOrds,postBBAoffset);
 
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Orbit correction %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
@@ -305,7 +308,7 @@ for FOO=0 % FAKE Loop. Just something to ``break'' out of if there is a fatal er
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Get pre LOCO lattice properties %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
-    results.preLOCO    = SCcalcLatticeProperties(SC,'DAsteps',DAsteps);
+    results.preLOCO    = calcLatticeProperties_ALSU_AR(SC,'DAsteps',DAsteps);
     results.preLOCO.SC = SC;
  
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -320,7 +323,7 @@ for FOO=0 % FAKE Loop. Just something to ``break'' out of if there is a fatal er
 
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Get post LOCO lattice properties %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	results.postLOCO    = SCcalcLatticeProperties(SC,'DAsteps',DAsteps);
+	results.postLOCO    = calcLatticeProperties_ALSU_AR(SC,'DAsteps',DAsteps);
     results.postLOCO.SC = SC;
 
      
