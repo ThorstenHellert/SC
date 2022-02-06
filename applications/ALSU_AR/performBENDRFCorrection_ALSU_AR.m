@@ -11,7 +11,7 @@ function [SC,out] = performBENDRFCorrection_ALSU_AR(SC,targetF,DAsteps)
 	SC = SCsetMags2SetPoints(SC,SCgetOrds(SC.RING,'QFA'),2,2,deltaSP0,'method','rel');
 	
 	% Get pre-LOCO lattice properties and save SC
-	out.preBEND    = SCcalcLatticeProperties(SC,'DAsteps',DAsteps);
+	out.preBEND    = calcLatticeProperties_ALSU_AR(SC,'DAsteps',DAsteps);
 	out.preBEND.SC = SC;
 
 	% Get modeal response matrix
@@ -49,6 +49,6 @@ function [SC,out] = performBENDRFCorrection_ALSU_AR(SC,targetF,DAsteps)
 	SC = performLOCO_ALSU_AR(SC);
 	
 	% Get post-LOCO lattice properties and save SC
-	out.postBEND    = SCcalcLatticeProperties(SC,'DAsteps',DAsteps);
+	out.postBEND    = calcLatticeProperties_ALSU_AR(SC,'DAsteps',DAsteps);
 	out.postBEND.SC = SC;
 end
