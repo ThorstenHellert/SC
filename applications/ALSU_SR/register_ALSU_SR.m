@@ -9,12 +9,12 @@ function [SC, BPMords, CMords] = register_ALSU_SR(SC)
 	
 	% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Add magnet errors to lattice 
-	magOffset     = 1* [30E-6 30E-6 200E-6]  * magErrorFactor; % Offsets of magnets in x, y and z [m]
+	magOffset     = 1* [35E-6 35E-6 200E-6]  * magErrorFactor; % Offsets of magnets in x, y and z [m]
 	magRoll       = 1* [200E-6 0 0]          * magErrorFactor; % Roll of magnets around z-, x- and y-axis [rad]
 	magCal        = 1* 2E-4                  * magErrorFactor; % Relative magnet strength error
 
 	SectionOffset = 1* 100E-6 * [1 1 0]       * magErrorFactor; % Offsets of sections in x, y and z [m]
-	GirderOffset  = 1* 30E-6  * [1 1 0;1 1 0] * magErrorFactor; % Offsets of girders in x, y and z [m]
+	GirderOffset  = 1* 35E-6  * [1 1 0;1 1 0] * magErrorFactor; % Offsets of girders in x, y and z [m]
 	girderRoll    = 1* [100E-6 0 0]           * magErrorFactor; % Roll of girders around z-, x- and y-axis [rad]
 
 	
@@ -22,7 +22,7 @@ function [SC, BPMords, CMords] = register_ALSU_SR(SC)
 	% Add errors to diagnostic devices% 
 	BPMcal          = 1* 5E-2   * [1 1] * diagErrorFactor; % BPM calibration error 
 	BPMoffset       = 1* 500E-6 * [1 1] * diagErrorFactor; % BPM offset [m]
-	BPMnoise        = 1* 3E-6   * [1 1] * diagErrorFactor; % BPM noise [m]
+	BPMnoise        = 1* 30E-6  * [1 1] * diagErrorFactor; % BPM noise [m]
 	BPMnoiseCO      = 1* 1E-6   * [1 1] * diagErrorFactor; % BPM noise for stored beam [m]
 	BPMroll         = 1* 4E-3           * diagErrorFactor; % BPM roll around z-axis [rad]
 	CMcal           = 1* 5E-2           * diagErrorFactor; % CM calibration error
