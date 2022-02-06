@@ -50,7 +50,7 @@ function [SC,wOrds] = IDLib_closeID(SC,ID,varargin)
 	par = p.Results;
 	
 	
-	if strncmp(ID,'LEDA',4) || strcmp(ID,'COSMIC') || strcmp(ID,'TENDER') || strcmp(ID,'EPU36') || strcmp(ID,'XType')
+	if strncmp(ID,'LEDA',4) || strcmp(ID,'COSMIC') || strcmp(ID,'TENDER') || strcmp(ID,'EPU36') || strcmp(ID,'XType') || strcmp(ID,'EPU38')
 		% Import and convert data
 		map  = importdata(par.IDmap);
 		brho = 6.67;

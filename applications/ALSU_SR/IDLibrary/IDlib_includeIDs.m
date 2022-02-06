@@ -61,7 +61,7 @@ function IDelements = getIDElements(RING,name,factor)
 	energy = 2E9;
 	
 	switch name
-		case {'LEDA','COSMIC','TENDER','EPU36','XType','EPU50','EPU35','EPU90'}
+		case {'LEDA','COSMIC','TENDER','EPU36','XType','EPU38','EPU50','EPU35','EPU90'}
 			% Create placeholder for kick map IDs 
 			IDelements.FamName    = name;
 			IDelements.Length     = 0;
