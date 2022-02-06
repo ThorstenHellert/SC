@@ -146,7 +146,7 @@ function [DA,RMAXs,thetas] = SCdynamicAperture(RING,dE,varargin)
 	if par.plot
 		figure(6232);
 		scatter(cos(thetas)'.*RMAXs,sin(thetas)'.*RMAXs);
-		set(gca,'xlim',18E-3*[-1 1],'ylim',18E-3*[-1 1])
+% 		set(gca,'xlim',18E-3*[-1 1],'ylim',18E-3*[-1 1])
 		drawnow;
 	end
 
