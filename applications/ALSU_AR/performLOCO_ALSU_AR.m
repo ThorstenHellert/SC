@@ -85,13 +85,16 @@ end
 % Plot correction progress (for debugging)
 function plotProgress(SC,CorrProgress,Dist)
 	
+	Dist = calcLatticeProperties_ALSU_AR(Dist.SC);
+
+	
 	nSteps = length(CorrProgress);
 	nPlots = 5;
 	tmp=[];
 	for nStep=1:nSteps
 		tmpSC = SC;
 		tmpSC.RING = CorrProgress{nStep};
-		OUT = SCcalcLatticeProperties(tmpSC);
+		OUT = calcLatticeProperties_ALSU_AR(tmpSC);
 		tmp.betaBeat(nStep,:)     = OUT.betaBeat;
 		tmp.dispBeat(nStep,:)     = OUT.dispBeat;
 		tmp.tuneShift(nStep,:)    = OUT.tuneShift;
@@ -108,7 +111,7 @@ function plotProgress(SC,CorrProgress,Dist)
 		plot(1E2*repmat(Dist.betaBeat(nDim),nSteps,1),'k','LineWidth',2);hold on
 		plot(1E2*tmp.betaBeat(:,nDim),'O--','LineWidth',2);
 		xlabel('Iteration');ylabel('\Delta\beta/\beta_0 [%]');title(titleBBstr{nDim})
-		set(gca,'YScale','log')%,'YLim',yLim)
+		set(gca,'YScale','log')
 		
 		subplot(2,nPlots,nPlots*(nDim-1)+2)
 		plot(1E3*repmat(Dist.dispBeat(nDim),nSteps,1),'k','LineWidth',2);hold on
