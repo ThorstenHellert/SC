@@ -126,6 +126,12 @@ function SC = SCregisterSupport(SC,varargin)
 				warning('New error model requires ''Offset'' to be an array of [dx,dy,dz]. dz=0 added. This warning will be removed in future updates. Please update your code. Thanks!')
 				varargin{i+1}(:,3) = 0; % TODO: double check!
 			end
+			% Check if outdated roll is provided
+			if strcmp(varargin{i},'Roll') && size(varargin{i+1},2)==1
+				warning('New error model requires ''Roll'' to be an array of [az,ax,ay]. ax=ay=0 added. This warning will be removed in future updates. Please update your code. Thanks!')
+				varargin{i+1}(1,3) = 0;
+			end
+			
 			% Define uncertainties for start points
 			SC.SIG.Support{ordPair(1)}.([type varargin{i}]) = varargin{i+1}(1,:);
 			% Check if endpoint uncertainties are given
@@ -155,13 +161,13 @@ function SC = SCregisterSupport(SC,varargin)
 		if any(strcmp(varargin,{'Offset'}))
 			offset = varargin{find(strcmp(varargin,{'Offset'}))+1};
 			if size(offset,2)~=3 || (size(offset,1)~=1 && size(offset,1)~=2)
-				error('Support structure offset uncertainty of ''%s'' must be given as [1x3] (start end endpoints get same offset errors) or [2x3] (start end endpoints get independent offset errors) array.',varargin{1})
+				warning('Support structure offset uncertainty of ''%s'' must be given as [1x3] (start end endpoints get same offset errors) or [2x3] (start end endpoints get independent offset errors) array.',varargin{1})
 			end
 		end
 		
 		if any(strcmp(varargin,{'Roll'}))
 			if length(varargin{find(strcmp(varargin,{'Roll'}))+1})~=3
-				error('''%s'' roll uncertainty must be [1x3] array [az,ax,ay] of roll (around z-axis), pitch (roll around x-axis) and yaw (roll around y-axis) angle.',varargin{1})
+				warning('''%s'' roll uncertainty must be [1x3] array [az,ax,ay] of roll (around z-axis), pitch (roll around x-axis) and yaw (roll around y-axis) angle.',varargin{1})
 			end
 		end
 	end
