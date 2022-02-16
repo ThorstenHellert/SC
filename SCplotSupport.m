@@ -58,28 +58,33 @@ function SCplotSupport(SC,varargin)
 	
 	% Get s position and support structure offset and rolls with high resolution
 	C = findspos(SC.RING,length(SC.RING)+1);
-	s = linspace(0,C,100*length(SC.RING));
+	s = linspace(par.xLim(1),par.xLim(2),100*diff(par.xLim));
+	sPos = findspos(SC.RING,1:length(SC.RING));
 	offSupportLine  = SCgetSupportOffset(SC,s);
 	rollSupportLine = SCgetSupportRoll(SC,s);
 	
 	% Magnet offsets and rolls
 	i=0;
 	for ord=SC.ORD.Magnet
-		i=i+1;
-		% Support structure offset
-		offMagSupport(:,i)=SC.RING{ord}.SupportOffset;
-		% Support structure roll
-		rollMagSupport(:,i)=SC.RING{ord}.SupportRoll;
-		
-		% Get individual magnet offset
-		offMagInd(:,i)=SC.RING{ord}.MagnetOffset;
-		% Get individual magnet roll
-		rollMagInd(:,i)=SC.RING{ord}.MagnetRoll;
-		
-		% Get overall magnet offset
-		offMagTot(:,i)=SC.RING{ord}.T2([1 3 6]);
-		% Get overall magnet roll
-		rollMagTot(:,i)=SC.RING{ord}.MagnetRoll + SC.RING{ord}.SupportRoll;
+		if sPos(ord)>=par.xLim(1) && sPos(ord)<=par.xLim(2)
+			i=i+1;
+			% Magnets in range
+			magOrds(i) = ord;
+			% Support structure offset
+			offMagSupport(:,i)=SC.RING{ord}.SupportOffset;
+			% Support structure roll
+			rollMagSupport(:,i)=SC.RING{ord}.SupportRoll;
+			
+			% Get individual magnet offset
+			offMagInd(:,i)=SC.RING{ord}.MagnetOffset;
+			% Get individual magnet roll
+			rollMagInd(:,i)=SC.RING{ord}.MagnetRoll;
+			
+			% Get overall magnet offset
+			offMagTot(:,i)=SC.RING{ord}.T2([1 3 6]);
+			% Get overall magnet roll
+			rollMagTot(:,i)=SC.RING{ord}.MagnetRoll + SC.RING{ord}.SupportRoll;
+		end
 	end
 	
 	% Loop over individual support structure types
@@ -88,26 +93,39 @@ function SCplotSupport(SC,varargin)
 		if isfield(SC.ORD,type{1})
 			i=1;
 			for ordPair=SC.ORD.(type{1})
-				% Get girder start and ending offsets
-				off.(type{1}).a(:,i)=SC.RING{ordPair(1)}.([type{1} 'Offset']);
-				off.(type{1}).b(:,i)=SC.RING{ordPair(2)}.([type{1} 'Offset']);
-				% Get girder rolls
-				roll.(type{1})(:,i)=SC.RING{ordPair(1)}.([type{1} 'Roll']);
-				i = i+1;
+				if (sPos(ordPair(1))>=par.xLim(1) && sPos(ordPair(1))<=par.xLim(2)) || (sPos(ordPair(2))>=par.xLim(1) && sPos(ordPair(2))<=par.xLim(2))
+					% Structures in range
+					SuppOrds.(type{1})(:,i) = ordPair;
+					% Get girder start and ending offsets
+					SuppOff.(type{1}).a(:,i)=SC.RING{ordPair(1)}.([type{1} 'Offset']);
+					SuppOff.(type{1}).b(:,i)=SC.RING{ordPair(2)}.([type{1} 'Offset']);
+					% Get girder rolls
+					SuppRoll.(type{1})(:,i)=SC.RING{ordPair(1)}.([type{1} 'Roll']);
+					i = i+1;
+				end
 			end
 		end
 	end
 	
+	% Find BPMs within plotting range
+	i=0;
+	for ord=SC.ORD.BPM
+		if sPos(ord)>=par.xLim(1) && sPos(ord)<=par.xLim(2)
+			i=i+1;
+			% Magnets in range
+			BPMords(i) = ord;	
+		end
+	end
 	
 	% BPM offsets
-	sBPM         = findspos(SC.RING,SC.ORD.BPM);
-	offBPM       = cell2mat(atgetfieldvalues(SC.RING(SC.ORD.BPM),'Offset'));
-	offBPMStruct = cell2mat(atgetfieldvalues(SC.RING(SC.ORD.BPM),'SupportOffset'));
+	sBPM         = findspos(SC.RING,BPMords);
+	offBPM       = cell2mat(atgetfieldvalues(SC.RING(BPMords),'Offset'));
+	offBPMStruct = cell2mat(atgetfieldvalues(SC.RING(BPMords),'SupportOffset'));
 	offBPM(      :,3) = 0; % Longitudinal offsets not supported for BPMs
 	offBPMStruct(:,3) = 0; % Longitudinal offsets not supported for BPMs
 	% BPM rolls
-	rollBPM       = atgetfieldvalues(SC.RING(SC.ORD.BPM),'Roll',{1,1});
-	rollBPMStruct = atgetfieldvalues(SC.RING(SC.ORD.BPM),'SupportRoll',{1,1});
+	rollBPM       = atgetfieldvalues(SC.RING(BPMords),'Roll',{1,1});
+	rollBPMStruct = atgetfieldvalues(SC.RING(BPMords),'SupportRoll',{1,1});
 	rollBPM(      :,2:3) = 0; % Pitch and yaw not supported for BPMs
 	rollBPMStruct(:,2:3) = 0; % Pitch and yaw not supported for BPMs
 	
@@ -135,36 +153,36 @@ function SCplotSupport(SC,varargin)
 		% Plot line of support offset
 		stairs(s,1E6*offSupportLine(nDim,:));
 		% Plot support offset at magnets
-		plot(findspos(SC.RING,SC.ORD.Magnet),1E6*offMagSupport(nDim,:),'D','Color',tmpCol(1,:));
+		plot(sPos(magOrds),1E6*offMagSupport(nDim,:),'D','Color',tmpCol(1,:));
 		% Fake plot for legend
 		pVec(end+1)=plot([-2 -1],[0 0],'-D','Color',tmpCol(1,:));legStr{end+1}='Overall support structure';
 		
 		% Plot individual magnet offset
-		pVec(end+1)=plot(findspos(SC.RING,SC.ORD.Magnet),1E6*offMagInd(nDim,:),'kx','MarkerSize',8);legStr{end+1}='Individual Magnet';
+		pVec(end+1)=plot(sPos(magOrds),1E6*offMagInd(nDim,:),'kx','MarkerSize',8);legStr{end+1}='Individual Magnet';
 		
 		% Loop over support structure types
 		for type = {'Section','Plinth','Girder'}
-			% Check if support structure is registered
-			if isfield(SC.ORD,type{1})
+			% Check if support structure is registered and within range
+			if isfield(SuppOrds,type{1})
 				% Plot plinth offset
-				for i=1:size(SC.ORD.(type{1}),2)
+				for i=1:size(SuppOrds.(type{1}),2)
 					% Check if support structure spans over injection point
-					if diff(findspos(SC.RING,SC.ORD.(type{1})(:,i)))<0
+					if diff(findspos(SC.RING,SuppOrds.(type{1})(:,i)))<0
 						for nCase=1:2
 							if nCase==1
 								% Interpolate between last support structure and end of ring
-								splot  = findspos(SC.RING,[SC.ORD.(type{1})(1,i) length(SC.RING)]);
-								sint   = [findspos(SC.RING,SC.ORD.(type{1})(1,i)),findspos(SC.RING,SC.ORD.(type{1})(2,i))+C];
+								splot  = findspos(SC.RING,[SuppOrds.(type{1})(1,i) length(SC.RING)]);
+								sint   = [findspos(SC.RING,SuppOrds.(type{1})(1,i)),findspos(SC.RING,SuppOrds.(type{1})(2,i))+C];
 							else
 								% Interpolate between beginning of ring and 1st support structure
-								splot  = findspos(SC.RING,[1 SC.ORD.(type{1})(2,i)]);
-								sint   = [-findspos(SC.RING,SC.ORD.(type{1})(2,i)),findspos(SC.RING,SC.ORD.(type{1})(2,i))];
+								splot  = findspos(SC.RING,[1 SuppOrds.(type{1})(2,i)]);
+								sint   = [-findspos(SC.RING,SuppOrds.(type{1})(2,i)),findspos(SC.RING,SuppOrds.(type{1})(2,i))];
 							end
-							offInt = interp1(sint,[off.(type{1}).a(nDim,i) off.(type{1}).b(nDim,i)],splot);
+							offInt = interp1(sint,[SuppOff.(type{1}).a(nDim,i) SuppOff.(type{1}).b(nDim,i)],splot);
 							plot(splot,1E6*offInt,lineSpec.(type{1}){:})
 						end
 					else
-						plot(findspos(SC.RING,SC.ORD.(type{1})(:,i)),1E6*[off.(type{1}).a(nDim,i) off.(type{1}).b(nDim,i)],lineSpec.(type{1}){:})
+						plot(findspos(SC.RING,SuppOrds.(type{1})(:,i)),1E6*[SuppOff.(type{1}).a(nDim,i) SuppOff.(type{1}).b(nDim,i)],lineSpec.(type{1}){:})
 					end
 				end
 				% Fake plot for legend entry
@@ -184,7 +202,7 @@ function SCplotSupport(SC,varargin)
 		ax(3*(nDim-1)+2,1)=subplot(12,2,2*4*(nDim-1)+ 5);
 		
 		% Plot magnet offset
-		plot(findspos(SC.RING,SC.ORD.Magnet),1E6*offMagTot(nDim,:),'kO-');
+		plot(sPos(magOrds),1E6*offMagTot(nDim,:),'kO-');
 		
 		% Legend and axis stuff
 		legend('Overall magnet offset');
@@ -217,36 +235,36 @@ function SCplotSupport(SC,varargin)
 		% Plot line of total support rolls
 		stairs(s,1E6*rollSupportLine(nDim,:),'Color',tmpCol(1,:));
 		% Plot total support rolls at magnets
-		plot(findspos(SC.RING,SC.ORD.Magnet),1E6*rollMagSupport(nDim,:),'D','Color',tmpCol(1,:));
+		plot(sPos(magOrds),1E6*rollMagSupport(nDim,:),'D','Color',tmpCol(1,:));
 		% Fake plot for legend
 		pVec(end+1)=plot([-2 -1],[0 0],'-D','Color',tmpCol(1,:));legStr{end+1}='Overall support structure';
 		
 		% Plot magnet individual roll
-		pVec(end+1)=plot(findspos(SC.RING,SC.ORD.Magnet),1E6*rollMagInd(nDim,:),'kx','MarkerSize',8);legStr{end+1}='Individual Magnet';
+		pVec(end+1)=plot(sPos(magOrds),1E6*rollMagInd(nDim,:),'kx','MarkerSize',8);legStr{end+1}='Individual Magnet';
 		
 		% Loop over support structure types
 		for type = {'Section','Plinth','Girder'}
 			% Check if support structure is registered
-			if isfield(SC.ORD,type{1})
+			if isfield(SuppOrds,type{1})
 				% Plot plinth offset
-				for i=1:size(SC.ORD.(type{1}),2)
+				for i=1:size(SuppOrds.(type{1}),2)
 					% Check if support structure spans over injection point
-					if diff(findspos(SC.RING,SC.ORD.(type{1})(:,i)))<0
+					if diff(findspos(SC.RING,SuppOrds.(type{1})(:,i)))<0
 						for nCase=1:2
 							if nCase==1
 								% Interpolate between last support structure and end of ring
-								splot  = findspos(SC.RING,[SC.ORD.(type{1})(1,i) length(SC.RING)]);
-								sint   = [findspos(SC.RING,SC.ORD.(type{1})(1,i)),findspos(SC.RING,SC.ORD.(type{1})(2,i))+C];
+								splot  = findspos(SC.RING,[SuppOrds.(type{1})(1,i) length(SC.RING)]);
+								sint   = [findspos(SC.RING,SuppOrds.(type{1})(1,i)),findspos(SC.RING,SuppOrds.(type{1})(2,i))+C];
 							else
 								% Interpolate between beginning of ring and 1st support structure
-								splot  = findspos(SC.RING,[1 SC.ORD.(type{1})(2,i)]);
-								sint   = [-findspos(SC.RING,SC.ORD.(type{1})(2,i)),findspos(SC.RING,SC.ORD.(type{1})(2,i))];
+								splot  = findspos(SC.RING,[1 SuppOrds.(type{1})(2,i)]);
+								sint   = [-findspos(SC.RING,SuppOrds.(type{1})(2,i)),findspos(SC.RING,SuppOrds.(type{1})(2,i))];
 							end
-							rollInt = interp1(sint,roll.(type{1})(nDim,i)*[1 1],splot);
+							rollInt = interp1(sint,SuppRoll.(type{1})(nDim,i)*[1 1],splot);
 							plot(splot,1E6*rollInt,lineSpec.(type{1}){:})
 						end
 					else
-						plot(findspos(SC.RING,SC.ORD.(type{1})(:,i)),1E6*roll.(type{1})(nDim,i)*[1 1],lineSpec.(type{1}){:})
+						plot(findspos(SC.RING,SuppOrds.(type{1})(:,i)),1E6*SuppRoll.(type{1})(nDim,i)*[1 1],lineSpec.(type{1}){:})
 					end
 				end
 				% Fake plot for legend entry
@@ -266,7 +284,7 @@ function SCplotSupport(SC,varargin)
 		ax(3*(nDim-1)+2,2)=subplot(12,2,2*4*(nDim-1)+ 6);hold on
 				
 		% Plot magnet roll
-		plot(findspos(SC.RING,SC.ORD.Magnet),1E6*rollMagTot(nDim,:),'kO-');
+		plot(sPos(magOrds),1E6*rollMagTot(nDim,:),'kO-');
 		
 		% Legend and axis stuff
 		legend('Overall magnet roll');
