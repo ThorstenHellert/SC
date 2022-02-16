@@ -118,7 +118,7 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 
 	% Initialize history. ``hist'' stores the 100 last RMS BPM readings.
 	% Based on this history, the break conditions are checked.
-	hist = nan(1,100);
+	BPMhist = nan(1,100);
 
 	% Main loop. In each step, a correction step is applied and the
 	% break-conditions are checked.
@@ -134,7 +134,7 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 			ERROR = 2; return;
 		end
 
-		if hist(1)<par.target && isStable(min(10,par.maxsteps),par.eps)
+		if BPMhist(1)<par.target && isStable(min(10,par.maxsteps),par.eps)
 			% Succeed, if we are below our RMS BPM-reading 'target'
 			% and the feedback has been stable for the last 10
 			% injections.
@@ -178,7 +178,7 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 			% applying the pseudo-inverse matrix to the current
 			% orbit deviation from the target-orbit 'R0'. The
 			% correction step is then applied and the old RMS-beam
-			% reading is prepended to 'hist'.
+			% reading is prepended to 'BPMhist'.
 			R = [B(1,:)'; B(2,:)'];
 			R(isnan(R))=0;
 			
@@ -190,22 +190,22 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 			end
 			SC = SCsetCMs2SetPoints(SC,par.CMords{1},-dphi(1:length(par.CMords{1})      ),1,'add');
 			SC = SCsetCMs2SetPoints(SC,par.CMords{2},-dphi(  length(par.CMords{1})+1:end),2,'add');
-			hist = circshift(hist,1);
-			hist(1) = sqrt(mean(R.^2,1));
+			BPMhist = circshift(BPMhist,1);
+			BPMhist(1) = sqrt(mean(R.^2,1));
 			ERROR = 0;
 	end
 
 	function res = isStable(n,eps)
 		% Is true, if the coefficient of variation of the last 'n' RMS
 		% BPM-readings is less that 'eps'.
-		CV=var(hist(1:n),1)/std(hist(1:n));
+		CV=var(BPMhist(1:n),1)/std(BPMhist(1:n));
 		res = CV<eps;
 	end
 
 	function res = isConverged(n,eps)
 		% Preliminary convergence criterion
 		% TODO: This is not a very good convergence criterion. PhA
-		CV=var(hist(1:n),1)/std(hist(1:n));
+		CV=var(BPMhist(1:n),1)/std(BPMhist(1:n));
 		res = CV<eps;
 	end
 end

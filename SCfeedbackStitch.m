@@ -101,7 +101,7 @@ function [SC,ERROR] = SCfeedbackStitch(SC,Mplus,varargin)
 	ERROR = 1;
 
 	% Initialize history of last-reached BPMs
-	hist = -1*ones(1,100);
+	BPMhist = -1*ones(1,100);
 
 	% Wiggle (see SCfeedbackFirstTurn) if initially there is not enough
 	% transmission.
@@ -126,13 +126,13 @@ function [SC,ERROR] = SCfeedbackStitch(SC,Mplus,varargin)
 		B = SCgetBPMreading(SC,'BPMords',par.BPMords); % Inject...
 		correctionStep(); % call correction subroutine.
 
-		if isSetback(hist)
+		if isSetback(BPMhist)
 			% Fail, is we have less transmission than before.
 			if par.verbose; fprintf('SCfeedbackStitch: FAIL Setback\n'); end;
 			ERROR=3; return;
 		end
 
-		if isRepro(hist,par.nRepro) && isTransmit(hist)
+		if isRepro(BPMhist,par.nRepro) && isTransmit(BPMhist)
 			% If we had full transmission in the last 'nRepro' injections
 			% we succeed.
 			if par.verbose; fprintf('SCfeedbackStitch: Success\n'); end;
@@ -158,7 +158,7 @@ function [SC,ERROR] = SCfeedbackStitch(SC,Mplus,varargin)
 		% and second-turn deviation from the first turn.
 		% The correction step is then applied and the old
 		% RMS-beam reading is prepended to 'BRMShist'. The last
-		hist = logLastBPM(hist,B);
+		BPMhist = logLastBPM(BPMhist,B);
 		lBPM = size(B,2);
 		Bx1 = B(1,1:lBPM/2);
 		By1 = B(2,1:lBPM/2);
@@ -191,13 +191,13 @@ function [SC,ERROR] = SCfeedbackStitch(SC,Mplus,varargin)
 					SC = SCsetCMs2SetPoints(SC,ord,dpts(2,i),2,'add');
 				end
 				W = SCgetBPMreading(SC,'BPMords',par.BPMords);
-				hist = logLastBPM(hist,W);
+				BPMhist = logLastBPM(BPMhist,W);
 				if isSignal(W,par.nBPMs) % TODO double check. Seems a bit iffy
-					hist = logLastBPM(hist,SCgetBPMreading(SC,'BPMords',par.BPMords));
-					hist = logLastBPM(hist,SCgetBPMreading(SC,'BPMords',par.BPMords));
-					hist = logLastBPM(hist,SCgetBPMreading(SC,'BPMords',par.BPMords));
-					if isRepro(hist,3)
-						hist(1:3) = -1; % void last hist
+					BPMhist = logLastBPM(BPMhist,SCgetBPMreading(SC,'BPMords',par.BPMords));
+					BPMhist = logLastBPM(BPMhist,SCgetBPMreading(SC,'BPMords',par.BPMords));
+					BPMhist = logLastBPM(BPMhist,SCgetBPMreading(SC,'BPMords',par.BPMords));
+					if isRepro(BPMhist,3)
+						BPMhist(1:3) = -1; % void last hist
 						return
 					end
 				end
@@ -239,24 +239,24 @@ function out = goldenDonut(r0, r1, Npts)
 	end
 end
 
-function res = isNew(hist)
+function res = isNew(BPMhist)
 	% True if, last correction step has reached a new BPM
-	res = hist(1)~=hist(2);
+	res = BPMhist(1)~=BPMhist(2);
 end
 
-function res = isSetback(hist)
+function res = isSetback(BPMhist)
 	% True if, last correction step resulted in less transmission
-	res = hist(1)~=0 && hist(1)<hist(3) && hist(2)<hist(3);
+	res = BPMhist(1)~=0 && BPMhist(1)<BPMhist(3) && BPMhist(2)<BPMhist(3);
 end
 
-function res = isRepro(hist,N)
+function res = isRepro(BPMhist,N)
 	% True, if last-reached BPM is the same for N injections
-	res = all(hist(1:N)==hist(1));
+	res = all(BPMhist(1:N)==BPMhist(1));
 end
 
-function res = isTransmit(hist)
+function res = isTransmit(BPMhist)
 	% True, if we have full transmission
-	res = hist(1)==0;
+	res = BPMhist(1)==0;
 end
 
 function res = isSignal(B,nBPMs)
@@ -265,15 +265,15 @@ function res = isSignal(B,nBPMs)
 	res = lastBPMidx >= size(B,2)/2 + nBPMs;
 end
 
-function hist = logLastBPM(hist,B)
-	% Write last reached BPM to 'hist'.
+function BPMhist = logLastBPM(BPMhist,B)
+	% Write last reached BPM to 'BPMhist'.
 	% '0' indicates all BPMs have been reached.
-	hist = circshift(hist,1);
+	BPMhist = circshift(BPMhist,1);
 	ord = getLastBPMord(B);
 	if ord
-		hist(1)=ord;
+		BPMhist(1)=ord;
 	else
-		hist(1)=0;
+		BPMhist(1)=0;
 	end
 end
 

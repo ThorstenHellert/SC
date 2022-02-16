@@ -104,7 +104,7 @@ function [SC,ERROR] = SCfeedbackFirstTurn(SC,Mplus,varargin)
 	if par.verbose; fprintf('SCfeedbackFirstTurn: Start\n'); end;
 
 	%Initialize history, error value and number of wiggled CMs.
-	hist = -1*ones(1,100);
+	BPMhist = -1*ones(1,100);
 	ERROR = 1;
 	nWiggleCM=1;
 
@@ -119,12 +119,12 @@ function [SC,ERROR] = SCfeedbackFirstTurn(SC,Mplus,varargin)
 	
 		correctionStep(); % call correction subroutine.
 
-		if isRepro(hist,5) && isTransmit(hist)
+		if isRepro(BPMhist,5) && isTransmit(BPMhist)
 			% If we had full transmission in the last 5 injections
 			% we succeed.
 			if par.verbose; fprintf('SCfeedbackFirstTurn: Success\n'); end;
 			ERROR = 0; return;
-		elseif isRepro(hist,par.wiggleAfter)
+		elseif isRepro(BPMhist,par.wiggleAfter)
 			% If the last-reached BPM has not changed over 20 injections,
 			% we start the wiggling procedure.
 			if par.verbose; fprintf('SCfeedbackFirstTurn: Wiggling\n'); end;
@@ -151,16 +151,16 @@ function [SC,ERROR] = SCfeedbackFirstTurn(SC,Mplus,varargin)
 				% Inject
 				W = SCgetBPMreading(SC,'BPMords',par.BPMords);
 				% See if we have reached a new BPM
-				hist = logLastBPM(hist,W);
-				if isNew(hist)
+				BPMhist = logLastBPM(BPMhist,W);
+				if isNew(BPMhist)
 					% Inject 3 additional times
-					hist = logLastBPM(hist,SCgetBPMreading(SC,'BPMords',par.BPMords));
-					hist = logLastBPM(hist,SCgetBPMreading(SC,'BPMords',par.BPMords));
-					hist = logLastBPM(hist,SCgetBPMreading(SC,'BPMords',par.BPMords));
+					BPMhist = logLastBPM(BPMhist,SCgetBPMreading(SC,'BPMords',par.BPMords));
+					BPMhist = logLastBPM(BPMhist,SCgetBPMreading(SC,'BPMords',par.BPMords));
+					BPMhist = logLastBPM(BPMhist,SCgetBPMreading(SC,'BPMords',par.BPMords));
 					% Check if all 3 injections had transmission
 					% to the newly reached BPM.
-					if isRepro(hist,3)
-						hist(1:3) = -1; % void last hist
+					if isRepro(BPMhist,3)
+						BPMhist(1:3) = -1; % void last hist
 						nWiggleCM = 0; % Reset Wiggler CM number
 						break % Continue with feedback
 					end
@@ -196,8 +196,8 @@ function [SC,ERROR] = SCfeedbackFirstTurn(SC,Mplus,varargin)
 		% Sub routine that calculates the correction step by applying
 		% the pseudo-inverse matrix to the current orbit deviation from
 		% the target-orbit 'R0'. The correction step is then applied
-		% and the last reached BPM is is prepended to 'hist'.
-		hist = logLastBPM(hist,B);
+		% and the last reached BPM is is prepended to 'BPMhist'.
+		BPMhist = logLastBPM(BPMhist,B);
 		R = [B(1,:)'; B(2,:)'];
 		dR = R-par.R0;
 		dR(isnan(dR)) = 0;
@@ -238,15 +238,15 @@ function idxs = getLastCMsDim(par,B,dim,n)
 	idxs = find(par.CMords{dim} <= lastBPMord,n,'last');
 end
 
-function hist = logLastBPM(hist,B)
-	% Write last reached BPM to 'hist'.
+function BPMhist = logLastBPM(BPMhist,B)
+	% Write last reached BPM to 'BPMhist'.
 	% '0' indicates all BPMs have been reached.
-	hist = circshift(hist,1);
+	BPMhist = circshift(BPMhist,1);
 	ord = getLastBPMord(B);
 	if ord
-		hist(1)=ord;
+		BPMhist(1)=ord;
 	else
-		hist(1)=0;
+		BPMhist(1)=0;
 	end
 end
 
@@ -255,16 +255,16 @@ function ord = getLastBPMord(B)
 	ord = find(isnan(B),1)-1;
 end
 
-function res = isRepro(hist,N)
+function res = isRepro(BPMhist,N)
 	% True, if last-reached BPM is the same for N injections
-	res = all(hist(1:N)==hist(1));
+	res = all(BPMhist(1:N)==BPMhist(1));
 end
 
-function res = isTransmit(hist)
+function res = isTransmit(BPMhist)
 	% True, if we have full transmission
-	res = hist(1)==0;
+	res = BPMhist(1)==0;
 end
 
-function res = isNew(hist)
-	res = hist(1)~=hist(2);
+function res = isNew(BPMhist)
+	res = BPMhist(1)~=BPMhist(2);
 end

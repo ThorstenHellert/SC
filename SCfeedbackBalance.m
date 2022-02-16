@@ -95,7 +95,7 @@ function [SC,ERROR] = SCfeedbackBalance(SC,Mplus,varargin)
 
 	% Initialize history. ``hist'' stores the 100 last last-reached BPM indices.
 	% Based on this history, some break conditions are checked.
-	hist = -1*ones(1,100);
+	BPMindHist = -1*ones(1,100);
 
 	% Initialize history. ``BRMShist'' stores the 100 last RMS BPM readings.
 	% Based on this history, some break conditions are checked.
@@ -109,13 +109,13 @@ function [SC,ERROR] = SCfeedbackBalance(SC,Mplus,varargin)
 		B = SCgetBPMreading(SC,'BPMords',par.BPMords); % Inject ...
 		correctionStep(); % call correction subroutine. See below.
 
-		if isSetback(hist)
+		if isSetback(BPMindHist)
 			% Fail, is we have less transmission than before.
 			if par.verbose; fprintf('SCfeedbackBalance: FAIL (setback)\n'); end;
 			ERROR = 1; return;
 		end
 
-		if ~isTransmit(hist)
+		if ~isTransmit(BPMindHist)
 			% Fail, if we do not have full transmission.
 			if par.verbose; fprintf('SCfeedbackBalance: FAIL (lost transmission)\n'); end;
 			ERROR = 2; return;
@@ -156,8 +156,8 @@ function [SC,ERROR] = SCfeedbackBalance(SC,Mplus,varargin)
 			% and second-turn deviation from the first turn.
 			% The correction step is then applied and the old
 			% RMS-beam reading is prepended to 'BRMShist'. The last
-			% reached BPM index is stored in hist.
-			hist = logLastBPM(hist,B);
+			% reached BPM index is stored in BPMindHist.
+			BPMindHist = logLastBPM(BPMindHist,B);
 			lBPM = size(B,2);
 			Bx1 = B(1,1:lBPM/2);
 			By1 = B(2,1:lBPM/2);
