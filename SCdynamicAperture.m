@@ -42,10 +42,12 @@ function [DA,RMAXs,thetas] = SCdynamicAperture(RING,dE,varargin)
 % `'accuracy'` (`1e-6`)::
 %	is the accuracy to which the dynamic aperture radii are determined [m].
 % `'launchOnOrbit'` (0)::
-%	If true, particles are launched on closed orbit (findorbit4), otherwise on axis
+%	If true, particles are launched on closed orbit, otherwise on axis
 % `'centerOnOrbit'` (1)::
-%	If true, the closed orbit (findorbit4) is subtracted from the DA coordinates, which 
+%	If true, the closed orbit is subtracted from the DA coordinates, which 
 %   is advised for a corrected machine with support structure misalignments.
+% `'useOrbit6'` (0)::
+%   If true, findorbit6 is used to determine the closed orbit, otherwise findorbit4
 % `'auto'` (0)::
 %	if >0, this number of automatically determined sampling points is used,
 %	taking into account a presumed near-elliptical shape of the DA. In this
@@ -78,6 +80,7 @@ function [DA,RMAXs,thetas] = SCdynamicAperture(RING,dE,varargin)
 	addOptional(p,'accuracy',1e-6);
 	addOptional(p,'launchOnOrbit',0);
 	addOptional(p,'centerOnOrbit',1);
+	addOptional(p,'useOrbit6',0);
 	addOptional(p,'auto',0);
 	addOptional(p,'plot',0);
 	addOptional(p,'verbose',0);
@@ -108,9 +111,13 @@ function [DA,RMAXs,thetas] = SCdynamicAperture(RING,dE,varargin)
 
 	ZCO = zeros(6,1);
 	if par.launchOnOrbit
-		tmp = findorbit4(RING,0,[1]); % Closed orbit at reference points
-		if ~isnan(tmp(1))
-			ZCO(1:4) = tmp;
+		if par.useOrbit6
+			ZCO = findorbit6(RING);
+		else
+			tmp = findorbit4(RING,0);
+			if ~isnan(tmp(1))
+				ZCO(1:4) = tmp;
+			end
 		end
 	end
 	ZCO(5) = dE;
@@ -121,26 +128,26 @@ function [DA,RMAXs,thetas] = SCdynamicAperture(RING,dE,varargin)
 	parfor (cntt = 1:length(thetas),parforArg) % Loop over angles
 		theta=thetas(cntt);
 
-		bounds = inibounds;
+		limits = inibounds;
 
 		fatpass(RING,nan(6,1),1,1,[1]); % Fake Track to initialize lattice
 
 		% Scale boundaries up until maxr is included
 		scales=0;
 		while scales<16
-			if check_bounds(RING,ZCO,nturns,theta,bounds); break; end;
-			bounds = scale_bounds(bounds,10);
+			if check_bounds(RING,ZCO,nturns,theta,limits); break; end
+			limits = scale_bounds(limits,10);
 			scales = scales + 1;
-			if par.verbose; fprintf('Scaled: %e %e\n',bounds(1),bounds(2)); end;
+			if par.verbose; fprintf('Scaled: %e %e\n',limits(1),limits(2)); end
 		end
 
 		% Refine boundaries until requested accuracy is reached
-		while abs(bounds(2)-bounds(1)) > par.accuracy 
-			bounds = refine_bounds(RING,ZCO,nturns,theta,bounds);
-			if par.verbose; fprintf('Refined: %e %e\n',bounds(1),bounds(2)); end;
+		while abs(limits(2)-limits(1)) > par.accuracy 
+			limits = refine_bounds(RING,ZCO,nturns,theta,limits);
+			if par.verbose; fprintf('Refined: %e %e\n',limits(1),limits(2)); end
 		end
 		
-		RMAXs(cntt)=mean(bounds); % Store mean of final boundaries
+		RMAXs(cntt)=mean(limits); % Store mean of final boundaries
 		
 	end
 	if par.plot
@@ -158,7 +165,11 @@ function [DA,RMAXs,thetas] = SCdynamicAperture(RING,dE,varargin)
 
 	% Center DA around closed orbit
 	if par.centerOnOrbit 
-		tmp = findorbit4(RING,0,1);
+		if par.useOrbit6
+			tmp = findorbit6(RING);
+		else
+			tmp = findorbit4(RING,0);
+		end
 		if ~isnan(tmp(1))
 			[x,y] = pol2cart(thetas,RMAXs');
 			x = x - tmp(1);
@@ -211,14 +222,14 @@ function bounds = refine_bounds(RING,ZCO,nturns,theta,boundsIn)
 	end
 end
 
-function out = scale_bounds(bounds,alpha)
-	lower = mean(bounds)-(mean(bounds)-bounds(1)) * alpha;
-	upper = mean(bounds)-(mean(bounds)-bounds(2)) * alpha;
+function out = scale_bounds(limits,alpha)
+	lower = mean(limits)-(mean(limits)-limits(1)) * alpha;
+	upper = mean(limits)-(mean(limits)-limits(2)) * alpha;
 	% Prohibit zero-crossing during scaling
-	if sign(lower) ~= sign(bounds(1))
+	if sign(lower) ~= sign(limits(1))
 		lower = 0.0;
 	end
-	if sign(upper) ~= sign(bounds(2))
+	if sign(upper) ~= sign(limits(2))
 		upper = 0.0;
 	end
 	out = [lower,upper];
