@@ -120,7 +120,8 @@ function [DA,RMAXs,thetas] = SCdynamicAperture(RING,dE,varargin)
 			end
 		end
 	end
-	ZCO(5) = dE;
+	% Add energy offset
+	ZCO(5) = ZCO(5) + dE;
 	
 	RMAXs = nan(length(thetas),1); % Initialize output array
 	DA = nan;
