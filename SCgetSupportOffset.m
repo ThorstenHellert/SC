@@ -75,15 +75,23 @@ function off = SCgetSupportOffset(SC,s)
 			off0(2,:) =  limp(off0(2,:),s0,C,s1,ord1,tmpoff1(2,:),s2,ord2,tmpoff2(2,:))';
 			off0(3,:) =  limp(off0(3,:),s0,C,s1,ord1,tmpoff1(3,:),s2,ord2,tmpoff2(3,:))';
 
-			
 		end
 	end
 
-	% Get offsets at requested s-positions
-	[~,b] = unique(s0);
-	off(1,:) = interp1(s0(b),off0(1,b),s,'linear','extrap');
-	off(2,:) = interp1(s0(b),off0(2,b),s,'linear','extrap');
-	off(3,:) = interp1(s0(b),off0(3,b),s,'linear','extrap');
+	% Workaround for bug in plotting which sometimes occurs when many adjacent markers in lattice file with variing offset
+	if ~isequal(s,s0)
+		% Get offsets at requested s-positions
+		[~,b] = unique(s0);
+		
+		% Interpolate offset
+		off(1,:) = interp1(s0(b),off0(1,b),s,'linear','extrap');
+		off(2,:) = interp1(s0(b),off0(2,b),s,'linear','extrap');
+		off(3,:) = interp1(s0(b),off0(3,b),s,'linear','extrap');
+	else
+		% Take offset as piecewise interpolated before
+		off = off0;
+	end
+	
 end
 
 
