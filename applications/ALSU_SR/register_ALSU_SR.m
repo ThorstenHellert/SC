@@ -9,9 +9,9 @@ function [SC, BPMords, CMords] = register_ALSU_SR(SC)
 	
 	% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Add magnet errors to lattice 
-	magOffset     = 1* [35E-6 35E-6 200E-6]  * magErrorFactor; % Offsets of magnets in x, y and z [m]
-	magRoll       = 1* [200E-6 0 0]          * magErrorFactor; % Roll of magnets around z-, x- and y-axis [rad]
-	magCal        = 1* 2E-4                  * magErrorFactor; % Relative magnet strength error
+	magOffset     = 1* [35E-6 35E-6 200E-6]   * magErrorFactor; % Offsets of magnets in x, y and z [m]
+	magRoll       = 1* [200E-6 200E-6 200E-6] * magErrorFactor; % Roll of magnets around z-, x- and y-axis [rad]
+	magCal        = 1* 2E-4                   * magErrorFactor; % Relative magnet strength error
 
 	SectionOffset = 1* 100E-6 * [1 1 0]       * magErrorFactor; % Offsets of sections in x, y and z [m]
 	GirderOffset  = 1* 35E-6  * [1 1 0;1 1 0] * magErrorFactor; % Offsets of girders in x, y and z [m]
