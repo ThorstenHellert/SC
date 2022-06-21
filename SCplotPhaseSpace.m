@@ -36,7 +36,7 @@ function SCplotPhaseSpace(SC,varargin)
 %   Ordinate for plotting.
 % `'plotCO'` (0)::
 %   Logical value defining if closed orbit should be plotted as well.
-% `'costumBunch'` ([])::
+% `'customBunch'` ([])::
 %   [6 x N] array of particle start points for phase space evaluation. If not specified a bunch is
 %   generated using *SCgenBunches*.
 
@@ -45,7 +45,8 @@ function SCplotPhaseSpace(SC,varargin)
 p = inputParser;
 addOptional(p,'ord',1);
 addOptional(p,'plotCO',0);
-addOptional(p,'costumBunch',[]);
+addOptional(p,'costumBunch',[]); % Typo in old version, optional argument will be removed soon
+addOptional(p,'customBunch',[]);
 addOptional(p,'nParticles',SC.INJ.nParticles);
 addOptional(p,'nTurns',SC.INJ.nTurns);
 parse(p,varargin{:});
@@ -59,11 +60,17 @@ end
 SC.INJ.nParticles = par.nParticles;
 SC.INJ.nTurns     = par.nTurns;
 
+% Deal with typo in old version
+if isempty(par.customBunch) && ~isempty(par.costumBunch)
+	warning('Typo in old version, please use ''customBunch'' going forward')
+	par.customBunch = par.costumBunch;
+end
+
 % Generate initial particle distribution
-if isempty(par.costumBunch)
+if isempty(par.customBunch)
 	Zin = SCgenBunches(SC);
 else
-	Zin = par.costumBunch;
+	Zin = par.customBunch;
 	SC.INJ.nParticles = size(Zin,2);
 end
 
