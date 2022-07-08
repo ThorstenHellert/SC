@@ -551,14 +551,14 @@ function [OffsetChange,Error] = dataEvaluation(SC,BPMords,jBPM,BPMpos,tmpTra,nDi
 	end
 
 	% Check if dipole compensation is not used (for combined function quadrupoles)
-	if ~par.dipCompensation && nDim==1
+	if ~par.dipCompensation && nDim==1 && SC.RING{mOrd}.NomPolynomB(2)~=0
 		% Read magnet properties
 		if isfield(SC.RING{mOrd},'BendingAngle')
 			B = SC.RING{mOrd}.BendingAngle;
 		else
 			B = 0;
 		end
-		K = SC.RING{mOrd}.K;
+		K = SC.RING{mOrd}.NomPolynomB(2);
 		L = SC.RING{mOrd}.Length;
 		
 		% Adjust for design quadrupole offset
