@@ -1,3 +1,5 @@
+See also: Penn et al., "Comparisons Between AT and Elegant Tracking", (https://jacow.org/ipac2021/papers/MOPAB119.pdf)
+
 The SC2elegant function takes an AT lattice stored in memory and
 converts it to an elegant lattice file, along with separate files
 for multipole fields as needed.
