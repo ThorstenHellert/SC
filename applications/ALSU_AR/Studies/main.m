@@ -59,8 +59,9 @@ SC = register_ALSU_AR(SC);
 % Define apertures
 SC.RING = defineApertures_ALSU_AR(SC.RING);
 
-% Get model response matrices
-[RM1,RM2,MidealCO,Bref1,Bref2] = SCloadSaveMideal(SC,'AR');
+% Get 1- and 2-turn model response matrices
+RM1 = SCgetModelRM(SC,SC.ORD.BPM,SC.ORD.CM,'nTurns',1,'useIdealRing',1);
+RM2 = SCgetModelRM(SC,SC.ORD.BPM,SC.ORD.CM,'nTurns',2,'useIdealRing',1);
 
 % Apply errors
 SC = SCapplyErrors(SC);

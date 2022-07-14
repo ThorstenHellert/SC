@@ -76,7 +76,8 @@ results.CMords  = CMords;
 SC.RING = setApertures_ALSU_SR(SC.RING);
 
 % Get 1- and 2-turn model response matrices
-[RM1,RM2,~,~,~] = SCloadSaveMideal(SC,'SR','overwrite',1,'BPMords',BPMords,'CMords',CMords);
+RM1 = SCgetModelRM(SC,BPMords,CMords,'nTurns',1,'useIdealRing',1);
+RM2 = SCgetModelRM(SC,BPMords,CMords,'nTurns',2,'useIdealRing',1);
 
 % Apply errors
 SC = SCapplyErrors(SC);
