@@ -83,12 +83,13 @@ function [B,T] = SCgetBPMreading(SC,varargin)
 
 
 	global plotFunctionFlag
-
+	
 	% Parse optional arguments
 	p = inputParser;
 	addOptional(p,'BPMords',[]);
 	parse(p,varargin{:});
 
+	
 	% Switch orbit or tracking mode
 	if strcmp(SC.INJ.trackMode,'ORB')
 		nTurns     = 1;
@@ -217,7 +218,16 @@ function B = calcBPMreading(SC,T,varargin)
 	BPMcalError = repmat(cell2mat(atgetfieldvalues(SC.RING(SC.ORD.BPM),'CalError'))',1,nTurns);
 	BPMroll     = repmat(atgetfieldvalues(SC.RING(SC.ORD.BPM),'Roll')',1,nTurns) + repmat(atgetfieldvalues(SC.RING(SC.ORD.BPM),'SupportRoll')',1,nTurns);
 	BPMnoise    = repmat(    BPMnoise   ,1,nTurns) .* SCrandnc(2,2,nTurns*length(SC.ORD.BPM));
-
+	BPMsumError = repmat(atgetfieldvalues(SC.RING(SC.ORD.BPM),'SumError')',1,nTurns);
+	
+	% Check if trajectories were given not only at BPMs
+	if p.Results.atAllElements
+		% Indices of BPMs in trajectories
+		nE = reshape((0:nTurns-1)*length(SC.RING)+SC.ORD.BPM',1,[]);
+	else
+		nE = 1:(length(SC.ORD.BPM)*nTurns);
+	end
+	
 	% Check for multiparticle tracking
 	if nParticles > 1
 
@@ -225,35 +235,35 @@ function B = calcBPMreading(SC,T,varargin)
 		M = SCparticlesIn3D(T,nParticles);
 
 		% Read x and y positions
-		Tx = squeeze(M(1,:,:));
-		Ty = squeeze(M(3,:,:));
-
-		% Check for detactable BPM signal
-		beamLost  = find( sum( isnan( Tx ),2 ) > ( nParticles * SC.INJ.beamLostAt ),1);
+		Tx = squeeze(M(1,nE,:));
+		Ty = squeeze(M(3,nE,:));
 
 		% Calculate center of charge
 		Bx1 = mean(Tx,2,'omitnan')';
 		By1 = mean(Ty,2,'omitnan')';
-	else
-		Bx1 = T(1,:);
-		By1 = T(3,:);
-
+		
 		% Check for detactable BPM signal
-		beamLost  = find( isnan( Bx1 ) ,1);
+		beamLost  = find( sum( isnan( Tx ),2 )' .* (1 + BPMsumError.*SCrandnc(2,size(BPMsumError))) > ( nParticles * SC.INJ.beamLostAt ),1);
+
+		% Reflect effective non detectable signal
+		Bx1(beamLost:end) = nan;
+		By1(beamLost:end) = nan;
+
+	else
+		% Read x and y positions
+		Bx1 = T(1,nE);
+		By1 = T(3,nE);
 	end
 
-	% Reflect effective non detectable signal
-	Bx1(beamLost:end) = nan;
-	By1(beamLost:end) = nan;
 
-	% Check if trajectories were given not only at BPMs
-	if p.Results.atAllElements
-		% Indices of BPMs in trajectories
-		nE = reshape((0:nTurns-1)*length(SC.RING)+SC.ORD.BPM',1,[]);
-		% Select trajectory at BPM
-		Bx1 = Bx1(nE);
-		By1 = By1(nE);
-	end
+% 	% Check if trajectories were given not only at BPMs
+% 	if p.Results.atAllElements
+% 		% Indices of BPMs in trajectories
+% 		nE = reshape((0:nTurns-1)*length(SC.RING)+SC.ORD.BPM',1,[]);
+% 		% Select trajectory at BPM
+% 		Bx1 = Bx1(nE);
+% 		By1 = By1(nE);
+% 	end
 
 	% Add roll error
 	Bx = cos(BPMroll) .* Bx1 - sin(BPMroll) .* By1;

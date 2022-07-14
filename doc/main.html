@@ -519,7 +519,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#SCgetSupportRoll">SCgetSupportRoll</a></li>
 <li><a href="#SCgetTransformation">SCgetTransformation</a></li>
 <li><a href="#SCinit">SCinit</a></li>
-<li><a href="#SCloadSaveMideal">SCloadSaveMideal</a></li>
 <li><a href="#SClocoLib">SClocoLib</a></li>
 <li><a href="#SCmomentumAperture">SCmomentumAperture</a></li>
 <li><a href="#SCmultipolesRead">SCmultipolesRead</a></li>
@@ -527,6 +526,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#SCplotBPMreading">SCplotBPMreading</a></li>
 <li><a href="#SCplotCMstrengths">SCplotCMstrengths</a></li>
 <li><a href="#SCplotLattice">SCplotLattice</a></li>
+<li><a href="#SCplotLattice_backup220627">SCplotLattice</a></li>
 <li><a href="#SCplotPhaseSpace">SCplotPhaseSpace</a></li>
 <li><a href="#SCplotSupport">SCplotSupport</a></li>
 <li><a href="#SCpseudoBBA">SCpseudoBBA</a></li>
@@ -586,7 +586,7 @@ fields.</p>
 <p>Initialization of the <code>SC</code> core structure</p>
 </li>
 <li>
-<p>Error source definition &amp; registration</p>
+<p>Error source definition &amp; registration of elements</p>
 </li>
 <li>
 <p>Generation of a machine realization including errors</p>
@@ -672,7 +672,7 @@ The function <a href="#SCsanityCheck">SCsanityCheck</a> helps identifying unreas
 <div class="paragraph">
 <p>Errors are randomly generated based on the uncertainties stored in <code>SC.SIG</code>
 and applied to the lattice via <a href="#SCapplyErrors">SCapplyErrors</a>.
-Typically, errors are modeled to follow a 2 <code>sigma</code>-truncated Gaussian
+By default, errors are modeled to follow a 2 <code>sigma</code>-truncated Gaussian
 distribution, where <code>sigma</code> is the value specified in <code>SC.SIG</code>. The actual realization of misalignments
 can be viewed by calling <a href="#SCplotSupport">SCplotSupport</a>.</p>
 </div>
@@ -697,7 +697,7 @@ and observing the readings of the BPMs previously defined by <a href="#SCregiste
 taking into account <a href="#err:inj">injection errors</a>, BPM offsets, BPM calibration errors,
 and more as described in the <a href="#sec:err">error descriptions</a>.</p>
 </div>
-<div class="paragraph">
+<div id="sec:inj" class="paragraph">
 <p>All information regarding the injection pattern are centrally stored in the
 <code>SC.INJ</code> structure, which includes the fields</p>
 </div>
@@ -714,6 +714,10 @@ Number of turns for tracking.</p>
 <li>
 <p>nShots:
 Number of injections used for averaging the BPM readings.</p>
+</li>
+<li>
+<p>beamLostAt:
+Fraction of particles below which a BPM does not return a proper reading anymore but a beam loss</p>
 </li>
 <li>
 <p>Z0ideal:
@@ -752,7 +756,7 @@ The BPM readings are averaged over the turns, giving a good estimate of the orbi
 </li>
 <li>
 <p><code>'ORB'</code> (orbit mode):
-It is assumed that stored beam has been achieved, so that the <code>AT</code> function <code>findorbit6</code> can be used to determine the orbit and BPM errors are applied.</p>
+It is assumed that stored beam has been achieved, so that the <code>AT</code> function <code>findorbit6</code> can be used to determine the orbit and BPM errors are applied. <code>nTurns</code> and <code>nParticles</code> are obsolete in this tracking mode</p>
 </li>
 </ul>
 </div>
@@ -815,6 +819,10 @@ Individual BPM rolls</p>
 <li>
 <p>SupportRoll:
 <a href="#err:support">Support structure (girder) roll</a> w.r.t. the design coordinate frame at the location of the BPMs.</p>
+</li>
+<li>
+<p>SumError:
+Calibration error of the sum signal. The sum signal is used to determine the beam loss location with a cutoff as defined <code>SC.INJ.beamLostAt</code> (see <a href="#sec:inj">injection pattern</a>).</p>
 </li>
 </ul>
 </div>
@@ -954,7 +962,7 @@ rotation of dipole magnets.</p>
 <p>Higher order multipole errors can be assigned in two different ways; static or dynamically updated. Dynamically updated multipoles are typically attributed to systematic multipoles.</p>
 </div>
 <div class="paragraph">
-<p>Systematic multipole tables must be in AT&#8217;s PolynomA/B units and normalized to the considered component. For example, a <code>[Nx2]</code> multipole table <code>AB_VCM</code> induced by the excitation of a vertical dipole corrector coil must have 1.0 at index <code>AB_VCM(1,1)</code>, for a skew quadrupole corrector it&#8217;s <code>AB_SQ(2,1)=1</code>.</p>
+<p>Systematic multipole tables must be in AT&#8217;s PolynomA/B units and normalized to the considered component. For example, a <code>[Nx2]</code> table <code>AB_HCM</code> containing the multipoles induced by the excitation of a horizontal dipole corrector coil must have 1.0 at index <code>AB_HCM(1,2)</code>, for a table with systematic multipoles corresponding to a skew quadrupole corrector it would be <code>AB_SQ(2,1)=1</code>.</p>
 </div>
 <div class="paragraph">
 <p>Multipole error tables can be read by <a href="#SCmultipolesRead">SCmultipolesRead</a> from a file and set by <a href="#SCsetMultipoles">SCsetMultipoles</a> to the lattice structure. After setting the systematic multipoles with <a href="#SCsetMultipoles">SCsetMultipoles</a> the corresponding lattice element may include the fields</p>
@@ -980,31 +988,47 @@ rotation of dipole magnets.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>In the above example,
-SysPolAFromA = {AB_VCM(:,1)}
-SysPolBFromA = {AB_VCM(:,2)}
-SysPolAFromB = {[], AB_SQ(:,1)}
-SysPolBFromB = {[], AB_SQ(:,2)}</p>
+<p>For the example above with a HCM and a skew quadrupole corrector coil the fields would like like the follwoing:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>SysPolAFromB = {AB_HCM(:,1)}</p>
+</li>
+<li>
+<p>SysPolBFromB = {AB_HCM(:,2)}</p>
+</li>
+<li>
+<p>SysPolAFromA = {[], AB_SQ(:,1)}</p>
+</li>
+<li>
+<p>SysPolBFromA = {[], AB_SQ(:,2)}</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>Note that each array may have a different length and that <a href="#SCsetMultipoles">SCsetMultipoles</a> sets the corresponding primary component to zero so that it does not get added later on. Each time the magnet fields are updated via <a href="#SCupdateMagnets">SCupdateMagnets</a>, the systematic multipoles are scaled by the current magnet excitation. In this example the normal and skew quadrupole multipole components, <code>polBi</code> and <code>polAi</code>, related to the normal quadrupole excitation are calcualted as</p>
+<p>Note that each array of multipoles may have a different length and that <a href="#SCsetMultipoles">SCsetMultipoles</a> sets the corresponding primary component to zero so that it does not get added later on. Each time the magnet fields are updated via <a href="#SCupdateMagnets">SCupdateMagnets</a>, the systematic multipoles are scaled by the current magnet excitation. In this example the normal and skew multipole components related to the skew quadrupole excitation are calcualted as</p>
 </div>
 <div class="paragraph">
-<p>polAi = [(1 + <code>CalErrorB(2)</code>) .* <code>SetPointB(2)</code>] * <code>SysPolAFromB{2}</code>,
-polBi = [(1 + <code>CalErrorB(2)</code>) .* <code>SetPointB(2)</code>] * <code>SysPolBFromB{2}</code>,</p>
+<p>polA_SQ(i) = [(1 + <code>CalErrorA(2)</code>) .* <code>SetPointA(2)</code>] * <code>SysPolAFromA{2}(i)</code>,</p>
 </div>
 <div class="paragraph">
-<p>the normal and skew dipole component goes as</p>
+<p>polB_SQ(i) = [(1 + <code>CalErrorA(2)</code>) .* <code>SetPointA(2)</code>] * <code>SysPolBFromA{2}(i)</code>,</p>
 </div>
 <div class="paragraph">
-<p>polAm = [(1 + <code>CalErrorA(1)</code>) .* <code>SetPointA(1)</code>] * <code>SysPolAFromA{2}</code>,
-polBm = [(1 + <code>CalErrorA(1)</code>) .* <code>SetPointA(1)</code>] * <code>SysPolBFromA{2}</code>.</p>
+<p>and the normal and skew multipoles associated with the horizontal dipole excitation goes as</p>
+</div>
+<div class="paragraph">
+<p>polA_HCM(i) = [(1 + <code>CalErrorB(1)</code>) .* <code>SetPointB(1)</code>] * <code>SysPolAFromB{1}(i)</code>,</p>
+</div>
+<div class="paragraph">
+<p>polB_HCM(i) = [(1 + <code>CalErrorB(1)</code>) .* <code>SetPointB(1)</code>] * <code>SysPolBFromB{1}(i)</code>.</p>
 </div>
 <div class="paragraph">
 <p>All systematic multipoles are calculated analogously, summed up and added to the primary coil field excitations.</p>
 </div>
 <div class="paragraph">
-<p>Additionally random multipole errors can be assigned via <a href="#SCsetMultipoles">SCsetMultipoles</a>. Here each multipole table entry gets scaled with a 2-sigma truncated Gaussian random number and stored in the lattice element field <code>PolynomBOffset</code> and <code>PolynomBOffset</code>. It is hereby assumed that the random multipole errors are static.</p>
+<p>Additionally random multipole errors can be assigned via <a href="#SCsetMultipoles">SCsetMultipoles</a>. Here each multipole table entry gets scaled with a 2-sigma truncated Gaussian random number and stored in the lattice element field <code>PolynomBOffset</code> and <code>PolynomBOffset</code>. It is hereby assumed that the random multipole errors are static and not affected by the setpoints of the magnets.</p>
 </div>
 <div class="paragraph">
 <p>See also <a href="#SCregisterMagnets">SCregisterMagnets</a>, <a href="#SCupdateMagnets">SCupdateMagnets</a> and <a href="#SCsetMultipoles">SCsetMultipoles</a>.</p>
@@ -1059,7 +1083,7 @@ offset errors only.</p>
 <div class="content">
 <img src="../fig_supportModel.jpg" alt="fig supportModel" width="700">
 </div>
-<div class="title">Figure 2. Illustration of different possible support structure implementations.</div>
+<div class="title">Figure 2. Illustration of different possible support structure implementations (see <a href="#SCregisterSupport">SCregisterSupport</a> for more details and examples).</div>
 </div>
 <div class="paragraph">
 <p>A global circumference error is modeled by <a href="#SCscaleCircumference">SCscaleCircumference</a> which scales all drift spaces such that the sections between two dipoles are scaled coherently.</p>
@@ -1077,7 +1101,7 @@ offset errors only.</p>
 <p>If only small random magnet and BPM errors are considered as in <a href="#img-coordSystem">Figure 3 a)</a>, the particle trajectories and the BPM readings follow the design axis which is identical to the machine axis as defined by the magnet centers. In b) we assume a well corrected machine, e.g. one where the particles pass through the magnet centers which have offsets due to significant girder offsets. The BPMs in this example are distributed around the design axis. Both particle trajectories and BPM readings show large oscillations in AT’s coordinate system as the particles follow the magnets.</p>
 </div>
 <div class="paragraph">
-<p>In the toolkit, however, it is by default assumed that BPMs are mounted on the girders, as indicated in c). While the particle trajectory oscilations remain, the calculated BPM readings in this case are distributed around AT’s design axis. In a similar way using AT’s findorbit6() to calculate the closed orbit deviation would not necessarily reflect the machine state. Instead, the orbit deviation w.r.t. the magnet centers should be evaluated, see <a href="#SCgetCOD">SCgetCOD</a>.</p>
+<p>In the toolkit, however, it is by default assumed that BPMs are mounted on the girders, as indicated in c). While the particle trajectory oscilations remain, the calculated BPM readings in this case are distributed around AT’s design axis. In such a case using AT’s findorbit6() to calculate the closed orbit deviation would not necessarily reflect the machine state. Instead, the orbit deviation with respect to the magnet centers should be evaluated, see <a href="#SCgetCOD">SCgetCOD</a>.</p>
 </div>
 </div>
 </div>
@@ -1675,9 +1699,6 @@ end</code></pre>
 <p><a href="#SCinit">SCinit</a></p>
 </li>
 <li>
-<p><a href="#SCloadSaveMideal">SCloadSaveMideal</a></p>
-</li>
-<li>
 <p><a href="#SCregisterBPMs">SCregisterBPMs</a></p>
 </li>
 <li>
@@ -2084,6 +2105,7 @@ injection and BBA-BPM (2-turn mode only).</p>
 <div class="paragraph">
 <p><a href="#SCsetMags2SetPoints">SCsetMags2SetPoints</a>, <a href="#SCgetBPMreading">SCgetBPMreading</a>, <a href="#SCfeedbackRun">SCfeedbackRun</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -2122,7 +2144,7 @@ Gaussian distribution with a cutoff (see option below) and <code>sigma</code> be
 value of the uncertainty field. The number will be stored in the
 corresponding field of the lattice structure, thus <code>SC.RING{ord}</code>. An
 exeption are bending angle errors which are stored in the <code>BendingAngleError</code>
-field. See examples in the register functions for more details.</p>
+field. See examples in the SCregister* functions for more details.</p>
 </div>
 </div>
 <div class="sect3">
@@ -2134,7 +2156,8 @@ field. See examples in the register functions for more details.</p>
 <dl>
 <dt class="hdlist1"><code>'nSig'</code> (2)</dt>
 <dd>
-<p>Number of sigmas at which the Gaussian distribution of errors is truncated.</p>
+<p>	Number of sigmas at which the Gaussian distribution of errors is truncated if not defined
+explicitly for individual uncertainties.</p>
 </dd>
 </dl>
 </div>
@@ -2155,6 +2178,7 @@ field. See examples in the register functions for more details.</p>
 <div class="paragraph">
 <p><a href="#SCregisterMagnets">SCregisterMagnets</a>, <a href="#SCregisterSupport">SCregisterSupport</a>, <a href="#SCregisterBPMs">SCregisterBPMs</a>, <a href="#SCregisterCAVs">SCregisterCAVs</a>, <a href="#SCrampUpErrors">SCrampUpErrors</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -2200,6 +2224,7 @@ on or off. Possible <code>mode`s are &#8217;radiationoff'</code>, <code>'radiati
 <pre>SC.RING = SCcronoff(SC.RING,'cavityoff','radiatonoff');</pre>
 </div>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -2268,12 +2293,16 @@ refined in this routine, so a rough guess is good enough.</p>
 </dd>
 <dt class="hdlist1"><code>'launchOnOrbit'</code> (0)</dt>
 <dd>
-<p>If true, particles are launched on closed orbit (findorbit4), otherwise on axis</p>
+<p>If true, particles are launched on closed orbit, otherwise on axis</p>
 </dd>
 <dt class="hdlist1"><code>'centerOnOrbit'</code> (1)</dt>
 <dd>
-<p>	If true, the closed orbit (findorbit4) is subtracted from the DA coordinates, which
+<p>	If true, the closed orbit is subtracted from the DA coordinates, which
 is advised for a corrected machine with support structure misalignments.</p>
+</dd>
+<dt class="hdlist1"><code>'useOrbit6'</code> (0)</dt>
+<dd>
+<p>If true, findorbit6 is used to determine the closed orbit, otherwise findorbit4</p>
 </dd>
 <dt class="hdlist1"><code>'auto'</code> (0)</dt>
 <dd>
@@ -2321,6 +2350,7 @@ case <code>'thetas'</code> is ignored.</p>
 </dd>
 </dl>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -2446,6 +2476,7 @@ that <code>Mplus</code> might be unstable.</p>
 <div class="paragraph">
 <p><a href="#SCgetPinv">SCgetPinv</a>, <a href="#SCfeedbackRun">SCfeedbackRun</a>, <a href="#SCfeedbackFirstTurn">SCfeedbackFirstTurn</a>, <a href="#SCfeedbackStitch">SCfeedbackStitch</a>, <a href="#SCgetBPMreading">SCgetBPMreading</a>, <a href="#SCsetCMs2SetPoints">SCsetCMs2SetPoints</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -2588,6 +2619,7 @@ of wiggling-CMs.</p>
 <div class="paragraph">
 <p><a href="#SCgetPinv">SCgetPinv</a>, <a href="#SCfeedbackRun">SCfeedbackRun</a>, <a href="#SCfeedbackStitch">SCfeedbackStitch</a>, <a href="#SCfeedbackBalance">SCfeedbackBalance</a>, <a href="#SCgetBPMreading">SCgetBPMreading</a>, <a href="#SCsetCMs2SetPoints">SCsetCMs2SetPoints</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -2740,6 +2772,7 @@ MinvCO = SCgetPinv([MCO 1E7*eta],'alpha',10);
 <div class="paragraph">
 <p><a href="#SCgetPinv">SCgetPinv</a>, <a href="#SCfeedbackStitch">SCfeedbackStitch</a>, <a href="#SCfeedbackFirstTurn">SCfeedbackFirstTurn</a>, <a href="#SCfeedbackBalance">SCfeedbackBalance</a>, <a href="#SCgetBPMreading">SCgetBPMreading</a>, <a href="#SCsetCMs2SetPoints">SCsetCMs2SetPoints</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -2873,6 +2906,7 @@ SC.INJ.nTurns = 2;
 <div class="paragraph">
 <p><a href="#SCgetPinv">SCgetPinv</a>, <a href="#SCgetModelRM">SCgetModelRM</a>, <a href="#SCfeedbackRun">SCfeedbackRun</a>, <a href="#SCfeedbackFirstTurn">SCfeedbackFirstTurn</a>, <a href="#SCfeedbackBalance">SCfeedbackBalance</a>, <a href="#SCgetBPMreading">SCgetBPMreading</a>, <a href="#SCsetCMs2SetPoints">SCsetCMs2SetPoints</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -2962,6 +2996,7 @@ A linear regression is used to identify the injected beam trajectory.</p>
 </dd>
 </dl>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -3058,6 +3093,7 @@ generated particles.</p>
 <div class="paragraph">
 <p><a href="#SCgetBPMreading">SCgetBPMreading</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -3198,6 +3234,7 @@ B = SCgetBPMreading(SC);</pre>
 <div class="paragraph">
 <p><a href="#SCgenBunches">SCgenBunches</a>, <a href="#SCregisterBPMs">SCregisterBPMs</a>, <a href="#SCplotBPMreading">SCplotBPMreading</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -3273,6 +3310,7 @@ determined by using the user specified field <code>SC.INJ.beamLostAt</code>.</p>
 <div class="paragraph">
 <p><a href="#SCgenBunches">SCgenBunches</a>, <a href="#SCgetBPMreading">SCgetBPMreading</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -3330,6 +3368,7 @@ determined by using the user specified field <code>SC.INJ.beamLostAt</code>.</p>
 <div class="paragraph">
 <p><a href="#SCsetCMs2SetPoints">SCsetCMs2SetPoints</a>, <a href="#SCregisterMagnets">SCregisterMagnets</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -3402,6 +3441,7 @@ determined by using the user specified field <code>SC.INJ.beamLostAt</code>.</p>
 <pre>COD = SCgetCOD(SC,'ords',SCgetOrds(SC.RING,'SF|SD'),'plot',1);</pre>
 </div>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -3490,6 +3530,7 @@ specified, the measurement is bi-directional</p>
 <div class="paragraph">
 <p><a href="#SCsetCavs2SetPoints">SCsetCavs2SetPoints</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -3548,6 +3589,7 @@ errors. Optionally the design lattice is used.</p>
 <div class="paragraph">
 <p><a href="#SCgetDispersion">SCgetDispersion</a>, <a href="#SCgetModelRM">SCgetModelRM</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -3595,6 +3637,7 @@ lattice errors and dipole fields are excluded.</p>
 </dd>
 </dl>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -3666,6 +3709,7 @@ option 'trackMode'.</p>
 </dd>
 </dl>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -3736,6 +3780,7 @@ each of them in a cell array <code>ords</code>.</p>
 <pre>ords = SCgetOrds(SC.RING,{'^QF$','^QD$'});</pre>
 </div>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -3841,6 +3886,7 @@ Tikhonov regularization with regularization parameter of 10.</p>
 <div class="paragraph">
 <p><a href="#SCgetModelRM">SCgetModelRM</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -3951,6 +3997,7 @@ specified, the measurement is bi-directional</p>
 <div class="paragraph">
 <p><a href="#SCgetModelRM">SCgetModelRM</a>, <a href="#SCgetBPMreading">SCgetBPMreading</a>, <a href="#SCsetCMs2SetPoints">SCsetCMs2SetPoints</a>, <a href="#SCgetCMSetPoints">SCgetCMSetPoints</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -4009,6 +4056,7 @@ local coordinate system along the beam trajectory.</p>
 <div class="paragraph">
 <p><a href="#SCregisterSupport">SCregisterSupport</a>, <a href="#SCupdateSupport">SCupdateSupport</a>, <a href="#SCgetSupportRoll">SCgetSupportRoll</a>, <a href="#SCplotSupport">SCplotSupport</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -4067,6 +4115,7 @@ local coordinate system along the beam trajectory.</p>
 <div class="paragraph">
 <p><a href="#SCregisterSupport">SCregisterSupport</a>, <a href="#SCupdateSupport">SCupdateSupport</a>, <a href="#SCgetSupportRoll">SCgetSupportRoll</a>, <a href="#SCplotSupport">SCplotSupport</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -4128,11 +4177,12 @@ local coordinate system along the beam trajectory.</p>
 <div class="paragraph">
 <p><a href="#SCregisterSupport">SCregisterSupport</a>, <a href="#SCupdateSupport">SCupdateSupport</a>, <a href="#SCgetSupportOffset">SCgetSupportOffset</a>, <a href="#SCplotSupport">SCplotSupport</a>, <a href="#SCapplyErrors">SCapplyErrors</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
 <h3 id="SCgetTransformation">SCgetTransformation</h3>
-
+<hr>
 </div>
 <div class="sect2">
 <h3 id="SCinit">SCinit</h3>
@@ -4182,131 +4232,25 @@ trajectories and BPM readings.</p>
 </dd>
 </dl>
 </div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="SCloadSaveMideal">SCloadSaveMideal</h3>
-<div class="sect3">
-<h4 id="_name_26">NAME</h4>
-<div class="paragraph">
-<p>SCloadSaveMideal - load/save ideal response matrices and reference trajectory</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_synopsis_26">SYNOPSIS</h4>
-<div class="paragraph">
-<p><code>[RM1,RM2,RMCO,Bref1,Bref2] = SCloadSaveMideal(SC, str)</code></p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_description_26">DESCRIPTION</h4>
-<div class="paragraph">
-<p>This script loads the precalculated ideal trajectory response matrices named with the string <code>str</code>,
-if they exist. Otherwise the 1 and 2-turn trajectory response and orbit response matrices are
-calculated and saved. Also calculated are the 1 and 2-turn reference trajectories.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_inputs_13">INPUTS</h4>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>SC</code></dt>
-<dd>
-<p>SC base structure</p>
-</dd>
-<dt class="hdlist1"><code>flag</code></dt>
-<dd>
-<p>String which is used to identify the response matrices</p>
-</dd>
-</dl>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_options_19">OPTIONS</h4>
-<div class="paragraph">
-<p>The following options can be specified as name-value pairs:</p>
-</div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>'overwrite'</code> (0)</dt>
-<dd>
-<p>If true, response matrizes will be calculated and saved even if the files exist</p>
-</dd>
-<dt class="hdlist1"><code>'CMords'</code> (<code>SC.ORD.CM</code>)</dt>
-<dd>
-<p>List of CM ordinates</p>
-</dd>
-<dt class="hdlist1"><code>'BPMords'</code> (<code>SC.ORD.BPM</code>)</dt>
-<dd>
-<p>List of BPM ordinates</p>
-</dd>
-</dl>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_return_value_12">RETURN VALUE</h4>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>RM1</code></dt>
-<dd>
-<p>1-turn trajectory response matrix.</p>
-</dd>
-<dt class="hdlist1"><code>RM2</code></dt>
-<dd>
-<p>2-turn trajectory response matrix.</p>
-</dd>
-<dt class="hdlist1"><code>RMCO</code></dt>
-<dd>
-<p>Orbit response matrix.</p>
-</dd>
-<dt class="hdlist1"><code>Bref1</code></dt>
-<dd>
-<p>1-turn reference trajectory.</p>
-</dd>
-<dt class="hdlist1"><code>Bref2</code></dt>
-<dd>
-<p>2-turn reference trajectory.</p>
-</dd>
-</dl>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_examples_9">EXAMPLES</h4>
-<div class="paragraph">
-<p>Check if the files <code>RM1_FODO</code>, <code>RM2_FODO</code> and <code>RMCO_FODO</code> exist and load them. Otherwise
-the response matrices for one and two turns and the orbit response matrix are calculated and
-saved under the previously mentioned file names. Additionally returns the 1 and 2 turn reference
-trajectory which might be usefull for off-axis injection schemes.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>[RM1,RM2,RMCO,Bref1,Bref2] = SCloadSaveMideal(SC,'_FODO')</pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_see_also_18">SEE ALSO</h4>
-<div class="paragraph">
-<p><a href="#SCgetModelRM">SCgetModelRM</a>, <a href="#SCgetBPMreading">SCgetBPMreading</a></p>
-</div>
+<hr>
 </div>
 </div>
 <div class="sect2">
 <h3 id="SClocoLib">SClocoLib</h3>
 <div class="sect3">
-<h4 id="_name_27">NAME</h4>
+<h4 id="_name_26">NAME</h4>
 <div class="paragraph">
 <p>SClocoLib - Function library to use LOCO with SC</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_27">SYNOPSIS</h4>
+<h4 id="_synopsis_26">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>varargout = SClocoLib(funName, varargin])</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_27">DESCRIPTION</h4>
+<h4 id="_description_26">DESCRIPTION</h4>
 <div class="paragraph">
 <p><code>SClocoLib</code> is a function library intended to connect the workflows and data
 structures of the AT/MML function <code>loco</code> with the <code>SC</code> workflow. The input
@@ -4320,19 +4264,19 @@ detail:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_28">NAME</h4>
+<h4 id="_name_27">NAME</h4>
 <div class="paragraph">
 <p>setupLOCOmodel - Sets up the LOCO model</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_28">SYNOPSIS</h4>
+<h4 id="_synopsis_27">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>[LOCOmodel, LOCOflags, Init] = SClocoLib('setupLOCOmodel', SC [, options])</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_28">DESCRIPTION</h4>
+<h4 id="_description_27">DESCRIPTION</h4>
 <div class="paragraph">
 <p>This function sets up the LOCO model used by the function <code>loco</code> based on the
 <code>SC</code> structure.  Additionally lattice properties of <code>SC.RING</code> are calculated
@@ -4341,7 +4285,7 @@ by <a href="#SCcalcLatticeProperties">SCcalcLatticeProperties</a> and stored tog
 </div>
 </div>
 <div class="sect3">
-<h4 id="_inputs_14">INPUTS</h4>
+<h4 id="_inputs_13">INPUTS</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -4352,14 +4296,14 @@ by <a href="#SCcalcLatticeProperties">SCcalcLatticeProperties</a> and stored tog
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_20">OPTIONS</h4>
+<h4 id="_options_19">OPTIONS</h4>
 <div class="paragraph">
 <p>Additional arguments can be given as name-value pairs and are written as
 fields in <code>LOCOflags</code>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_13">RETURN VALUE</h4>
+<h4 id="_return_value_12">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>LOCOmodel</code></dt>
@@ -4379,7 +4323,7 @@ properties.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_examples_10">EXAMPLES</h4>
+<h4 id="_examples_9">EXAMPLES</h4>
 <div class="paragraph">
 <p>Set up the LOCO model, include dispersion and set the horizontal and vertical
 dispersion weights to 100.</p>
@@ -4397,26 +4341,26 @@ dispersion weights to 100.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_29">NAME</h4>
+<h4 id="_name_28">NAME</h4>
 <div class="paragraph">
 <p>getBPMCMstructure - Sets up the BPM and CM data structure for LOCO</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_29">SYNOPSIS</h4>
+<h4 id="_synopsis_28">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>[BPMData, CMData] =  SClocoLib('getBPMCMstructure', SC, CMstep [, options])</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_29">DESCRIPTION</h4>
+<h4 id="_description_28">DESCRIPTION</h4>
 <div class="paragraph">
 <p>This function sets up the BPM and CM data structure used by the function
 <code>loco</code> based on the <code>SC</code> registration.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_inputs_15">INPUTS</h4>
+<h4 id="_inputs_14">INPUTS</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -4431,7 +4375,7 @@ dispersion weights to 100.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_21">OPTIONS</h4>
+<h4 id="_options_20">OPTIONS</h4>
 <div class="paragraph">
 <p>Additional arguments can be given as cell arrays of strings as
 type-name-value triples and are written as fields in in the BPM or CM structure
@@ -4439,7 +4383,7 @@ type-name-value triples and are written as fields in in the BPM or CM structure
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_14">RETURN VALUE</h4>
+<h4 id="_return_value_13">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>BPMData</code></dt>
@@ -4454,7 +4398,7 @@ type-name-value triples and are written as fields in in the BPM or CM structure
 </div>
 </div>
 <div class="sect3">
-<h4 id="_examples_11">EXAMPLES</h4>
+<h4 id="_examples_10">EXAMPLES</h4>
 <div class="paragraph">
 <p>Set up the BPM and CM data structures with a CM step of <code>0.1mrad</code> and include
 fitting the BPM gains and CM kicks and use only every second CM and BPM in both planes.</p>
@@ -4473,26 +4417,26 @@ fitting the BPM gains and CM kicks and use only every second CM and BPM in both 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_30">NAME</h4>
+<h4 id="_name_29">NAME</h4>
 <div class="paragraph">
 <p>getMeasurement - Simulates the response matrix measurement</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_30">SYNOPSIS</h4>
+<h4 id="_synopsis_29">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>LOCOmeasData =  SClocoLib('getMeasurement', SC, CMstep, RFstep [, options])</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_30">DESCRIPTION</h4>
+<h4 id="_description_29">DESCRIPTION</h4>
 <div class="paragraph">
 <p>Sets up the 'measured' response matrix data structure used by <code>loco</code>. Optional arguments
 are passed to <a href="#SCgetRespMat">SCgetRespMat</a>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_inputs_16">INPUTS</h4>
+<h4 id="_inputs_15">INPUTS</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -4511,7 +4455,7 @@ are passed to <a href="#SCgetRespMat">SCgetRespMat</a>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_15">RETURN VALUE</h4>
+<h4 id="_return_value_14">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>LOCOmeasData</code></dt>
@@ -4522,7 +4466,7 @@ are passed to <a href="#SCgetRespMat">SCgetRespMat</a>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_examples_12">EXAMPLES</h4>
+<h4 id="_examples_11">EXAMPLES</h4>
 <div class="paragraph">
 <p>Get the orbit response matrix and the dispersion measurement using CM steps
 of 0.1mrad and an rf frequency step of 1kHz, respectively.</p>
@@ -4546,19 +4490,19 @@ of 0.1mm and an rf frequency step of 1kHz, respectively and save the used CM ste
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_31">NAME</h4>
+<h4 id="_name_30">NAME</h4>
 <div class="paragraph">
 <p>setupFitparameters - Set up the LOCO fit parameter structure</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_31">SYNOPSIS</h4>
+<h4 id="_synopsis_30">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>FitParameters = SClocoLib('setupFitparameters', SC, RING0, LOCOmodel, RFstep [, parameters])</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_31">DESCRIPTION</h4>
+<h4 id="_description_30">DESCRIPTION</h4>
 <div class="paragraph">
 <p>Sets up the fit parameter structure which shall be used by <code>loco</code>.
 Additionally the inital values of the fit parameters are stored, which is
@@ -4566,7 +4510,7 @@ needed in order to eventually apply the lattice correction.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_inputs_17">INPUTS</h4>
+<h4 id="_inputs_16">INPUTS</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -4597,7 +4541,7 @@ fit parameters.  Each cell must be given as {<code>ordinates</code>, <code>norma
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_16">RETURN VALUE</h4>
+<h4 id="_return_value_15">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>FitParameters</code></dt>
@@ -4608,7 +4552,7 @@ fit parameters.  Each cell must be given as {<code>ordinates</code>, <code>norma
 </div>
 </div>
 <div class="sect3">
-<h4 id="_examples_13">EXAMPLES</h4>
+<h4 id="_examples_12">EXAMPLES</h4>
 <div class="paragraph">
 <p>Set up the LOCO fit parameter structure using all <code>QF</code> and <code>QD</code> normal
 quadrupoles (see also <a href="#SCgetOrds">SCgetOrds</a>) which are individually powered and using a
@@ -4643,26 +4587,26 @@ the fit parameters and an rf frequency step of 1kHz is assumed.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_32">NAME</h4>
+<h4 id="_name_31">NAME</h4>
 <div class="paragraph">
 <p>applyLatticeCorrection - Applies the LOCO lattice correction</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_32">SYNOPSIS</h4>
+<h4 id="_synopsis_31">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>SC = SClocoLib('applyLatticeCorrection', SC, FitParameters)</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_32">DESCRIPTION</h4>
+<h4 id="_description_31">DESCRIPTION</h4>
 <div class="paragraph">
 <p>Applies the calculated lattice correction by adjusting the setpoints in
 <code>SC.RING</code>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_inputs_18">INPUTS</h4>
+<h4 id="_inputs_17">INPUTS</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -4677,7 +4621,7 @@ the fit parameters and an rf frequency step of 1kHz is assumed.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_17">RETURN VALUE</h4>
+<h4 id="_return_value_16">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -4691,19 +4635,19 @@ the fit parameters and an rf frequency step of 1kHz is assumed.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_33">NAME</h4>
+<h4 id="_name_32">NAME</h4>
 <div class="paragraph">
 <p>applyDiagnosticCorrection - Applies the LOCO result to BPMs and CMs</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_33">SYNOPSIS</h4>
+<h4 id="_synopsis_32">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>SC = SClocoLib('applyDiagnosticCorrection', SC, CMstep, CMData, BPMData [, options])</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_33">DESCRIPTION</h4>
+<h4 id="_description_32">DESCRIPTION</h4>
 <div class="paragraph">
 <p>Corrects the BPM and CM errors in <code>SC</code> by applying the LOCO fit results. If quadrupoles are used
 as CMs, the actual CM kick differs from the setpoint due to feed down effects. The (linear)
@@ -4715,7 +4659,7 @@ too low.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_inputs_19">INPUTS</h4>
+<h4 id="_inputs_18">INPUTS</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -4738,7 +4682,7 @@ too low.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_22">OPTIONS</h4>
+<h4 id="_options_21">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -4762,7 +4706,7 @@ discarded and not applied to the SC structure.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_18">RETURN VALUE</h4>
+<h4 id="_return_value_17">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -4776,25 +4720,25 @@ discarded and not applied to the SC structure.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_34">NAME</h4>
+<h4 id="_name_33">NAME</h4>
 <div class="paragraph">
 <p>applyOrbitCorrection - Applies orbit correction</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_34">SYNOPSIS</h4>
+<h4 id="_synopsis_33">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>SC = SClocoLib('applyOrbitCorrection', SC [, options])</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_34">DESCRIPTION</h4>
+<h4 id="_description_33">DESCRIPTION</h4>
 <div class="paragraph">
 <p>Applies orbit feedback using <a href="#SCfeedbackRun">SCfeedbackRun</a>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_inputs_20">INPUTS</h4>
+<h4 id="_inputs_19">INPUTS</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -4805,7 +4749,7 @@ discarded and not applied to the SC structure.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_23">OPTIONS</h4>
+<h4 id="_options_22">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -4837,7 +4781,7 @@ discarded and not applied to the SC structure.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_19">RETURN VALUE</h4>
+<h4 id="_return_value_18">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -4851,19 +4795,19 @@ discarded and not applied to the SC structure.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_35">NAME</h4>
+<h4 id="_name_34">NAME</h4>
 <div class="paragraph">
 <p>fitChromaticity - Fit chromaticity</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_35">SYNOPSIS</h4>
+<h4 id="_synopsis_34">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>SC = SClocoLib('fitChromaticity', SC, sFamOrds, [, options])</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_35">DESCRIPTION</h4>
+<h4 id="_description_34">DESCRIPTION</h4>
 <div class="paragraph">
 <p>Applies a chromaticity correction using two sextupole families. The absolute initial
 setpoint variation wihtin one family remains unchanged. Note:
@@ -4871,7 +4815,7 @@ this is not beam based but assumes the chromaticities can be measured reasonably
 </div>
 </div>
 <div class="sect3">
-<h4 id="_inputs_21">INPUTS</h4>
+<h4 id="_inputs_20">INPUTS</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -4886,7 +4830,7 @@ this is not beam based but assumes the chromaticities can be measured reasonably
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_24">OPTIONS</h4>
+<h4 id="_options_23">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -4917,7 +4861,7 @@ calcualted from <code>SC.IDEALRING</code> are being used.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_20">RETURN VALUE</h4>
+<h4 id="_return_value_19">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -4928,7 +4872,7 @@ calcualted from <code>SC.IDEALRING</code> are being used.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_examples_14">EXAMPLES</h4>
+<h4 id="_examples_13">EXAMPLES</h4>
 <div class="paragraph">
 <p>Match the chromaticity in both planes to 1 using all magnets named <code>'SF'</code> and
 <code>'SD'</code> (see also <a href="#SCgetOrds">SCgetOrds</a>).</p>
@@ -4943,19 +4887,19 @@ calcualted from <code>SC.IDEALRING</code> are being used.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_36">NAME</h4>
+<h4 id="_name_35">NAME</h4>
 <div class="paragraph">
 <p>fitTune - Fit tunes</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_36">SYNOPSIS</h4>
+<h4 id="_synopsis_35">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>SC = SClocoLib('fitTune', SC, qFamOrds, [, options])</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_36">DESCRIPTION</h4>
+<h4 id="_description_35">DESCRIPTION</h4>
 <div class="paragraph">
 <p>Applies a tune correction using two quadrupole families. The absolute initial
 setpoint variation wihtin one family, e.g. from LOCO remains unchanged. Note:
@@ -4963,7 +4907,7 @@ this is not beam based but assumes the tunes can be measured reasonably well.</p
 </div>
 </div>
 <div class="sect3">
-<h4 id="_inputs_22">INPUTS</h4>
+<h4 id="_inputs_21">INPUTS</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -4978,7 +4922,7 @@ this is not beam based but assumes the tunes can be measured reasonably well.</p
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_25">OPTIONS</h4>
+<h4 id="_options_24">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -5013,7 +4957,7 @@ calcualted from <code>SC.IDEALRING</code> are being used.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_21">RETURN VALUE</h4>
+<h4 id="_return_value_20">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -5024,7 +4968,7 @@ calcualted from <code>SC.IDEALRING</code> are being used.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_examples_15">EXAMPLES</h4>
+<h4 id="_examples_14">EXAMPLES</h4>
 <div class="paragraph">
 <p>Match the fractional tunes in both planes to the ideal tunes using all
 magnets named <code>'QF'</code> and <code>'QD'</code> (see also <a href="#SCgetOrds">SCgetOrds</a>).</p>
@@ -5039,26 +4983,26 @@ magnets named <code>'QF'</code> and <code>'QD'</code> (see also <a href="#SCgetO
 </div>
 </div>
 <div class="sect3">
-<h4 id="_name_37">NAME</h4>
+<h4 id="_name_36">NAME</h4>
 <div class="paragraph">
 <p>plotStatus - Plots the current LOCO correction</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_37">SYNOPSIS</h4>
+<h4 id="_synopsis_36">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>SClocoLib('plotStatus', SC, Init, BPMData, CMData)</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_37">DESCRIPTION</h4>
+<h4 id="_description_36">DESCRIPTION</h4>
 <div class="paragraph">
 <p>Plots the current beta beat, dispersion error and BPM and CM calibration and
 roll errors.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_inputs_23">INPUTS</h4>
+<h4 id="_inputs_22">INPUTS</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -5080,24 +5024,25 @@ properties.</p>
 </dd>
 </dl>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
 <h3 id="SCmomentumAperture">SCmomentumAperture</h3>
 <div class="sect3">
-<h4 id="_name_38">NAME</h4>
+<h4 id="_name_37">NAME</h4>
 <div class="paragraph">
 <p>SCmomentumAperture - Calculates the momentum aperture</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_38">SYNOPSIS</h4>
+<h4 id="_synopsis_37">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>dbounds = SCmomentumAperture(RING, REFPTS, inibound [, options])</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_38">DESCRIPTION</h4>
+<h4 id="_description_37">DESCRIPTION</h4>
 <div class="paragraph">
 <p>Calculates the momentum aperture of <code>RING</code> at the given <code>REFPTS</code>.  <code>dbounds</code>
 is a <code>[2,length(REFPTS)]</code>-array containing the upper and lower bounds of the
@@ -5127,7 +5072,7 @@ routine, so a rough guess is good enough.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_26">OPTIONS</h4>
+<h4 id="_options_25">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -5169,7 +5114,7 @@ point is not within them.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_22">RETURN VALUE</h4>
+<h4 id="_return_value_21">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>dbounds</code></dt>
@@ -5181,7 +5126,7 @@ bounds.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_examples_16">EXAMPLES</h4>
+<h4 id="_examples_15">EXAMPLES</h4>
 <div class="paragraph">
 <p>Calculates the positive MA bounds for the first 10 lattice elements of <code>SC.RING</code> with
 intial guess of [0,4E-2] over 1000 turns. Debug information is printed and the results
@@ -5204,24 +5149,25 @@ runParallel = 1;
 dbounds = SCmomentumAperture(SC.RING,ords,[-5E-3,-2E-2],'nturns',10000);</pre>
 </div>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
 <h3 id="SCmultipolesRead">SCmultipolesRead</h3>
 <div class="sect3">
-<h4 id="_name_39">NAME</h4>
+<h4 id="_name_38">NAME</h4>
 <div class="paragraph">
 <p>SCmultipolesRead - Reads multipole tables</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_39">SYNOPSIS</h4>
+<h4 id="_synopsis_38">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>[AB, order, type] = SCmultipolesRead(fname)</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_39">DESCRIPTION</h4>
+<h4 id="_description_38">DESCRIPTION</h4>
 <div class="paragraph">
 <p>This functions reads multipole coefficients from the text-file <code>fname</code>, see
 below for an example.
@@ -5278,18 +5224,19 @@ whether it is the normal (2) or skew (1) component.</p>
 9	+0.000000000E+00	-5.382882472E+14</pre>
 </div>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
 <h3 id="SCparticlesIn3D">SCparticlesIn3D</h3>
 <div class="sect3">
-<h4 id="_name_40">NAME</h4>
+<h4 id="_name_39">NAME</h4>
 <div class="paragraph">
 <p>SCparticlesIn3D - Re-order particle trajectories</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_40">DESCRIPTION</h4>
+<h4 id="_description_39">DESCRIPTION</h4>
 <div class="paragraph">
 <p><code>atpass</code> gives its result in form of an <code>6x(NPART NELEM*NTURN)</code> array, where
 <code>NPART</code>/<code>NELEM</code>/<code>NTURN</code> are the number of particles/elements/turns.
@@ -5322,24 +5269,25 @@ dimensions <code>6x(NELEM*NTURN)xNPART</code>.</p>
 </dd>
 </dl>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
 <h3 id="SCplotBPMreading">SCplotBPMreading</h3>
 <div class="sect3">
-<h4 id="_name_41">NAME</h4>
+<h4 id="_name_40">NAME</h4>
 <div class="paragraph">
 <p>SCplotBPMreading - plots BPM readings and particle trajectories</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_40">SYNOPSIS</h4>
+<h4 id="_synopsis_39">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>SCplotBPMreading(SC, B, T)</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_41">DESCRIPTION</h4>
+<h4 id="_description_40">DESCRIPTION</h4>
 <div class="paragraph">
 <p><code>SCplotBPMreading</code> is a plotting function used by <a href="#SCgetBPMreading">SCgetBPMreading</a> and plots the BPM readings and
 particel trajectories including the aperture model. Note that the BPM readings mus include all
@@ -5347,7 +5295,7 @@ registered BPMs and the trajectories must be evaluated at all lattice elements.<
 </div>
 </div>
 <div class="sect3">
-<h4 id="_inputs_24">INPUTS</h4>
+<h4 id="_inputs_23">INPUTS</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -5366,30 +5314,71 @@ registered BPMs and the trajectories must be evaluated at all lattice elements.<
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_19">SEE ALSO</h4>
+<h4 id="_see_also_18">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCgetBPMreading">SCgetBPMreading</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
 <h3 id="SCplotCMstrengths">SCplotCMstrengths</h3>
 <div class="sect3">
-<h4 id="_name_42">NAME</h4>
+<h4 id="_name_41">NAME</h4>
 <div class="paragraph">
 <p>SCplotCMstrengths - plots the current CM setpoints</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_synopsis_41">SYNOPSIS</h4>
+<h4 id="_synopsis_40">SYNOPSIS</h4>
 <div class="paragraph">
 <p><code>SCplotCMstrengths(SC)</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_description_42">DESCRIPTION</h4>
+<h4 id="_description_41">DESCRIPTION</h4>
 <div class="paragraph">
 <p>Plots the current CM setpoints.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_inputs_24">INPUTS</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>SC</code></dt>
+<dd>
+<p>SC base structure</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_see_also_19">SEE ALSO</h4>
+<div class="paragraph">
+<p><a href="#SCsetCMs2SetPoints">SCsetCMs2SetPoints</a></p>
+</div>
+<hr>
+</div>
+</div>
+<div class="sect2">
+<h3 id="SCplotLattice">SCplotLattice</h3>
+<div class="sect3">
+<h4 id="_name_42">NAME</h4>
+<div class="paragraph">
+<p>SCplotLattice - Plots the lattice including the location of BPMs and CMs</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_synopsis_41">SYNOPSIS</h4>
+<div class="paragraph">
+<p><code>SCplotLattice(SC [, options])</code></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_description_42">DESCRIPTION</h4>
+<div class="paragraph">
+<p>This function plots the lattice functions as well as the distribution of registered magnets
+including CMs and BPMs.</p>
 </div>
 </div>
 <div class="sect3">
@@ -5404,14 +5393,76 @@ registered BPMs and the trajectories must be evaluated at all lattice elements.<
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_20">SEE ALSO</h4>
+<h4 id="_options_26">OPTIONS</h4>
 <div class="paragraph">
-<p><a href="#SCsetCMs2SetPoints">SCsetCMs2SetPoints</a></p>
+<p>The following options can be given as name/value-pairs:</p>
 </div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>'transferLine'</code> (0)</dt>
+<dd>
+<p>If true the function 'twissline' is used to calculate the lattice functions</p>
+</dd>
+<dt class="hdlist1"><code>'sRange'</code> ([])</dt>
+<dd>
+<p>Array ['sMin','sMax'] defining the plot range [m].</p>
+</dd>
+<dt class="hdlist1"><code>'oList'</code> ([])</dt>
+<dd>
+<p>If <code>'sRange'</code> is empty, <code>'oList'</code>  can be used to specify a list of ordinates at which the lattice should be plotted</p>
+</dd>
+<dt class="hdlist1"><code>'nSectors'</code> (1)</dt>
+<dd>
+<p>If <code>'oList'</code> is empty, <code>'nSectors'</code> can be used to plot only the first fraction of the lattice</p>
+</dd>
+<dt class="hdlist1"><code>'plotIdealRing'</code> (1)</dt>
+<dd>
+<p>Specify if 'SC.IDEALRING' should be used to plot twiss functions, otherwise 'SC.RING'.</p>
+</dd>
+<dt class="hdlist1"><code>'plotMagNames'</code> (0)</dt>
+<dd>
+<p>Specify if magnet names should be printed next to the magnets. Note: since Matlab is not able to
+find the best placement of text annotations automatically, it is likely required that the
+corresponding lines in the code are adjusted to the users discretion.</p>
+</dd>
+<dt class="hdlist1"><code>'fontSize'</code> (16)</dt>
+<dd>
+<p>Figure font size.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_examples_16">EXAMPLES</h4>
+<div class="paragraph">
+<p>Plots the complete lattice for a ring</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SCplotLattice(SC);</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Plots the lattice from ordinate 30 to 130 for a transfer line</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SCplotLattice(SC,'transferLine',1,'oList',30:120);</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Plots the lattice of one arc for a twelfe-fold symmetric ring lattice</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SCplotLattice(SC,'nSectors',12);</pre>
+</div>
+</div>
+<hr>
 </div>
 </div>
 <div class="sect2">
-<h3 id="SCplotLattice">SCplotLattice</h3>
+<h3 id="SCplotLattice_backup220627">SCplotLattice</h3>
 <div class="sect3">
 <h4 id="_name_43">NAME</h4>
 <div class="paragraph">
@@ -5508,6 +5559,7 @@ corresponding lines in the code are adjusted to the users discretion.</p>
 <pre>SCplotLattice(SC,'nSectors',12);</pre>
 </div>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -5567,13 +5619,14 @@ longitudinal coordinate is adjusted for plotting.</p>
 <dd>
 <p>Logical value defining if closed orbit should be plotted as well.</p>
 </dd>
-<dt class="hdlist1"><code>'costumBunch'</code> ([])</dt>
+<dt class="hdlist1"><code>'customBunch'</code> ([])</dt>
 <dd>
 <p>[6 x N] array of particle start points for phase space evaluation. If not specified a bunch is
 generated using <a href="#SCgenBunches">SCgenBunches</a>.</p>
 </dd>
 </dl>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -5634,10 +5687,11 @@ to adjust plot apperance properties.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_21">SEE ALSO</h4>
+<h4 id="_see_also_20">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCregisterSupport">SCregisterSupport</a>, <a href="#SCgetSupportOffset">SCgetSupportOffset</a>, <a href="#SCgetSupportRoll">SCgetSupportRoll</a>, <a href="#SCupdateSupport">SCupdateSupport</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -5724,10 +5778,11 @@ SC = SCpseudoBBA(SC,SC.ORD.BPM,QuadOrds,50E-6);</pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_22">SEE ALSO</h4>
+<h4 id="_see_also_21">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCgetOrds">SCgetOrds</a>, <a href="#SCBBA">SCBBA</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -5835,10 +5890,11 @@ SC.INJ.trackMode = 'ORB';
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_23">SEE ALSO</h4>
+<h4 id="_see_also_22">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCregisterMagnets">SCregisterMagnets</a>, <a href="#SCregisterBPMs">SCregisterBPMs</a>, <a href="#SCregisterCAVs">SCregisterCAVs</a>, <a href="#SCapplyErrors">SCapplyErrors</a>, <a href="#SCgetModelRM">SCgetModelRM</a>, <a href="#SCgetPinv">SCgetPinv</a>,  <a href="#SCfeedbackRun">SCfeedbackRun</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -5922,6 +5978,7 @@ the built in Matlab function randn but allows to specify a cut parameter <code>c
 <pre>out = SCrandnc(2,1,10);</pre>
 </div>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -5977,6 +6034,11 @@ the location of the BPMs, see <a href="#SCupdateSupport">SCupdateSupport</a>.</p
 <p>BPM roll around z-axis which results from the corresponding support structure roll at
 the location of the BPMs, see <a href="#SCupdateSupport">SCupdateSupport</a>.</p>
 </dd>
+<dt class="hdlist1"><code>SumError</code></dt>
+<dd>
+<p>Calibration error of the sum signal. The sum signal is used to determine the beam loss location
+with a cutoff as defined <code>SC.INJ.beamLostAt</code>.</p>
+</dd>
 </dl>
 </div>
 </div>
@@ -6000,11 +6062,14 @@ the location of the BPMs, see <a href="#SCupdateSupport">SCupdateSupport</a>.</p
 <div class="paragraph">
 <p>Additional name/vale-pairs are interpreted as uncertainties and passed to the sigma structure
 <code>SC.SIG</code> for the corresponding BPM. The function <a href="#SCapplyErrors">SCapplyErrors</a> uses the fields of <code>SC.SIG</code> to
-randomly generate errors and applies them to the corresponding fields in <code>SC.RING</code>.</p>
+randomly generate errors and applies them to the corresponding fields in <code>SC.RING</code>.
+By default a 2 sigma cutoff is applied. The user can specify a different cutoff by giving the
+uncertainty as a cell structure, e.g. {[1x2],nSig}, with nSig being the cutoff (see examples
+below).</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_23">RETURN VALUE</h4>
+<h4 id="_return_value_22">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -6035,12 +6100,32 @@ both planes. A subsequent call of <a href="#SCapplyErrors">SCapplyErrors</a> wou
 <pre>SC = SCregisterBPMs(SC,ords,'Offset',500E-6*[1 1]);</pre>
 </div>
 </div>
+<div class="paragraph">
+<p>Register the BPMs specified in <code>ords</code> in <code>SC</code> and set the uncertanty of the offset to <code>500um</code> in
+both planes and a calibration error of the sum signal of 20%.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SC = SCregisterBPMs(SC,ords,'Offset',500E-6*[1 1],'SumError',0.2);</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Register the BPMs specified in <code>ords</code> in <code>SC</code> and set the uncertanty of the offset to <code>500um</code> in
+both planes. A subsequent call of <a href="#SCapplyErrors">SCapplyErrors</a> would generate a random BPM offset errors with
+<code>sigma=500um</code> with a 3 sigma cutoff.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SC = SCregisterBPMs(SC,ords,'Offset',{500E-6*[1 1],3});</pre>
+</div>
+</div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_24">SEE ALSO</h4>
+<h4 id="_see_also_23">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCgetBPMreading">SCgetBPMreading</a>, <a href="#SCgetOrds">SCgetOrds</a>, <a href="#SCsanityCheck">SCsanityCheck</a>, <a href="#SCapplyErrors">SCapplyErrors</a>, <a href="#SCregisterSupport">SCregisterSupport</a>, <a href="#SCupdateSupport">SCupdateSupport</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -6125,11 +6210,14 @@ fields in the lattice elements are</p>
 <div class="paragraph">
 <p>Additional name/vale-pairs are interpreted as uncertainties and passed to the sigma structure
 <code>SC.SIG</code> for the corresponding cavity. The function <a href="#SCapplyErrors">SCapplyErrors</a> uses the fields of <code>SC.SIG</code>
-to randomly generate errors and applies them to the corresponding fields of the lattice element.</p>
+to randomly generate errors and applies them to the corresponding fields of the lattice element.
+By default a 2 sigma cutoff is applied. The user can specify a different cutoff by giving the
+uncertainty as a cell structure, e.g. {deltaF,nSig}, with nSig being the cutoff (see examples
+below).</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_24">RETURN VALUE</h4>
+<h4 id="_return_value_23">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -6160,12 +6248,33 @@ to 1kHz. A subsequent call of <a href="#SCapplyErrors">SCapplyErrors</a> would g
 <pre>SC = SCregisterCAVs(SC,ords,'FrequencyOffset',1E3);</pre>
 </div>
 </div>
+<div class="paragraph">
+<p>Register the cavities specified in <code>ords</code> in <code>SC</code> and sets the uncertanty of the frequency offset
+to 1kHz. A subsequent call of <a href="#SCapplyErrors">SCapplyErrors</a> would generate a random frequncy offset error with
+<code>sigma=1kHz</code> and a 3 sigma cutoff.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SC = SCregisterCAVs(SC,ords,'FrequencyOffset',{1E3,3});</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Register the cavities specified in <code>ords</code> in <code>SC</code> and sets the uncertanty of the timelag offset
+to 0.3m. A subsequent call of <a href="#SCapplyErrors">SCapplyErrors</a> would generate a random timelag offset error
+('phase error') with <code>sigma=0.3m</code> and a 3 sigma cutoff.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SC = SCregisterCAVs(SC,ords,'TimeLagOffset',{0.3,3});</pre>
+</div>
+</div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_25">SEE ALSO</h4>
+<h4 id="_see_also_24">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCgetOrds">SCgetOrds</a>, <a href="#SCsanityCheck">SCsanityCheck</a>, <a href="#SCapplyErrors">SCapplyErrors</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -6346,9 +6455,12 @@ currently not be updated correctly.</p>
 <div class="paragraph">
 <p>Every name/value-pair which is not explicitly mentioned in the options above
 is interpreted as an uncertainty and passed to the sigma structure <code>SC.SIG</code>
-for the corresponding magnets defined in <code>MAGords</code>.
+for the corresponding magnets defined in <code>MAGords</code> (see examples below).
 The function <a href="#SCapplyErrors">SCapplyErrors</a> uses the fields of <code>SC.SIG</code> to randomly generate
-errors and applies them to the corresponding fields of the lattice elements.</p>
+errors and applies them to the corresponding fields of the lattice elements.
+By default, a Gaussian distribution with a cutoff at 2 sigma is applied. An
+alternative cutoff value can be given explicitly for each uncertainty type,
+see examples below.</p>
 </div>
 </div>
 <div class="sect3">
@@ -6371,6 +6483,18 @@ the quadrupole component to 1E-3 and 30um horizontal and vertical offset.</p>
 <pre>SC = SCregisterMagnets(SC,ords, ...
 	'CalErrorB',[0 1E-3],...
 	'MagnetOffset',[30E-6 30E-6 0]);</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Register the magnets specified in <code>ords</code> in <code>SC</code> and set the uncertainty of
+the quadrupole component to 1E-3 and 30um horizontal and vertical offset with
+a 3 sigma cutoff value (when applied with <a href="#SCapplyErrors">SCapplyErrors</a>).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SC = SCregisterMagnets(SC,ords, ...
+	'CalErrorB',[0 1E-3],...
+	'MagnetOffset',{[30E-6 30E-6 0],3});</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -6415,13 +6539,13 @@ SC = SCregisterMagnets(SC,masterOrds, ...
 <div class="paragraph">
 <p>Register the magnets specified in <code>ords</code> in <code>SC</code> and set the uncertainty of
 the quadrupole component to 1E-3 and the uncertainty of the bending angle to
-1E-4.</p>
+1E-4, the latter with a 3 sigma cutoff.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre>SC = SCregisterMagnets(SC,ords, ...
 	'CalErrorB',[0 1E-3], ...
-	'BendingAngle',1E-4);</pre>
+	'BendingAngle',{1E-4,3});</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -6478,11 +6602,12 @@ mrad. Furthermore, set the uncertanty of the skew quadrupole component to
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_26">SEE ALSO</h4>
+<h4 id="_see_also_25">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCgetOrds">SCgetOrds</a>, <a href="#SCupdateMagnets">SCupdateMagnets</a>, <a href="#SCsanityCheck">SCsanityCheck</a>, <a href="#SCapplyErrors">SCapplyErrors</a>,
 <a href="#SCregisterSupport">SCregisterSupport</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -6528,7 +6653,7 @@ offsets in the sigma structure <code>SC.SIG.Support</code>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_25">RETURN VALUE</h4>
+<h4 id="_return_value_24">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -6551,7 +6676,7 @@ offsets in the sigma structure <code>SC.SIG.Support</code>.</p>
 points or [2x3] array defining horizontal, vertical and longitudinal offset uncertainties for
 the start end endpoints. If end points have dedicated uncertainties, <a href="#SCapplyErrors">SCapplyErrors</a> applies
 random offset errors of both start end endpoints of the corresponding support structure,
-effectively  tilting the support structure.
+effectively tilting the support structure.
 If only start points have asigned uncertainties, <a href="#SCapplyErrors">SCapplyErrors</a> applies to the support
 structure endpoints the same offset error as to the start points, resulting in a paraxial
 translation of the element. Only in this case dedicated <code>'Roll'</code> uncertainties may be given which
@@ -6569,6 +6694,10 @@ around y-axis) angle uncertainties.</p>
 </dd>
 </dl>
 </div>
+<div class="paragraph">
+<p>By default a 2 sigma cutoff is applied. The user can specify a different cutoff by giving the
+uncertainty as a cell structure, e.g. {[1x3],nSig}, with nSig being the cutoff (see examples below).</p>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_examples_24">EXAMPLES</h4>
@@ -6581,6 +6710,18 @@ offset error as the start points, resulting in a paraxial translation of the gir
 <div class="listingblock">
 <div class="content">
 <pre>SC = SCregisterSupport(SC,'Girder',ords,'Offset',[dX dY dZ]);</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Registers the girder start end endpoints defined in <code>ords</code> and assignes the horiatonal,
+vertical and longitudinal girder offset uncertainties <code>dX</code>, <code>dY</code> and <code>dZ</code>, respectively, to the
+girder start points with a cutoff value of 3 sigma. When the support errors are applied the girder
+endpoints will get the same offset error as the start points, resulting in a paraxial translation
+of the girder.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SC = SCregisterSupport(SC,'Girder',ords,'Offset',{[dX dY dZ],3});</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -6619,10 +6760,11 @@ rotations around the three x-, y- and z-axes.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_27">SEE ALSO</h4>
+<h4 id="_see_also_26">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCgetOrds">SCgetOrds</a>, <a href="#SCupdateSupport">SCupdateSupport</a>, <a href="#SCgetSupportOffset">SCgetSupportOffset</a>, <a href="#SCplotSupport">SCplotSupport</a>, <a href="#SCapplyErrors">SCapplyErrors</a>, <a href="#SCregisterMagnets">SCregisterMagnets</a>, <a href="#SCgetTransformation">SCgetTransformation</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -6642,7 +6784,8 @@ rotations around the three x-, y- and z-axes.</p>
 <div class="sect3">
 <h4 id="_description_53">DESCRIPTION</h4>
 <div class="paragraph">
-<p>Performs a sanity check on the current <code>SC</code> structure adn returns warnings if things look fishy.</p>
+<p>Performs a sanity check on the current <code>SC</code> structure adn returns warnings if things look fishy.
+If you find something that is missing please contact us.</p>
 </div>
 </div>
 <div class="sect3">
@@ -6657,10 +6800,11 @@ rotations around the three x-, y- and z-axes.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_28">SEE ALSO</h4>
+<h4 id="_see_also_27">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCregisterMagnets">SCregisterMagnets</a>, <a href="#SCregisterBPMs">SCregisterBPMs</a>, <a href="#SCregisterCAVs">SCregisterCAVs</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -6700,7 +6844,7 @@ spaces in the lattice.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_26">Return Value</h4>
+<h4 id="_return_value_25">Return Value</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>RING</code></dt>
@@ -6709,6 +6853,7 @@ spaces in the lattice.</p>
 </dd>
 </dl>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -6812,10 +6957,23 @@ will results in kicks in the positive horizontal or vertical direction.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_29">SEE ALSO</h4>
+<h4 id="_globals_5">GLOBALS</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>isExp</code></dt>
+<dd>
+<p>Specify if a real machine is being used, so that a custom user defined
+function is being called instead</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_see_also_28">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCregisterMagnets">SCregisterMagnets</a>, <a href="#SCsetMags2SetPoints">SCsetMags2SetPoints</a>, <a href="#SCupdateMagnets">SCupdateMagnets</a>, <a href="#SCgetCMSetPoints">SCgetCMSetPoints</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -6883,7 +7041,7 @@ the setpoint is applied to all cavities.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_27">RETURN VALUE</h4>
+<h4 id="_return_value_26">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -6911,6 +7069,7 @@ the setpoint is applied to all cavities.</p>
 <pre>SC = SCsetCavs2SetPoints(SC, SC.ORD.Cavity(1), 'Frequency', 1E3, 'add');</pre>
 </div>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -7038,10 +7197,11 @@ SC = SCsetMags2SetPoints(SC,ords,2,2,0.99,'method','rel');</pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_30">SEE ALSO</h4>
+<h4 id="_see_also_29">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCupdateMagnets">SCupdateMagnets</a>, <a href="#SCregisterMagnets">SCregisterMagnets</a>, <a href="#SCsetCMs2SetPoints">SCsetCMs2SetPoints</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -7154,10 +7314,11 @@ RING = SCsetMultipoles(RING,ords,AB,'method','sys','order',order,'type',type);</
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_31">SEE ALSO</h4>
+<h4 id="_see_also_30">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCmultipolesRead">SCmultipolesRead</a>, <a href="#SCupdateMagnets">SCupdateMagnets</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -7276,10 +7437,11 @@ differs significantly throughout the different applied frequency steps.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_32">SEE ALSO</h4>
+<h4 id="_see_also_31">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCsetCavs2SetPoints">SCsetCavs2SetPoints</a>, <a href="#SCgetBPMreading">SCgetBPMreading</a>, <a href="#SCsynchEnergyCorrection">SCsynchEnergyCorrection</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -7389,10 +7551,11 @@ cavities. Results might be compromised.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_33">SEE ALSO</h4>
+<h4 id="_see_also_32">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCsetCavs2SetPoints">SCsetCavs2SetPoints</a>, <a href="#SCgetBPMreading">SCgetBPMreading</a>, <a href="#SCsynchEnergyCorrection">SCsynchEnergyCorrection</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -7518,10 +7681,11 @@ resulted in best transmission.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_34">SEE ALSO</h4>
+<h4 id="_see_also_33">SEE ALSO</h4>
 <div class="paragraph">
 <p><strong>getBPMReading()</strong>, <strong>SCgenBunches()</strong></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -7562,7 +7726,7 @@ updated. For each cavity and each field, the setpoints, calibration errors and o
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_28">RETURN VALUE</h4>
+<h4 id="_return_value_27">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -7573,10 +7737,11 @@ updated. For each cavity and each field, the setpoints, calibration errors and o
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_35">SEE ALSO</h4>
+<h4 id="_see_also_34">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCregisterCAVs">SCregisterCAVs</a>, <a href="#SCapplyErrors">SCapplyErrors</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -7615,7 +7780,7 @@ magnets with different gradients, however, or split CMs can currently not be upd
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_29">RETURN VALUE</h4>
+<h4 id="_return_value_28">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code></dt>
@@ -7626,10 +7791,11 @@ magnets with different gradients, however, or split CMs can currently not be upd
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_36">SEE ALSO</h4>
+<h4 id="_see_also_35">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCregisterMagnets">SCregisterMagnets</a>, <a href="#SCapplyErrors">SCapplyErrors</a>, <a href="#SCsetMultipoles">SCsetMultipoles</a>, <a href="#SCsetMags2SetPoints">SCsetMags2SetPoints</a>, <a href="#SCsetCMs2SetPoints">SCsetCMs2SetPoints</a></p>
 </div>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -7684,7 +7850,7 @@ based on the current support errors, by setting the lattice fields <code>T1</cod
 </div>
 </div>
 <div class="sect3">
-<h4 id="_return_value_30">RETURN VALUE</h4>
+<h4 id="_return_value_29">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>SC</code> </dt>
@@ -7695,10 +7861,11 @@ based on the current support errors, by setting the lattice fields <code>T1</cod
 </div>
 </div>
 <div class="sect3">
-<h4 id="_see_also_37">SEE ALSO</h4>
+<h4 id="_see_also_36">SEE ALSO</h4>
 <div class="paragraph">
 <p><a href="#SCregisterSupport">SCregisterSupport</a>, <a href="#SCgetSupportOffset">SCgetSupportOffset</a>, <a href="#SCgetSupportRoll">SCgetSupportRoll</a>, <a href="#SCplotSupport">SCplotSupport</a></p>
 </div>
+<hr>
 </div>
 </div>
 </div>
@@ -7706,7 +7873,7 @@ based on the current support errors, by setting the lattice fields <code>T1</cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-02-06 13:58:32 +0100
+Last updated 2022-07-14 15:14:26 +0200
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
