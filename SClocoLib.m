@@ -585,6 +585,7 @@ function varargout = SClocoLib(funName,varargin)
 		LocoMeasData.RF         = SC.RING{SC.ORD.Cavity(1)}.Frequency;
 		LocoMeasData.DeltaRF    = deltaRF;
 		LocoMeasData.BPMSTD     = 1E-3*ones(1,2*length(BPMords)); % [mm]
+				
 		
 		[RM,Err,CMsteps] = SCgetRespMat(SC,CMstep,BPMords,CMords,varargin{:});
 		
@@ -855,6 +856,13 @@ function varargout = SClocoLib(funName,varargin)
 		% Select target chromaticity
 		if isempty(par.targetChrom)
 			[~, ~, par.targetChrom] = atlinopt(SC.IDEALRING,0,[]);
+		end
+		
+		% Check if something wnet wrong
+		if any(isnan(par.targetChrom))
+			fprintf('Target chromaticity must not contain NaN. Aborting.\n')
+			varargout{1} = SC;
+			return
 		end
 		
 		% Copy intial SC state (for convinience)

@@ -159,7 +159,7 @@ function [T1,T2,R1,R2] = SCgetTransformation(dx,dy,dz,ax,ay,az,magTheta,magLengt
 		% 2nd translation vector 
 		T0 = [LD*R(3,1)/R(3,3), R(3,1), LD*R(3,2)/R(3,3), R(3,2),  0 ,LD/R(3,3)]';
 		
-		% Final translation vector
+		% Final translation vector 
 		T = T0 + tD0;
 		
 		% Final rotation matrix

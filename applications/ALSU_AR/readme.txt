@@ -5,7 +5,7 @@ As an example we include the workflow which worked best for us:
 
 - Symbolic links in the user's home directory named 'sc', 'at' and 'MML' point to the folders where the SC toolkit, AT and the MML are located, respectively. This allows for scripts working conveniently on different machines (e.g. laptop, cluster, different users) without modification.
 
-- The files for different machines are located at e.g. ~/sc/applications/ALSU_AR_final/ 
+- The files for different machines are located at e.g. ~/sc/applications/ALSU_AR/ 
 In this folder all general functions regarding the ALS-U accumulator ring are stored, e.g. for loading the multipole tables ('set*Polynoms_ALSU_AR') or how the LOCO sequence ('performLOCO_ALSU_AR'), apertures ('defineApertures_ALSU_AR') are defined. 
 
 - All multipole tables (in AT notation) are located in [...]/Multipoles/

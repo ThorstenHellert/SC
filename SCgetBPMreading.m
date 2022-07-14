@@ -255,16 +255,6 @@ function B = calcBPMreading(SC,T,varargin)
 		By1 = T(3,nE);
 	end
 
-
-% 	% Check if trajectories were given not only at BPMs
-% 	if p.Results.atAllElements
-% 		% Indices of BPMs in trajectories
-% 		nE = reshape((0:nTurns-1)*length(SC.RING)+SC.ORD.BPM',1,[]);
-% 		% Select trajectory at BPM
-% 		Bx1 = Bx1(nE);
-% 		By1 = By1(nE);
-% 	end
-
 	% Add roll error
 	Bx = cos(BPMroll) .* Bx1 - sin(BPMroll) .* By1;
 	By = sin(BPMroll) .* Bx1 + cos(BPMroll) .* By1;
