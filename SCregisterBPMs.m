@@ -33,7 +33,10 @@ function SC = SCregisterBPMs(SC,BPMords,varargin)
 % `SupportRoll`::
 %   BPM roll around z-axis which results from the corresponding support structure roll at
 %   the location of the BPMs, see *SCupdateSupport*.
-%
+% `SumError`::
+%   Calibration error of the sum signal. The sum signal is used to determine the beam loss location
+%   with a cutoff as defined `SC.INJ.beamLostAt`.
+% 
 %
 % INPUTS
 % ------
@@ -46,6 +49,9 @@ function SC = SCregisterBPMs(SC,BPMords,varargin)
 % Additional name/vale-pairs are interpreted as uncertainties and passed to the sigma structure
 % `SC.SIG` for the corresponding BPM. The function *SCapplyErrors* uses the fields of `SC.SIG` to
 % randomly generate errors and applies them to the corresponding fields in `SC.RING`.
+% By default a 2 sigma cutoff is applied. The user can specify a different cutoff by giving the 
+% uncertainty as a cell structure, e.g. {[1x2],nSig}, with nSig being the cutoff (see examples 
+% below).
 %
 %
 % RETURN VALUE
@@ -67,6 +73,19 @@ function SC = SCregisterBPMs(SC,BPMords,varargin)
 % `sigma=500um`.
 % ------------------------------------------------------------------
 % SC = SCregisterBPMs(SC,ords,'Offset',500E-6*[1 1]);
+% ------------------------------------------------------------------
+%   
+% Register the BPMs specified in `ords` in `SC` and set the uncertanty of the offset to `500um` in 
+% both planes and a calibration error of the sum signal of 20%.
+% ------------------------------------------------------------------
+% SC = SCregisterBPMs(SC,ords,'Offset',500E-6*[1 1],'SumError',0.2);
+% ------------------------------------------------------------------
+%   
+% Register the BPMs specified in `ords` in `SC` and set the uncertanty of the offset to `500um` in 
+% both planes. A subsequent call of *SCapplyErrors* would generate a random BPM offset errors with 
+% `sigma=500um` with a 3 sigma cutoff.
+% ------------------------------------------------------------------
+% SC = SCregisterBPMs(SC,ords,'Offset',{500E-6*[1 1],3});
 % ------------------------------------------------------------------
 %   
 % SEE ALSO
@@ -111,6 +130,9 @@ function SC = SCregisterBPMs(SC,BPMords,varargin)
 
 		% Set BPM calibration
 		SC.RING{ord}.CalError = zeros(1,2);
+
+		% Set BPM sum signal error
+		SC.RING{ord}.SumError = 0;
 	end
 	
 end

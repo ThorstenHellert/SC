@@ -48,6 +48,9 @@ function SC = SCregisterCAVs(SC,CAVords,varargin)
 % Additional name/vale-pairs are interpreted as uncertainties and passed to the sigma structure
 % `SC.SIG` for the corresponding cavity. The function *SCapplyErrors* uses the fields of `SC.SIG`
 % to randomly generate errors and applies them to the corresponding fields of the lattice element.
+% By default a 2 sigma cutoff is applied. The user can specify a different cutoff by giving the 
+% uncertainty as a cell structure, e.g. {deltaF,nSig}, with nSig being the cutoff (see examples 
+% below).
 %
 %
 % RETURN VALUE
@@ -69,6 +72,20 @@ function SC = SCregisterCAVs(SC,CAVords,varargin)
 % `sigma=1kHz`.
 % ------------------------------------------------------------------
 % SC = SCregisterCAVs(SC,ords,'FrequencyOffset',1E3);
+% ------------------------------------------------------------------
+%
+% Register the cavities specified in `ords` in `SC` and sets the uncertanty of the frequency offset 
+% to 1kHz. A subsequent call of *SCapplyErrors* would generate a random frequncy offset error with 
+% `sigma=1kHz` and a 3 sigma cutoff.
+% ------------------------------------------------------------------
+% SC = SCregisterCAVs(SC,ords,'FrequencyOffset',{1E3,3});
+% ------------------------------------------------------------------
+%
+% Register the cavities specified in `ords` in `SC` and sets the uncertanty of the timelag offset 
+% to 0.3m. A subsequent call of *SCapplyErrors* would generate a random timelag offset error 
+% ('phase error') with `sigma=0.3m` and a 3 sigma cutoff.
+% ------------------------------------------------------------------
+% SC = SCregisterCAVs(SC,ords,'TimeLagOffset',{0.3,3});
 % ------------------------------------------------------------------
 %
 % SEE ALSO

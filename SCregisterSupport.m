@@ -43,7 +43,7 @@ function SC = SCregisterSupport(SC,varargin)
 %   points or [2x3] array defining horizontal, vertical and longitudinal offset uncertainties for
 %   the start end endpoints. If end points have dedicated uncertainties, *SCapplyErrors* applies 
 %   random offset errors of both start end endpoints of the corresponding support structure, 
-%   effectively  tilting the support structure. 
+%   effectively tilting the support structure.
 %   If only start points have asigned uncertainties, *SCapplyErrors* applies to the support
 %   structure endpoints the same offset error as to the start points, resulting in a paraxial 
 %   translation of the element. Only in this case dedicated `'Roll'` uncertainties may be given which
@@ -57,6 +57,9 @@ function SC = SCregisterSupport(SC,varargin)
 %   [1x3] array [az,ax,ay] defineing roll (around z-axis), pitch (roll around x-axis) and yaw (roll
 %   around y-axis) angle uncertainties.
 %
+% By default a 2 sigma cutoff is applied. The user can specify a different cutoff by giving the 
+% uncertainty as a cell structure, e.g. {[1x3],nSig}, with nSig being the cutoff (see examples below).
+%
 % EXAMPLES
 % --------
 % Registers the girder start end endpoints defined in `ords` and assignes the horiatonal,
@@ -65,6 +68,14 @@ function SC = SCregisterSupport(SC,varargin)
 % offset error as the start points, resulting in a paraxial translation of the girder.
 % ------------------------------------------------------------------
 % SC = SCregisterSupport(SC,'Girder',ords,'Offset',[dX dY dZ]);
+% ------------------------------------------------------------------
+% Registers the girder start end endpoints defined in `ords` and assignes the horiatonal,
+% vertical and longitudinal girder offset uncertainties `dX`, `dY` and `dZ`, respectively, to the 
+% girder start points with a cutoff value of 3 sigma. When the support errors are applied the girder
+% endpoints will get the same offset error as the start points, resulting in a paraxial translation
+% of the girder.
+% ------------------------------------------------------------------
+% SC = SCregisterSupport(SC,'Girder',ords,'Offset',{[dX dY dZ],3});
 % ------------------------------------------------------------------
 % Registers the section start- end endpoints defined in `ords` and assignes the horiatonal and
 % vertical section offset uncertainties `dX` and `dY`, respectively, to the start points. When
@@ -118,30 +129,29 @@ function SC = SCregisterSupport(SC,varargin)
 			SC.RING{ordPair(n)}.([type 'Offset']) = [0 0 0]; % [x,y,z]
 			SC.RING{ordPair(n)}.([type 'Roll'  ]) = [0 0 0]; % [az,ax,ay]
 		end
-
+		
 		% Loop over input name/pair-values if given
 		for i=3:2:(length(varargin)-1)
-			% Check if outdated offset is provided
-			if strcmp(varargin{i},'Offset') && size(varargin{i+1},2)==2
-				warning('New error model requires ''Offset'' to be an array of [dx,dy,dz]. dz=0 added. This warning will be removed in future updates. Please update your code. Thanks!')
-				varargin{i+1}(:,3) = 0; % TODO: double check!
-			end
-			% Check if outdated roll is provided
-			if strcmp(varargin{i},'Roll') && size(varargin{i+1},2)==1
-				warning('New error model requires ''Roll'' to be an array of [az,ax,ay]. ax=ay=0 added. This warning will be removed in future updates. Please update your code. Thanks!')
-				varargin{i+1}(1,3) = 0;
-			end
-			
-			% Define uncertainties for start points
-			SC.SIG.Support{ordPair(1)}.([type varargin{i}]) = varargin{i+1}(1,:);
-			% Check if endpoint uncertainties are given
-			if size(varargin{i+1},1)==2
-				% Define uncertainties for endpoints
-				SC.SIG.Support{ordPair(2)}.([type varargin{i}]) = varargin{i+1}(2,:);
+ 			% Check if individual cutoffs are defined
+			if iscell(varargin{i+1}(1,:))
+				% Define uncertainties for start points
+				SC.SIG.Support{ordPair(1)}.([type varargin{i}]) = {varargin{i+1}{1}(1,:),varargin{i+1}{2}};
+				% Check if endpoint uncertainties are given
+				if size(varargin{i+1}{1},1)==2
+					% Define uncertainties for endpoints
+					SC.SIG.Support{ordPair(2)}.([type varargin{i}]) = {varargin{i+1}{1}(2,:),varargin{i+1}{2}};
+				end
+			else
+				% Define uncertainties for start points
+				SC.SIG.Support{ordPair(1)}.([type varargin{i}]) = varargin{i+1}(1,:);
+				% Check if endpoint uncertainties are given
+				if size(varargin{i+1},1)==2
+					% Define uncertainties for endpoints
+					SC.SIG.Support{ordPair(2)}.([type varargin{i}]) = varargin{i+1}(2,:);
+				end
 			end
 		end
 	end
-
 
 	function checkInput()
 		if ~any(strcmp(varargin{1},{'Girder','Plinth','Section'}))
@@ -160,13 +170,26 @@ function SC = SCregisterSupport(SC,varargin)
 		
 		if any(strcmp(varargin,{'Offset'}))
 			offset = varargin{find(strcmp(varargin,{'Offset'}))+1};
+			if iscell(offset)
+				if length(offset{2})~=1
+					error('Sigma cutoff must be a singla value.')
+				end
+				offset = offset{1};
+			end
 			if size(offset,2)~=3 || (size(offset,1)~=1 && size(offset,1)~=2)
 				warning('Support structure offset uncertainty of ''%s'' must be given as [1x3] (start end endpoints get same offset errors) or [2x3] (start end endpoints get independent offset errors) array.',varargin{1})
 			end
 		end
 		
 		if any(strcmp(varargin,{'Roll'}))
-			if length(varargin{find(strcmp(varargin,{'Roll'}))+1})~=3
+			roll = varargin{find(strcmp(varargin,{'Roll'}))+1};
+			if iscell(roll)
+				if length(roll{2})~=1
+					error('Sigma cutoff must be a singla value.')
+				end
+				roll = roll{1};
+			end
+			if length(roll)~=3
 				warning('''%s'' roll uncertainty must be [1x3] array [az,ax,ay] of roll (around z-axis), pitch (roll around x-axis) and yaw (roll around y-axis) angle.',varargin{1})
 			end
 		end

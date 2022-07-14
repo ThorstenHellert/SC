@@ -25,14 +25,15 @@ function SC = SCapplyErrors(SC,varargin)
 % value of the uncertainty field. The number will be stored in the
 % corresponding field of the lattice structure, thus `SC.RING{ord}`. An
 % exeption are bending angle errors which are stored in the `BendingAngleError`
-% field. See examples in the register functions for more details.
+% field. See examples in the SCregister* functions for more details.
 %
 % OPTIONS
 % -------
 % The following options can be given as name/value-pairs:
 %
 % `'nSig'` (2)::
-%	Number of sigmas at which the Gaussian distribution of errors is truncated.
+%	Number of sigmas at which the Gaussian distribution of errors is truncated if not defined
+%   explicitly for individual uncertainties.
 %
 % RETURN VALUE
 % ------------
@@ -50,6 +51,7 @@ function SC = SCapplyErrors(SC,varargin)
 	par=p.Results;
 
 	if ~isfield(SC,'SIG')
+		warning('No uncertanties provided.')
 		return;
 	end
 
@@ -93,14 +95,19 @@ function SC = applyCavityError(SC,par)
 	if isfield(SC.SIG,'RF')
 		for ord=SC.ORD.Cavity
 			
-			% Check if uncertainty for current BPM is given
+			% Check if uncertainty for current cavity is given
 			if isempty(SC.SIG.RF{ord})
 				continue
 			end
 
 			% Loop over uncertainties
 			for field=fieldnames(SC.SIG.RF{ord})'
-				SC.RING{ord}.(field{1}) = SC.SIG.RF{ord}.(field{1}) * SCrandnc(par.nSig);
+				% Check if individual cutoff is defined
+				if iscell(SC.SIG.RF{ord}.(field{1}))
+					SC.RING{ord}.(field{1}) = SC.SIG.RF{ord}.(field{1}){1} * SCrandnc(SC.SIG.RF{ord}.(field{1}){2});
+				else
+					SC.RING{ord}.(field{1}) = SC.SIG.RF{ord}.(field{1}) * SCrandnc(par.nSig);
+				end
 			end
 		end
 	end
@@ -145,7 +152,12 @@ function SC = applyBPMerrors(SC,par)
 			if regexp(field{1},'Noise')
 				SC.RING{ord}.(field{1}) = SC.SIG.BPM{ord}.(field{1});
 			else
-				SC.RING{ord}.(field{1}) = SC.SIG.BPM{ord}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.BPM{ord}.(field{1})));
+				% Check if individual cutoff is defined
+				if iscell(SC.SIG.BPM{ord}.(field{1}))
+					SC.RING{ord}.(field{1}) = SC.SIG.BPM{ord}.(field{1}){1} .* SCrandnc(SC.SIG.BPM{ord}.(field{1}){2},size(SC.SIG.BPM{ord}.(field{1}){1}));
+				else
+					SC.RING{ord}.(field{1}) = SC.SIG.BPM{ord}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.BPM{ord}.(field{1})));
+				end
 			end
 		end
 	end
@@ -191,12 +203,22 @@ function SC = applySupportAlignmentError(SC,par)
 				end
 
 				% Generate random error for support structure beginning
-				SC.RING{ordPair(1)}.(field{1}) = SC.SIG.Support{ordPair(1)}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.Support{ordPair(1)}.(field{1})));
-
+				if iscell(SC.SIG.Support{ordPair(1)}.(field{1}))
+					% Individual cutoff is given
+					SC.RING{ordPair(1)}.(field{1}) = SC.SIG.Support{ordPair(1)}.(field{1}){1} .* SCrandnc(SC.SIG.Support{ordPair(1)}.(field{1}){2},size(SC.SIG.Support{ordPair(1)}.(field{1}){1}));
+				else
+					SC.RING{ordPair(1)}.(field{1}) = SC.SIG.Support{ordPair(1)}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.Support{ordPair(1)}.(field{1})));
+				end
+				
 				% Check if uncertanty is specified for endpoint
 				if length(SC.SIG.Support)>=ordPair(2) && isfield(SC.SIG.Support{ordPair(2)},field{1})
 					% Generate random error for support structure endpoint
-					SC.RING{ordPair(2)}.(field{1}) = SC.SIG.Support{ordPair(2)}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.Support{ordPair(2)}.(field{1})));
+					if iscell(SC.SIG.Support{ordPair(2)}.(field{1}))
+						% Individual cutoff is given
+						SC.RING{ordPair(2)}.(field{1}) = SC.SIG.Support{ordPair(2)}.(field{1}){1} .* SCrandnc(SC.SIG.Support{ordPair(2)}.(field{1}){2},size(SC.SIG.Support{ordPair(2)}.(field{1}){1}));
+					else
+						SC.RING{ordPair(2)}.(field{1}) = SC.SIG.Support{ordPair(2)}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.Support{ordPair(2)}.(field{1})));
+					end
 				else
 					% Copy support structure endpoint from structure beginning
 					SC.RING{ordPair(2)}.(field{1}) = SC.RING{ordPair(1)}.(field{1});
@@ -254,19 +276,28 @@ function SC = applyMagnetError(SC,par)
 	if ~isfield(SC.SIG,'Mag')
 		return;
 	end
+	% Loop over magnets
 	for ord = SC.ORD.Magnet
 
 		if isempty(SC.SIG.Mag{ord})
 			continue
 		end
+		% Loop over uncertanties
 		for field=fieldnames(SC.SIG.Mag{ord})'
+			% Check if individual cutoff is given
+			if iscell(SC.SIG.Mag{ord}.(field{1}))
+				nSig = SC.SIG.Mag{ord}.(field{1}){2};
+				sig = SC.SIG.Mag{ord}.(field{1}){1};
+			else
+				nSig = par.nSig;
+				sig = SC.SIG.Mag{ord}.(field{1});
+			end
+			
 			% Bending angle error gets applied differently
 			if strcmp(field{1},'BendingAngle')
-				SC.RING{ord}.BendingAngleError = SC.SIG.Mag{ord}.BendingAngle * SCrandnc(par.nSig,1,1);
-			elseif strcmp(field{1},'MagnetOffset')
-				SC.RING{ord}.(field{1}) = SC.SIG.Mag{ord}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.Mag{ord}.(field{1})));
+				SC.RING{ord}.BendingAngleError = sig * SCrandnc(nSig,1,1);
 			else
-				SC.RING{ord}.(field{1}) = SC.SIG.Mag{ord}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.Mag{ord}.(field{1})));
+				SC.RING{ord}.(field{1}) = sig .* SCrandnc(nSig,size(sig));
 			end
 		end
 		

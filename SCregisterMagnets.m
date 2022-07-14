@@ -113,9 +113,12 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 % -------------
 % Every name/value-pair which is not explicitly mentioned in the options above
 % is interpreted as an uncertainty and passed to the sigma structure `SC.SIG`
-% for the corresponding magnets defined in `MAGords`.
+% for the corresponding magnets defined in `MAGords` (see examples below).
 % The function *SCapplyErrors* uses the fields of `SC.SIG` to randomly generate
-% errors and applies them to the corresponding fields of the lattice elements.
+% errors and applies them to the corresponding fields of the lattice elements. 
+% By default, a Gaussian distribution with a cutoff at 2 sigma is applied. An
+% alternative cutoff value can be given explicitly for each uncertainty type, 
+% see examples below.
 %
 %
 % EXAMPLES
@@ -133,6 +136,15 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 % SC = SCregisterMagnets(SC,ords, ...
 %	'CalErrorB',[0 1E-3],...
 %	'MagnetOffset',[30E-6 30E-6 0]);
+% ----------------------------------------------------------------------------
+%
+% Register the magnets specified in `ords` in `SC` and set the uncertainty of
+% the quadrupole component to 1E-3 and 30um horizontal and vertical offset with 
+% a 3 sigma cutoff value (when applied with *SCapplyErrors*).
+% ----------------------------------------------------------------------------
+% SC = SCregisterMagnets(SC,ords, ...
+%	'CalErrorB',[0 1E-3],...
+%	'MagnetOffset',{[30E-6 30E-6 0],3});
 % ----------------------------------------------------------------------------
 %
 % Register the magnets specified in `ords` in `SC` and set the uncertainty of
@@ -167,11 +179,11 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 %
 % Register the magnets specified in `ords` in `SC` and set the uncertainty of
 % the quadrupole component to 1E-3 and the uncertainty of the bending angle to
-% 1E-4.
+% 1E-4, the latter with a 3 sigma cutoff.
 % ----------------------------------------------------------------------------
 % SC = SCregisterMagnets(SC,ords, ...
 %	'CalErrorB',[0 1E-3], ...
-%	'BendingAngle',1E-4);
+%	'BendingAngle',{1E-4,3});
 % ----------------------------------------------------------------------------
 %
 % Register the magnets specified in `ords` in `SC` as combined function magnets
@@ -276,17 +288,12 @@ function [nvpairs] = getSigmaPairs(keywords,varargin)
 	nvpairs={};
 	for n=1:2:length(varargin)
 		if ~any(strcmp(varargin{n},keywords))
-			% Check if outdated offset is provided
-			if strcmp(varargin{n},'MagnetOffset') && length(varargin{n+1})==2
-				warning('New error model requires ''MagnetOffset'' to be a 1x3 array of [dx,dy,dz]. dz=0 added. This warning will be removed in future updates. Please update your code. Thanks!')
-				varargin{n+1}(:,3) = 0;
-			end
-			if strcmp(varargin{n},'MagnetRoll') && length(varargin{n+1})~=3
-				warning('New error model requires ''MagnetRoll'' to be a 1x3 array of [az,ax,ay]. ax=ay=0 added. This warning will be removed in future updates. Please update your code. Thanks!')
-				varargin{n+1}(3) = 0;
-			end
 			% Write input argument in sigma name/value-pair
-			nvpairs = horzcat(nvpairs,varargin{n},varargin{n+1});
+			if iscell(varargin{n+1})
+				nvpairs = horzcat(nvpairs,varargin{n},{varargin{n+1}});
+			else
+				nvpairs = horzcat(nvpairs,varargin{n},varargin{n+1});
+			end
 		end
 	end
 end

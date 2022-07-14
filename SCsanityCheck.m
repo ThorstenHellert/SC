@@ -12,7 +12,8 @@ function SCsanityCheck(SC)
 %
 % DESCRIPTION
 % -----------
-% Performs a sanity check on the current `SC` structure adn returns warnings if things look fishy.
+% Performs a sanity check on the current `SC` structure adn returns warnings if things look fishy. 
+% If you find something that is missing please contact us.
 %
 % INPUTS
 % ------
@@ -124,7 +125,12 @@ function SCsanityCheck(SC)
 						warning(sprintf('Field ''%s'' in SC.SIG.Mag doesn''t match lattice element (Magnet ord: %d)',field{1},ord))
 					end
 					if strcmp(field{1},'MagnetOffset')
-						if length(SC.SIG.Mag{ord}.(field{1}))~=3
+						if iscell(SC.SIG.Mag{ord}.(field{1}))
+							off = SC.SIG.Mag{ord}.(field{1}){1};
+						else
+							off = SC.SIG.Mag{ord}.(field{1});
+						end
+						if length(off)~=3
 							warning('SC.SIG.Mag{%d}.MagnetOffset should be a [1x3] (dx,dy,dz) array.',ord)
 						end
 					end
