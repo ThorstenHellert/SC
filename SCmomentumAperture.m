@@ -114,7 +114,7 @@ function dbounds = SCmomentumAperture(RING,REFPTS,inibounds,varargin)
 		ord = REFPTS(i);
 
 		% Reset bounds to initial values
-		bounds=inibounds;
+		local_bounds=inibounds;
 
 		% Shift so that ord-th element is the first
 		SHIFTRING = circshift(RING,-ord+1);
@@ -123,22 +123,22 @@ function dbounds = SCmomentumAperture(RING,REFPTS,inibounds,varargin)
 		ZCO = ZCOs(:,i); 
 
 		% Scale boundaries up until dp is included
-		while ~check_bounds(bounds,SHIFTRING,ZCO,par.nturns)
-			bounds = increment_bounds(bounds,par.stepsize);
-			if par.debug; fprintf('ord: %d; Incremented: %+0.5e %+0.5e\n',ord,bounds(1),bounds(2)); end;
+		while ~check_bounds(local_bounds,SHIFTRING,ZCO,par.nturns)
+			local_bounds = increment_bounds(local_bounds,par.stepsize);
+			if par.debug; fprintf('ord: %d; Incremented: %+0.5e %+0.5e\n',ord,local_bounds(1),local_bounds(2)); end;
 		end
 
 		% Refine boundaries until requested accuracy is reached
-		while abs((bounds(2)-bounds(1))/max(bounds)) > par.accuracy
-			bounds = refine_bounds(bounds,SHIFTRING,ZCO,par.nturns);
-			if par.debug; fprintf('ord: %d; Refined: %e %e\n',ord,bounds(1),bounds(2)); end;
+		while abs((local_bounds(2)-local_bounds(1))/max(local_bounds)) > par.accuracy
+			local_bounds = refine_bounds(local_bounds,SHIFTRING,ZCO,par.nturns);
+			if par.debug; fprintf('ord: %d; Refined: %e %e\n',ord,local_bounds(1),local_bounds(2)); end;
 		end
 
 		% Store final boundaries
-		dboundHI(i) = bounds(1);
-		dboundLO(i) = bounds(2);
+		dboundHI(i) = local_bounds(1);
+		dboundLO(i) = local_bounds(2);
 
-		if par.debug; fprintf('ord: %d; Found: %+0.5e %+0.5e\n',ord,bounds(1),bounds(2)); end;
+		if par.debug; fprintf('ord: %d; Found: %+0.5e %+0.5e\n',ord,local_bounds(1),local_bounds(2)); end;
 
 	end
 	
@@ -156,10 +156,10 @@ function dbounds = SCmomentumAperture(RING,REFPTS,inibounds,varargin)
 
 end
 
-function bounds = refine_bounds(bounds,RING,ZCO,nturns)
-	% bounds shal be absolute-ordered i.e.
+function local_bounds = refine_bounds(local_bounds,RING,ZCO,nturns)
+	% bounds shall be absolute-ordered i.e.
 	% [0.1,0.2] or [-0.1,-0.3]
-	dmean = mean(bounds);
+	dmean = mean(local_bounds);
 
 	% Add momentum deviations to closed orbit
 	Z0 = ZCO;
@@ -169,19 +169,19 @@ function bounds = refine_bounds(bounds,RING,ZCO,nturns)
 	ROUT = atpass(RING,Z0,1,nturns,[]);
 
 	if isnan(ROUT(1)) % Particle dead :(
-		bounds(2) = dmean; % Set abs-upper bound to midpoint
+		local_bounds(2) = dmean; % Set abs-upper bound to midpoint
 	else % Particle alive :)
-		bounds(1) = dmean; % Set abs-lower bound to midpoint
+		local_bounds(1) = dmean; % Set abs-lower bound to midpoint
 	end
 
 end
 
-function check = check_bounds(bounds,RING,ZCO,nturns)
+function check = check_bounds(local_bounds,RING,ZCO,nturns)
 	% Returns true when the lower (upper) bound is (un)stable
 
 	% Add momentum deviations to closed orbit
 	Z=[ZCO,ZCO];
-	Z(5,:)=Z(5,:)+bounds(:)';
+	Z(5,:)=Z(5,:)+local_bounds(:)';
 
 	% Track
 	ROUT = atpass(RING,Z,1,nturns,[]);
@@ -197,22 +197,22 @@ function check = check_bounds(bounds,RING,ZCO,nturns)
 
 end
 
-function bounds = increment_bounds(bounds,stepsize)
-	bounds = bounds + [-1,1] .* mysign(bounds)*stepsize;
+function local_bounds = increment_bounds(local_bounds,stepsize)
+	local_bounds = local_bounds + [-1,1] .* mysign(local_bounds)*stepsize;
 end
 
 function s = mysign(v)
 	s = 1 - 2 * (v<0);
 end
 
-function out = scale_bounds(bounds,alpha)
-	lower = mean(bounds)-(mean(bounds)-bounds(1)) * alpha;
-	upper = mean(bounds)-(mean(bounds)-bounds(2)) * alpha;
+function out = scale_bounds(local_bounds,alpha)
+	lower = mean(local_bounds)-(mean(local_bounds)-local_bounds(1)) * alpha;
+	upper = mean(local_bounds)-(mean(local_bounds)-local_bounds(2)) * alpha;
 	% Prohibit zero-crossing during scaling
-	if sign(lower) ~= sign(bounds(1))
+	if sign(lower) ~= sign(local_bounds(1))
 		lower = 0.0;
 	end
-	if sign(upper) ~= sign(bounds(2))
+	if sign(upper) ~= sign(local_bounds(2))
 		upper = 0.0;
 	end
 	out = [lower,upper];
