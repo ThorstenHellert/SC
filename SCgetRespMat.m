@@ -14,7 +14,7 @@ function [RM,Err,CMsteps] = SCgetRespMat(SC,Amp,BPMords,CMords,varargin)
 % DESCRIPTION
 % -----------
 % Gets the beam based response matrix based on the current injection pattern and using the BPMs and
-% CMs specified in `BPMords` and `CMords`, respectively. By default the response matrix is measrued
+% CMs specified in `BPMords` and `CMords`, respectively. By default the response matrix is measured
 % using a fixed initial kick amplitude `Amp` (see options below), which can be given either as a 
 % single value for all CMs or as a cell array with amplitudes for each CM specified in `CMords`. 
 %
@@ -95,10 +95,10 @@ function [RM,Err,CMsteps] = SCgetRespMat(SC,Amp,BPMords,CMords,varargin)
 	% Switch orbit or tracking mode
 	if strcmp(SC.INJ.trackMode,'ORB')
 		par.nTurns = 1;
-		if par.verbose;fprintf('Calculate orbit response matrix for %d BPMs and %d|%d CMs with mode ''%s'' and amplitde %.0e|%.0e using %d steps ...',length(BPMords),length(CMords{1}),length(CMords{2}),par.mode,mean(Amp{1}),mean(Amp{2}),par.nSteps);end
+		if par.verbose;fprintf('Calculate orbit response matrix for %d BPMs and %d|%d CMs with mode ''%s'' and amplitude %.0e|%.0e using %d steps ...',length(BPMords),length(CMords{1}),length(CMords{2}),par.mode,mean(Amp{1}),mean(Amp{2}),par.nSteps);end
 	else
 		par.nTurns = SC.INJ.nTurns;
-		if par.verbose;fprintf('Calculate %d-turn trajectory response matrix for %d BPMs and %d|%d CMs with mode ''%s'' and amplitde %.0e|%.0e using %d steps ...',SC.INJ.nTurns,length(BPMords),length(CMords{1}),length(CMords{2}),par.mode,mean(Amp{1}),mean(Amp{2}),par.nSteps);end
+		if par.verbose;fprintf('Calculate %d-turn trajectory response matrix for %d BPMs and %d|%d CMs with mode ''%s'' and amplitude %.0e|%.0e using %d steps ...',SC.INJ.nTurns,length(BPMords),length(CMords{1}),length(CMords{2}),par.mode,mean(Amp{1}),mean(Amp{2}),par.nSteps);end
 	end
 	
 	% Alocate structures
