@@ -858,7 +858,7 @@ function varargout = SClocoLib(funName,varargin)
 			[~, ~, par.targetChrom] = atlinopt(SC.IDEALRING,0,[]);
 		end
 		
-		% Check if something wnet wrong
+		% Check if something went wrong
 		if any(isnan(par.targetChrom))
 			fprintf('Target chromaticity must not contain NaN. Aborting.\n')
 			varargout{1} = SC;
