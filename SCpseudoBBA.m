@@ -85,7 +85,10 @@ function SC = SCpseudoBBA(SC,BPMords,MagOrds,postBBAoffset,varargin)
 		for nDim=1:2
 		
 			% Write new BPM offset		
-			SC.RING{BPMords(nDim,nBPM)}.Offset(nDim) = SC.RING{MagOrds(nDim,nBPM)}.MagnetOffset(nDim) + SC.RING{MagOrds(nDim,nBPM)}.SupportOffset(nDim) - SC.RING{BPMords(nDim,nBPM)}.SupportOffset(nDim) + postBBAoffset(nDim,nBPM) * SCrandnc(p.Results.sigma);
+			SC.RING{BPMords(nDim,nBPM)}.Offset(nDim) = SC.RING{MagOrds(nDim,nBPM)}.MagnetOffset(nDim) + ...
+									SC.RING{MagOrds(nDim,nBPM)}.SupportOffset(nDim) - ...
+									SC.RING{BPMords(nDim,nBPM)}.SupportOffset(nDim) + ...
+									postBBAoffset(nDim,nBPM) * SCrandnc(p.Results.sigma);
 		
 		end
 	end
