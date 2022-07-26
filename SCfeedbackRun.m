@@ -14,7 +14,7 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 % DESCRIPTION
 % -----------
 % Iteratively applies orbit corrections using the pseudoinverse of the
-% trajcectory response matrix `Mplus`, until a break-condition specified by one
+% trajectory response matrix `Mplus`, until a break-condition specified by one
 % of the 'OPTIONS' is met.  
 % The dispersion can be included, thus the rf frequency as a correction 
 % parameter. If the dispersion is to be included, `Mplus` has to have the size 
@@ -22,7 +22,7 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 % `(length(SC.ORD.CM{1}) + length(SC.ORD.CM{2})) x length(SC.ORD.BPM)`, or correspondingly if the CM
 % and/or BPM ordinates for the correction is explicitly given (see options below). `SC.RING` is 
 % assumed to be a lattice with transmission through all considered turns. This routine will
-% also return, if transmssion is lost.
+% also return, if transmission is lost.
 %
 %
 % INPUT
@@ -47,7 +47,7 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 %	target orbit in the format `[x_1 ... x_n y_1 ...y_n]`, where
 %	`[x_i,y_i]` is the target position at the i-th BPM.
 % `'scaleDisp'` (0)::
-%   Scaling factor for and flag indicating if the dispersion is included in the respoinse matrix
+%   Scaling factor for and flag indicating if the dispersion is included in the response matrix
 % `'CMords'` (`SC.ORD.CM`):: 
 %   List of CM ordinates to be used for correction
 % `'BPMords'` (`SC.ORD.BPM`):: 
