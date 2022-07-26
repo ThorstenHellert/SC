@@ -21,7 +21,7 @@ function eta = SCgetDispersion(SC,RFstep,varargin)
 % `SC`::
 %	SC base structure
 % `RFstep`::
-%	Change of rf frequency
+%	Change of RF frequency in Hz
 %
 % OPTIONS
 % -------
@@ -42,7 +42,7 @@ function eta = SCgetDispersion(SC,RFstep,varargin)
 %
 % EXAMPLES
 % --------
-% Calculate the dispersion with a 1kHz rf frequency change.
+% Calculate the dispersion with a 1 kHz rf frequency change.
 % -------------------------------
 % eta = SCgetDispersion(SC,1E3);
 % -------------------------------
