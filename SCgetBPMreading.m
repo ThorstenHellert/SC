@@ -13,7 +13,7 @@ function [B,T] = SCgetBPMreading(SC,varargin)
 %
 % DESCRIPTION
 % -----------
-% This function calculates the particel trajectories based on the current
+% This function calculates the particle trajectories based on the current
 % injection setup as defined in `SC.INJ` and calculates the corresponding BPM
 % readings. The injection setup is a structure with the fields:
 %
@@ -211,15 +211,15 @@ function B = calcBPMreading(SC,T,varargin)
 		nParticles = SC.INJ.nParticles;
 	end
 
-	
-	
+
+
 	% Define BPM errors along trajectory (multiple turns)
 	BPMoffset   = repmat(cell2mat(atgetfieldvalues(SC.RING(SC.ORD.BPM),'Offset'))' + cell2mat(atgetfieldvalues(SC.RING(SC.ORD.BPM),'SupportOffset'))',1,nTurns);
 	BPMcalError = repmat(cell2mat(atgetfieldvalues(SC.RING(SC.ORD.BPM),'CalError'))',1,nTurns);
 	BPMroll     = repmat(atgetfieldvalues(SC.RING(SC.ORD.BPM),'Roll')',1,nTurns) + repmat(atgetfieldvalues(SC.RING(SC.ORD.BPM),'SupportRoll')',1,nTurns);
 	BPMnoise    = repmat(    BPMnoise   ,1,nTurns) .* SCrandnc(2,2,nTurns*length(SC.ORD.BPM));
 	BPMsumError = repmat(atgetfieldvalues(SC.RING(SC.ORD.BPM),'SumError')',1,nTurns);
-	
+
 	% Check if trajectories were given not only at BPMs
 	if p.Results.atAllElements
 		% Indices of BPMs in trajectories
@@ -227,7 +227,7 @@ function B = calcBPMreading(SC,T,varargin)
 	else
 		nE = 1:(length(SC.ORD.BPM)*nTurns);
 	end
-	
+
 	% Check for multiparticle tracking
 	if nParticles > 1
 
@@ -241,7 +241,7 @@ function B = calcBPMreading(SC,T,varargin)
 		% Calculate center of charge
 		Bx1 = mean(Tx,2,'omitnan')';
 		By1 = mean(Ty,2,'omitnan')';
-		
+
 		% Check for detactable BPM signal
 		beamLost  = find( sum( isnan( Tx ),2 )' .* (1 + BPMsumError.*SCrandnc(2,size(BPMsumError))) > ( nParticles * SC.INJ.beamLostAt ),1);
 
