@@ -209,7 +209,7 @@ function SC = applySupportAlignmentError(SC,par)
 				else
 					SC.RING{ordPair(1)}.(field{1}) = SC.SIG.Support{ordPair(1)}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.Support{ordPair(1)}.(field{1})));
 				end
-				
+
 				% Check if uncertanty is specified for endpoint
 				if length(SC.SIG.Support)>=ordPair(2) && isfield(SC.SIG.Support{ordPair(2)},field{1})
 					% Generate random error for support structure endpoint
@@ -224,7 +224,7 @@ function SC = applySupportAlignmentError(SC,par)
 					SC.RING{ordPair(2)}.(field{1}) = SC.RING{ordPair(1)}.(field{1});
 				end
 			end
-			
+
 			% Get support structure length
 			if diff(ordPair)>=0
 				structLength = abs(diff(findspos(SC.RING,ordPair)));
@@ -292,7 +292,7 @@ function SC = applyMagnetError(SC,par)
 				nSig = par.nSig;
 				sig = SC.SIG.Mag{ord}.(field{1});
 			end
-			
+
 			% Bending angle error gets applied differently
 			if strcmp(field{1},'BendingAngle')
 				SC.RING{ord}.BendingAngleError = sig * SCrandnc(nSig,1,1);
