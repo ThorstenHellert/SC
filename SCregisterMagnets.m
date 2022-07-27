@@ -115,9 +115,9 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 % is interpreted as an uncertainty and passed to the sigma structure `SC.SIG`
 % for the corresponding magnets defined in `MAGords` (see examples below).
 % The function *SCapplyErrors* uses the fields of `SC.SIG` to randomly generate
-% errors and applies them to the corresponding fields of the lattice elements. 
+% errors and applies them to the corresponding fields of the lattice elements.
 % By default, a Gaussian distribution with a cutoff at 2 sigma is applied. An
-% alternative cutoff value can be given explicitly for each uncertainty type, 
+% alternative cutoff value can be given explicitly for each uncertainty type,
 % see examples below.
 %
 %
@@ -139,7 +139,7 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 % ----------------------------------------------------------------------------
 %
 % Register the magnets specified in `ords` in `SC` and set the uncertainty of
-% the quadrupole component to 1E-3 and 30um horizontal and vertical offset with 
+% the quadrupole component to 1E-3 and 30um horizontal and vertical offset with
 % a 3 sigma cutoff value (when applied with *SCapplyErrors*).
 % ----------------------------------------------------------------------------
 % SC = SCregisterMagnets(SC,ords, ...
