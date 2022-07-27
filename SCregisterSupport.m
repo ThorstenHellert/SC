@@ -57,7 +57,7 @@ function SC = SCregisterSupport(SC,varargin)
 %   [1x3] array [az,ax,ay] defining roll (around z-axis), pitch (roll around x-axis) and yaw (roll
 %   around y-axis) angle uncertainties.
 %
-% By default a 2 sigma cutoff is applied. The user can specify a different cutoff by giving the 
+% By default a 2 sigma cutoff is applied. The user can specify a different cutoff by giving the
 % uncertainty as a cell structure, e.g. {[1x3],nSig}, with nSig being the cutoff (see examples below).
 %
 % EXAMPLES
@@ -70,7 +70,7 @@ function SC = SCregisterSupport(SC,varargin)
 % SC = SCregisterSupport(SC,'Girder',ords,'Offset',[dX dY dZ]);
 % ------------------------------------------------------------------
 % Registers the girder start end endpoints defined in `ords` and assigns the horizontal,
-% vertical and longitudinal girder offset uncertainties `dX`, `dY` and `dZ`, respectively, to the 
+% vertical and longitudinal girder offset uncertainties `dX`, `dY` and `dZ`, respectively, to the
 % girder start points with a cutoff value of 3 sigma. When the support errors are applied the girder
 % endpoints will get the same offset error as the start points, resulting in a paraxial translation
 % of the girder.
@@ -132,7 +132,7 @@ function SC = SCregisterSupport(SC,varargin)
 
 		% Loop over input name/pair-values if given
 		for i=3:2:(length(varargin)-1)
- 			% Check if individual cutoffs are defined
+			% Check if individual cutoffs are defined
 			if iscell(varargin{i+1}(1,:))
 				% Define uncertainties for start points
 				SC.SIG.Support{ordPair(1)}.([type varargin{i}]) = {varargin{i+1}{1}(1,:),varargin{i+1}{2}};
