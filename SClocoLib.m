@@ -170,7 +170,7 @@ function varargout = SClocoLib(funName,varargin)
 % DESCRIPTION
 % -----------
 % Sets up the fit parameter structure which shall be used by `loco`.
-% Additionally the inital values of the fit parameters are stored, which is
+% Additionally the initial values of the fit parameters are stored, which is
 % needed in order to eventually apply the lattice correction.
 %
 % INPUTS
@@ -188,7 +188,7 @@ function varargout = SClocoLib(funName,varargin)
 % ----------
 % Additional arguments are given as cell arrays and specify the
 % fit parameters.  Each cell must be given as {`ordinates`, `normal/skew`,
-% `individual/family`, `deltaK`} quadrupel, see examples.
+% `individual/family`, `deltaK`} quadrupole, see examples.
 %
 % RETURN VALUE
 % ------------
@@ -200,7 +200,7 @@ function varargout = SClocoLib(funName,varargin)
 % Set up the LOCO fit parameter structure using all `QF` and `QD` normal
 % quadrupoles (see also *SCgetOrds*) which are individually powered and using a
 % strength variation of 1E-3 and 1E-4 to calculate the derivatives,
-% respectively. The disturbed lattice `RING0` is used to identify the inital
+% respectively. The disturbed lattice `RING0` is used to identify the initial
 % setpoints of the fit parameters and an rf frequency step of 1kHz is assumed.
 % ------------------------------------------------------------------
 % ordQF = SCgetOrds(SC.RING,'QF');
