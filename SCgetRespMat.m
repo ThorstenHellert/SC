@@ -132,7 +132,7 @@ function [RM,Err,CMsteps] = SCgetRespMat(SC,Amp,BPMords,CMords,varargin)
 			% Get CM kick vector
 			CMstepVec = linspace(-MaxStep,MaxStep,par.nSteps);
 			
-			% Check if only two CM settings are concernded : measurement already done by getKickAmplitude()
+			% Check if only two CM settings are concerned : measurement already done by getKickAmplitude()
 			if par.nSteps~=2
 				
 				% Initialize CM setpoint vector and BPM readings
