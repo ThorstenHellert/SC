@@ -28,7 +28,7 @@ function varargout = SClocoLib(funName,varargin)
 %
 % SYNOPSIS
 % --------
-% `[LOCOmodel, LOCOflags, Init] = SClocoLib('setupLOCOmodel', SC [, options])`
+% `[RINGdata, LOCOflags, Init] = SClocoLib('setupLOCOmodel', SC [, options])`
 %
 % DESCRIPTION
 % -----------
@@ -49,8 +49,8 @@ function varargout = SClocoLib(funName,varargin)
 %
 % RETURN VALUE
 % ------------
-% `LOCOmodel`::
-%	LOCO model used by `locoresponsematrix`.
+% `RINGdata`::
+%	RING data used by `locoresponsematrix`.
 % `LOCOflags`::
 %	LOCO flags used by `loco`.
 % `Init`::
@@ -62,7 +62,7 @@ function varargout = SClocoLib(funName,varargin)
 % Set up the LOCO model, include dispersion and set the horizontal and vertical
 % dispersion weights to 100.
 % ------------------------------------------------------------------
-% [LOCOmodel,LOCOflags,Init] = SClocoLib('setupLOCOmodel',SC,...
+% [RINGdata,LOCOflags,Init] = SClocoLib('setupLOCOmodel',SC,...
 % 	'Dispersion','Yes',...
 % 	'HorizontalDispersionWeight',.1E2,...
 % 	'VerticalDispersionWeight',.1E2);
@@ -165,7 +165,7 @@ function varargout = SClocoLib(funName,varargin)
 %
 % SYNOPSIS
 % --------
-% `FitParameters = SClocoLib('setupFitparameters', SC, RING0, LOCOmodel, RFstep [, parameters])`
+% `FitParameters = SClocoLib('setupFitparameters', SC, RING0, RINGdata, RFstep [, parameters])`
 %
 % DESCRIPTION
 % -----------
@@ -179,8 +179,8 @@ function varargout = SClocoLib(funName,varargin)
 %	SC base structure.
 % `RING0`::
 %	Initial (disturbed) lattice cell structure which was used for the response matrix measurement.
-% `LOCOmodel`::
-%	LOCO model structure.
+% `RINGdata`::
+%	RING data structure.
 % `RFstep`::
 %	RF frequency step [Hz] for `locoresponsematrix`.
 %
@@ -205,7 +205,7 @@ function varargout = SClocoLib(funName,varargin)
 % ------------------------------------------------------------------
 % ordQF = SCgetOrds(SC.RING,'QF');
 % ordQD = SCgetOrds(SC.RING,'QD');
-% FitParameters = SClocoLib('setupFitparameters',SC,RING0,LOCOmodel,1E3,...
+% FitParameters = SClocoLib('setupFitparameters',SC,RING0,RINGdata,1E3,...
 % 	{ordQF,'normal','individual',1E-3},...
 % 	{ordQD,'normal','individual',1E-4});
 % ------------------------------------------------------------------
@@ -216,7 +216,7 @@ function varargout = SClocoLib(funName,varargin)
 % `Init` (see `'setupLOCOmodel'`) is used to identify the inital setpoints of
 % the fit parameters and an rf frequency step of 1kHz is assumed.
 % ------------------------------------------------------------------
-% FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,LOCOmodel,1E3,...
+% FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,RINGdata,1E3,...
 % 	{SCgetOrds(SC.RING,'QFA'),'normal','family',1E-4},...
 % ------------------------------------------------------------------
 %
@@ -483,9 +483,9 @@ function varargout = SClocoLib(funName,varargin)
 	function setupLOCOmodel(SC,varargin)
 
 		% Create LOCO model from ideal ring
-		LOCOmodel.CavityFrequency   = SC.IDEALRING{SC.ORD.Cavity}.Frequency;
-		LOCOmodel.CavityHarmNumber  = SC.IDEALRING{SC.ORD.Cavity}.HarmNumber;
-		LOCOmodel.Lattice           = SC.IDEALRING;
+		RINGdata.CavityFrequency   = SC.IDEALRING{SC.ORD.Cavity}.Frequency;
+		RINGdata.CavityHarmNumber  = SC.IDEALRING{SC.ORD.Cavity}.HarmNumber;
+		RINGdata.Lattice           = SC.IDEALRING;
 		
 		% Calculate disturbed lattice properties and save initial machine state
 		Init.SC      = SC;
@@ -509,7 +509,7 @@ function varargout = SClocoLib(funName,varargin)
 		end
 
 		% Define output arguments
-		varargout{1} = LOCOmodel;
+		varargout{1} = RINGdata;
 		varargout{2} = LOCOflags;
 		varargout{3} = Init;
 
@@ -607,7 +607,7 @@ function varargout = SClocoLib(funName,varargin)
 	% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Set up LOCO fit parameter structure
-	function setupFitparameters(SC,RING0,MODEL,DeltaRF,varargin)
+	function setupFitparameters(SC,RING0,RINGdata,DeltaRF,varargin)
 
 		FitParameters.FitRFFrequency = 'Yes';
 		FitParameters.DeltaRF        = DeltaRF;
@@ -636,7 +636,7 @@ function varargout = SClocoLib(funName,varargin)
 				FitParameters.Params{nGroup,1}(nElem).Function   = @(x) x;
 				FitParameters.Params{nGroup,1}(nElem).Args       = {};
 				% Get fit parameter values
-				FitParameters.Values(nGroup,1)      = MODEL.Lattice{ord}.(FitParameters.Params{nGroup}(nElem).FieldName)(2);
+				FitParameters.Values(nGroup,1)      = RINGdata.Lattice{ord}.(FitParameters.Params{nGroup}(nElem).FieldName)(2);
 				FitParameters.IdealValues(nGroup,1) = SC.IDEALRING{ ord}.(FitParameters.Params{nGroup}(nElem).FieldName)(2);
 				FitParameters.OrigValues(nGroup,1)  = RING0{ord}.(        FitParameters.Params{nGroup}(nElem).SCFieldName)(2);
 

@@ -375,7 +375,7 @@ end
 CMstep = 1E-4; % [rad]
 RFstep = 1E3;  % [Hz]
 
-[LOCOmodel,LOCOflags,Init] = SClocoLib('setupLOCOmodel',SC,...
+[RINGdata,LOCOflags,Init] = SClocoLib('setupLOCOmodel',SC,...
 	'Dispersion','Yes',...
 	'HorizontalDispersionWeight',.1E2,...
 	'VerticalDispersionWeight',.1E2);
@@ -386,7 +386,7 @@ RFstep = 1E3;  % [Hz]
 
 LOCOmeasData =  SClocoLib('getMeasurement',SC,CMstep,RFstep,SC.ORD.BPM,SC.ORD.CM);
 
-FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,LOCOmodel,RFstep,...
+FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,RINGdata,RFstep,...
 	{SCgetOrds(SC.RING,'QF'),'normal','individual',1E-3},... % {Ords, normal/skew, ind/fam, deltaK}
 	{SCgetOrds(SC.RING,'QD'),'normal','individual',1E-4});   % {Ords, normal/skew, ind/fam, deltaK}
 
@@ -395,7 +395,7 @@ FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,LOCOmodel,RFstep,
 % include coupling (off-diagonal response matrix blocks) and the skew
 % quadrupole correctors as LOCO fitparameters.
 for n=1:6
-	[~, BPMData, CMData, FitParameters, LOCOflags, LOCOmodel] = loco(LOCOmeasData,  BPMData,  CMData,  FitParameters,  LOCOflags,  LOCOmodel);
+	[~, BPMData, CMData, FitParameters, LOCOflags, RINGdata] = loco(LOCOmeasData,  BPMData,  CMData,  FitParameters,  LOCOflags,  RINGdata);
 
 	SC = SClocoLib('applyLatticeCorrection',SC,FitParameters);
 
@@ -406,7 +406,7 @@ for n=1:6
 	if n==3
 		LOCOflags.Coupling = 'Yes';
 
-		FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,LOCOmodel,RFstep,...
+		FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,RINGdata,RFstep,...
 			{SCgetOrds(SC.RING,'QF'),'normal','individual',1E-3},...
 			{SCgetOrds(SC.RING,'QD'),'normal','individual',1E-4},...
 			{SC.ORD.SkewQuad,'skew','individual',1E-3});

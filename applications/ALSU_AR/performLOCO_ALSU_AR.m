@@ -8,7 +8,7 @@ function SC = performLOCO_ALSU_AR(SC)
 	deltaRF  = 1e2 * CMstep/1E-5; % RF difference for dispersion measurement
 	
 	% Setup LOCO model
-	[LOCOmodel,LocoFlags,Init] = SClocoLib('setupLOCOmodel',SC,...
+	[RINGdata,LocoFlags,Init] = SClocoLib('setupLOCOmodel',SC,...
 		'HorizontalDispersionWeight',1E1,...
 		'VerticalDispersionWeight',2E1,...
 		'SVmethod',1E-3);
@@ -27,7 +27,7 @@ function SC = performLOCO_ALSU_AR(SC)
 		
 		if nIter==1
 			% Set up LOCO fit parameter structure for QF/QD magnets
-			FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,LOCOmodel,deltaRF,...
+			FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,RINGdata,deltaRF,...
 				{SCgetOrds(SC.RING,'QF:'),'normal','individual',2E-3},... % {Ordinates, normal/skew, individual/family, deltaK}
 				{SCgetOrds(SC.RING,'QD:'),'normal','individual',1E-3});   % {Ordinates, normal/skew, individual/family, deltaK}
 		elseif nIter==2
@@ -42,7 +42,7 @@ function SC = performLOCO_ALSU_AR(SC)
 			CMData.FitKicks      = 'No';
 			
 			% Set up LOCO fit parameter structure for all magnets
-			FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,LOCOmodel,deltaRF,...
+			FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,RINGdata,deltaRF,...
 				{SCgetOrds(SC.RING,'QF:'),'normal','individual',2E-3},... % {Ordinates, normal/skew, individual/family, deltaK}
 				{SCgetOrds(SC.RING,'QD:'),'normal','individual',1E-3},...  % {Ordinates, normal/skew, individual/family, deltaK}
 				{SCgetOrds(SC.RING,'QFA:'),'normal','family',4E-4},...  % {Ordinates, normal/skew, individual/family, deltaK}
@@ -50,7 +50,7 @@ function SC = performLOCO_ALSU_AR(SC)
 		end	
 
 		% Run LOCO
-		[~,BPMData, CMData, FitParameters, LocoFlags, LOCOmodel] = loco(LocoMeasData,  BPMData,  CMData,  FitParameters,  LocoFlags,  LOCOmodel);
+		[~,BPMData, CMData, FitParameters, LocoFlags, RINGdata] = loco(LocoMeasData,  BPMData,  CMData,  FitParameters,  LocoFlags,  RINGdata);
 		
 		% Apply lattice correction step
 		SC = SClocoLib('applyLatticeCorrection',SC,FitParameters);
