@@ -18,8 +18,8 @@ function [deltaF,ERROR] = SCsynchEnergyCorrection(SC,varargin)
 % turn-by-turn horizontal BPM deviation. A straight line is fitted to the data and the zero crossing
 % is identified. It is assumed that the beam is injected relatively close to the synchronous phase.
 % Then, for sufficiently small number of turns the synchrotron motion results in a mean turn-by-turn
-% energy deviation which is zero if the synchronous energy defined by by the rf frequency matches
-% the injected beam energy. The number of evaluated turns should be smaller than sunchrotron period. 
+% energy deviation which is zero if the synchronous energy defined by the rf frequency matches
+% the injected beam energy. The number of evaluated turns should be smaller than synchrotron period.
 % Note that if more than one cavity is specified the same frequency steps are
 % applied to all cavities. Not also that results might be compromised if the beam transmission
 % differs significantly throughout the different applied frequency steps.

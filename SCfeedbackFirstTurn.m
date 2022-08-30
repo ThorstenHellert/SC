@@ -25,13 +25,13 @@ function [SC,ERROR] = SCfeedbackFirstTurn(SC,Mplus,varargin)
 % The RMS-values of both, BPM readings and CM settings, are determined by the
 % regularization of Mplus.  Successively - during the course of repeated
 % application of (1) - more and more transmission is achieved throughout the
-% ring, more magnets are traversed near their magnetic center (wich is hopefuly
+% ring, more magnets are traversed near their magnetic center (which is hopefully
 % at least somewhere near the BPM zero-point), resulting in decreased kicks.
 % If, however, the beam encounters a heavily displaced quadrupole magnet this
 % approach is bound to fail as correction towards the center of the last
 % reached BPM does no good, really. In this case the magnet has to be cleared
 % using other means than linear algebra.  In this approach the kicks of an
-% increasing number of the last reached CMs are deterministialy ``wiggled''
+% increasing number of the last reached CMs are deterministically ``wiggled''
 % until transmission to the next BPM is achieved. Then, application of (1) is
 % resumed.
 %
@@ -53,7 +53,7 @@ function [SC,ERROR] = SCfeedbackFirstTurn(SC,Mplus,varargin)
 %	target orbit in the format `[x_1 ... x_n y_1 ...y_n]`, where
 %	`[x_i,y_i]` is the target position at the i-th BPM.
 % `'wiggleAfter'` (`20`)::
-%	Number of iterations wihtout increased transmission to start wiggling.
+%	Number of iterations without increased transmission to start wiggling.
 % `'wiggleSteps'` (`64`)::
 %	Number of wiggle steps to perform, before incresing the number
 %	of wiggling-CMs.
