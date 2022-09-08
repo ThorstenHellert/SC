@@ -191,7 +191,7 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 	% Save initial BPM offset errors (for plotting)
 	initOffsetErrors = getBPMoffsetFromMag(SC,BPMords,magOrds);
 	
-	% Initilaize error flags
+	% Initialize error flags
 	errorFlags = nan(size(BPMords));
 	
 	% Offset and kick angle variation at injection (for trajectory mode)
