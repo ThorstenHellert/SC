@@ -60,7 +60,7 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 %    is discarted and the BPM offset is not updated.
 % `'fakeMeasForFailures'` (`1`)::
 %    This option intends to mimic the operater's ability to identify errors in the 
-%    measurment procedure and adjust the fine tuning parameters for individual BPMs.
+%    measurement procedure and adjust the fine tuning parameters for individual BPMs.
 %	 After performing the measurement routine, the rms value of the difference between
 %    the BPM offsets and the magnet centers is calculated for both planes for all 
 %    successful BPMs. If this flag is set to `1`, all BPM offsets at which the measurement
@@ -418,7 +418,7 @@ function [OffsetChange,Error] = dataEvaluation(SC,BPMords,jBPM,BPMpos,tmpTra,nDi
 	% RETURN VALUES
 	% -------------
 	% `OffsetChange`:: Calculated BPM offset change (to be added on lattice element)
-	% `Error`:: Flag specifying if and why measurment failed. Values are:
+	% `Error`:: Flag specifying if and why measurement failed. Values are:
 	%           (0): All good
 	%           (1): Max. range at BBA-BPM to small (see option 'minBPMrangeAtBBABBPM')
 	%           (2): Max. range at downstream BPM to small (see option 'minBPMrangeOtherBPM')
@@ -531,7 +531,7 @@ function [OffsetChange,Error] = dataEvaluation(SC,BPMords,jBPM,BPMpos,tmpTra,nDi
 	end
 
 	
-	% Check if measurment requirements have been met
+	% Check if measurement requirements have been met
 	if (max(tmpRangeX) < par.minBPMrangeAtBBABBPM)  
 		% Max. range at BBA-BPM to small
 		Error = 1;
@@ -804,7 +804,7 @@ function plotBBAstep(SC,BPMind,jBPM,nDim,nQ,mOrd,nKick,par)
 	% 	xLim = [0 12.5];yLim = .3*[-1 1];
 	xLim = sPos(mOrd)+[-10 10];yLim = 1.3*[-1 1];
 	
-	% Clear figure at beginning of measurment
+	% Clear figure at beginning of measurement
 	if nQ==1 && nKick==1;figure(99);clf;end
 	% Get trajectories
 	plotFunctionFlag=1;[B,T]=SCgetBPMreading(SC);plotFunctionFlag=[];
@@ -926,9 +926,9 @@ end
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Fake measurment to remove outliers
+% Fake measurement to remove outliers
 function SC = fakeMeasurement(SC,BPMords,magOrds,errorFlags)
-	% This function intends to mimic the operater's ability to identify errors in the measurment procedure,
+	% This function intends to mimic the operater's ability to identify errors in the measurement procedure,
 	% adjust the fine tuning parameters for individual BPMs and repeat the measurement.
 	% Here, the rms value of the difference between the BPM offsets and the magnet centers is calculated 
 	% for both planes for the succesfull BPMs.
