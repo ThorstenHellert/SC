@@ -40,6 +40,8 @@ function RING = SCcronoff(RING,varargin)
 					switch RING{ord}.PassMethod
 						case 'BndMPoleSymplectic4RadPass'
 							RING{ord}.PassMethod = 'BndMPoleSymplectic4Pass';
+						case 'BndMPoleSymplectic4E2RadPass'
+							RING{ord}.PassMethod = 'BndMPoleSymplectic4E2Pass';
 						case 'StrMPoleSymplectic4RadPass'
 							RING{ord}.PassMethod = 'StrMPoleSymplectic4Pass';
 					end
@@ -51,6 +53,8 @@ function RING = SCcronoff(RING,varargin)
 					switch RING{ord}.PassMethod
 						case 'BndMPoleSymplectic4Pass'
 							RING{ord}.PassMethod = 'BndMPoleSymplectic4RadPass';
+						case 'BndMPoleSymplectic4E2Pass'
+							RING{ord}.PassMethod = 'BndMPoleSymplectic4E2RadPass';							
 						case 'StrMPoleSymplectic4Pass'
 							RING{ord}.PassMethod = 'StrMPoleSymplectic4RadPass';
 					end
