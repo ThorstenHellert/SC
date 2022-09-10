@@ -720,7 +720,7 @@ function [CMords,CMvec] = getOrbitBump(SC,mOrd,BPMord,nDim,par)
 	% of zero except at the BBA-BPM (here the target is 'par.BBABPMtarget'). The weights 
 	% at the BPMs upstream and downstream the BBA BPM as defined by 'par.orbBumpWindow' are set to 
 	% zero in order to give some slack.
-	% Note that this could also be done by creating a 'real' orbut bump using 3 CMs, however we 
+	% Note that this could also be done by creating a 'real' orbit bump using 3 CMs, however we
 	% found that this procedure is faster and more robust with CMs potentially close to their 
 	% setpoint limits.
 	%
@@ -738,7 +738,7 @@ function [CMords,CMvec] = getOrbitBump(SC,mOrd,BPMord,nDim,par)
 	% `CMvec`:: CM setpoint matrix for orbit bumps in BBA measurement
 
 		
-	% Exclude dip. compensation CM (needed if consideed quadrupole has reverse bending)
+	% Exclude dip. compensation CM (needed if considered quadrupole has reverse bending)
 	tmpCMind = find(par.RMstruct.CMords{1}==mOrd);
 	if ~isempty(tmpCMind)
 		par.RMstruct.RM(:,tmpCMind)      = [];
