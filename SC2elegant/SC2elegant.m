@@ -1,6 +1,7 @@
 function SC2elegant( Lattice, LatticeName, FileName )
 %
 % Gregory Penn, 10 Oct 2021
+% modified 22 Aug 2022 to include additional pass method
 %
 % Makes a basic elegant input file out of an AT lattice data structure.
 % Functions to handle specific elements are at the end of the file.
@@ -13,6 +14,7 @@ function SC2elegant( Lattice, LatticeName, FileName )
 %   polyB is 'normal' components, polyA is 'skew' components
 %   the 'tilt' parameter in elegant means rotate given fields by tilt
 %      in the counterclockwise direction
+%
 %
    clear('elementlist')
    clear('newnamelist')
@@ -123,6 +125,8 @@ function SC2elegant( Lattice, LatticeName, FileName )
          MakeRF(Lattice{i},newnamelist{i},fid);
       case 'RFCavityPass'
          MakeRF(Lattice{i},newnamelist{i},fid);
+      case 'CorrectorPass'
+         MakeKicker(Lattice{i},newnamelist{i},elementlist{i},fid);
       case 'StrMPoleSymplectic4Pass'
          radloss=0;
          switch Lattice{i}.Class;
@@ -259,6 +263,14 @@ function SC2elegant( Lattice, LatticeName, FileName )
       adjFreq=t_element.Frequency*b0;
 %      fprintf(t_id,'%s: RFCA,L=%.15g,FREQ=%.20g,VOLT=%.15g,PHASE=%.20g,CHANGE_T=0\n',t_name,t_element.Length,t_element.Frequency,t_element.Voltage,phase);
       fprintf(t_id,'%s: RFCA,L=%.15g,FREQ=%.20g,VOLT=%.15g,PHASE=%.20g,CHANGE_T=0\n',t_name,t_element.Length,adjFreq,t_element.Voltage,phase);
+   end
+%
+% Corrector element
+%  note that CorrectorPass does not seem to allow misalignments, so left out
+   function MakeKicker(t_element,t_name,t_group,t_id);
+      xkick=t_element.KickAngle(1);
+      ykick=t_element.KickAngle(2);
+      fprintf(t_id,'%s: EKICKER,GROUP=%s,L=%.15g,HKICK=%.15g,VKICK=%.15g\n',t_name,t_group,t_element.Length,xkick,ykick);
    end
 %
 % Dipole
