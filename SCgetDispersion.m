@@ -30,8 +30,8 @@ function eta = SCgetDispersion(SC,RFstep,varargin)
 % `'BPMords'` (`SC.ORD.BPM`)::
 %    List of BPM ordinates at which the dispersion should be returned
 % `'CAVords'` (`SC.ORD.CAV`)::
-%    List of cavity ordinates with which the dispersion should be measrued
-% `'nSteps'` (2):: 
+%    List of cavity ordinates with which the dispersion should be measured
+% `'nSteps'` (2)::
 %    Number of RF steps (1st RF step is considered the reference). If more than 2 steps are 
 %    specified, the measurement is bi-directional
 %
