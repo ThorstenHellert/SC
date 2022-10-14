@@ -17,7 +17,7 @@ function [deltaPhi,ERROR] = SCsynchPhaseCorrection(SC,varargin)
 % Changes the cavity phase within the phase interval [-pi,pi] stepwise and evaluates the mean
 % turn-by-turn horizontal BPM deviation. A sinusoidal function is fitted to the data and the zero
 % crossing is identified. It is assumed that for sufficiently small number of turns the synchrotron
-% motion is negligable and injection at the synchronous phase will result in zero turn-by-turn
+% motion is negligible and injection at the synchronous phase will result in zero turn-by-turn
 % energy variation. Thus, the horizontal turn-by-turn BPM readings should in first approximation not
 % differ. The number of evaluated turns should be significantly smaller than half a sunchrotron
 % period. Note that if more than one cavity is specified the same phase steps are applied to all
@@ -138,7 +138,7 @@ function [deltaPhi,ERROR] = SCsynchPhaseCorrection(SC,varargin)
 	% Define sinusoidal function
 	sinFun = @(par,s) par(1)*sin(2*pi*(par(4)*s + par(2))) +par(3);
 
-	% Define merrit function
+	% Define merit function
 	fomFun = @(par)  sum( (sinFun(par,lambdaTestVec) - BPMshift).^2 );
 
 	% Loop over different start point guesses

@@ -13,7 +13,7 @@ function SCplotPhaseSpace(SC,varargin)
 %
 % DESCRIPTION
 % -----------
-% Plots the horizontal, vertical and longitudinal turn-by-turn phase space for a bunch of partciles
+% Plots the horizontal, vertical and longitudinal turn-by-turn phase space for a bunch of particles
 % as specified in the injection pattern `SC.INJ`. If `'RFCavityPass'` is the specified cavity pass
 % method, the slippage length per turn caused by a potential frequency error is calculated and the
 % longitudinal coordinate is adjusted for plotting.
