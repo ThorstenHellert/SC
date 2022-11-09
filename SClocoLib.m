@@ -243,6 +243,18 @@ function varargout = SClocoLib(funName,varargin)
 % `FitParameters`::
 %	Fit parameter structure (calculated by `loco`).
 %
+% OPTIONS
+% -------
+% The following options can be given as name/value-pairs:
+%
+% `'dipCompensation'` (1)::
+%	Used for combined function quadrupoles (see `SCsetMags2SetPoints`). If this flag is set and if 
+%   there is a horizontal CM registered in the considered magnet, the CM is used to compensate
+%   the bending angle difference if the applied quadrupole setpoints differs from the design value.
+% `'damping'` (1)::
+%   Damping factor applied to each lattice correction step, e.g. `0.7` meaning that the correction 
+%   is only applied with 70% of it's calculated amplitude.
+%
 % RETURN VALUE
 % ------------
 % `SC`::
@@ -662,19 +674,28 @@ function varargout = SClocoLib(funName,varargin)
 	% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% Apply lattice correction step
-	function applyLatticeCorrection(SC,FitParameters)
+	function applyLatticeCorrection(SC,FitParameters,varargin)
+		
+		% Parse optional arguments
+		p = inputParser;
+		addOptional(p,'dipCompensation',1);
+		addOptional(p,'damping',1);
+		parse(p,varargin{:});
+		
 		% Loop over fit parameters
 		for nGroup = 1:length(FitParameters.Params)
 			% Loop over elements in group
 			for nElem = 1:length(FitParameters.Params{nGroup})
 				ord      = FitParameters.Params{nGroup}(nElem).ElemIndex;
 				field    = FitParameters.Params{nGroup}(nElem).SCFieldName;
-				setpoint = FitParameters.OrigValues(nGroup) + (FitParameters.IdealValues(nGroup)-FitParameters.Values(nGroup));
 			
+				% New quadrupole setpoint
+				setpoint = FitParameters.OrigValues(nGroup) + p.Results.damping * (FitParameters.IdealValues(nGroup)-FitParameters.Values(nGroup));
+				
 				% Apply setpoint correction
 				switch field
 					case 'SetPointB' % Normal quadrupole
-						SC = SCsetMags2SetPoints(SC,ord,2,2,setpoint,'dipCompensation',1);
+						SC = SCsetMags2SetPoints(SC,ord,2,2,setpoint,'dipCompensation',p.Results.dipCompensation);
 					case 'SetPointA' % Skew quadrupole
 						SC = SCsetMags2SetPoints(SC,ord,1,2,setpoint);
 				end
