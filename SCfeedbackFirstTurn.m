@@ -110,7 +110,7 @@ function [SC,ERROR] = SCfeedbackFirstTurn(SC,Mplus,varargin)
 
 	% Main loop. In each step, a correction step is applied and the
 	% break-conditions are checked.
-	for i=1:par.maxsteps
+	for n=1:par.maxsteps
 
 		B = SCgetBPMreading(SC,'BPMords',par.BPMords); % Inject...
 		
