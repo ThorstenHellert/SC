@@ -88,6 +88,9 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 % `'magSPflag'` (`'rel'`)::
 %	 Specify how magnet setpoint as specified by option 'magSPvec' should be changed,
 %    e.g. relative or absolute (see *SCsetMags2SetPoints*).
+% `'skewQuadrupole'` (`0`)::
+%	 If true, it is assumed that a skew quadrupole is used. Thus, the BPM readings in the 
+%    dimension other than the trajectory/orbit excitation is used for evaluation.
 % `'switchOffSext'` (`0`)::
 %	 Flag specifying if sextupole coil in BBA magnet should be switched off 
 %    (e.g. if quadrupole trim coils are used).
@@ -151,6 +154,7 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 	addOptional(p,'magOrder',2);
 	addOptional(p,'magSPvec',[0.95,1.05]);
 	addOptional(p,'magSPflag','rel');
+	addOptional(p,'skewQuadrupole',0);
 	addOptional(p,'switchOffSext',0);
 	addOptional(p,'RMstruct',[]);
 	addOptional(p,'orbBumpWindow',5);
@@ -326,6 +330,20 @@ function [BPMpos,tmpTra] = dataMeasurement(SC,mOrd,BPMind,jBPM,nDim,par,varargin
 	% `BPMpos`:: Offset variation at BBA BPM
 	% `tmpTra`:: All other BPM readings throught the measurement
 
+	% Check if skew quadrupole is used
+    if par.skewQuadrupole
+        magType = 1;
+        if nDim==1
+            measDim = 2;
+		else
+            measDim = 1;
+        end
+    else
+        magType = 2;
+        measDim = nDim;
+    end
+	
+	
 	switch par.mode
 		case 'ORB'
 			
@@ -357,7 +375,7 @@ function [BPMpos,tmpTra] = dataMeasurement(SC,mOrd,BPMind,jBPM,nDim,par,varargin
 	for nQ=1:length(par.magSPvec{nDim,jBPM})
 
 		% Set magnet to different setpoints
-		SC = SCsetMags2SetPoints(SC,mOrd,2,par.magOrder,par.magSPvec{nDim,jBPM}(nQ),...
+		SC = SCsetMags2SetPoints(SC,mOrd,magType,par.magOrder,par.magSPvec{nDim,jBPM}(nQ),...
 			'method',par.magSPflag,...
 			'dipCompensation',par.dipCompensation);
 
@@ -388,10 +406,10 @@ function [BPMpos,tmpTra] = dataMeasurement(SC,mOrd,BPMind,jBPM,nDim,par,varargin
 			switch par.mode
 				case 'ORB'
 					% Save all BPM readings
-					tmpTra(nKick,nQ,:) = B(nDim, : );
+					tmpTra(nKick,nQ,:) = B(measDim, : );
 				case 'TBT'
 					% Save downstream BPM readings
-					tmpTra(nKick,nQ,:) = B(nDim, (BPMind+1):(BPMind+par.maxNumOfDownstreamBPMs) );
+					tmpTra(nKick,nQ,:) = B(measDim, (BPMind+1):(BPMind+par.maxNumOfDownstreamBPMs) );
 			end
 		end
 	end
@@ -961,8 +979,15 @@ function SC = fakeMeasurement(SC,BPMords,magOrds,errorFlags)
 		for nDim=1:2
 			% Check if measurement failed
 			if errorFlags(nDim,nBPM)~=0
-				% Write new BPM offset 
-				SC.RING{BPMords(nDim,nBPM)}.Offset(nDim) = SC.RING{magOrds(nDim,nBPM)}.MagnetOffset(nDim) + SC.RING{magOrds(nDim,nBPM)}.SupportOffset(nDim) - SC.RING{BPMords(nDim,nBPM)}.SupportOffset(nDim) + sqrt(mean(finOffsetErrors(nDim,:).^2,'omitnan')) * SCrandnc(2);
+				% Calculate fake measurement result
+				fakeBPMoffset = SC.RING{magOrds(nDim,nBPM)}.MagnetOffset(nDim) + SC.RING{magOrds(nDim,nBPM)}.SupportOffset(nDim) - SC.RING{BPMords(nDim,nBPM)}.SupportOffset(nDim) + sqrt(mean(finOffsetErrors(nDim,:).^2,'omitnan')) * SCrandnc(2);
+				% Ensure no NaN
+				if ~isnan(fakeBPMoffset)
+					% Write new BPM offset
+					SC.RING{BPMords(nDim,nBPM)}.Offset(nDim) = fakeBPMoffset;
+				else
+					fprint('BPM offset not reasigned, NaN.\n')
+				end
 			end
 		end
 	end
