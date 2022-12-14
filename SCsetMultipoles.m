@@ -43,7 +43,7 @@ function RING = SCsetMultipoles(RING,ords,AB,varargin)
 % `'order'` ([])::
 %   Numeric value defining the order of the considered magnet: [1,2,3,...] => [dip,quad,sext,...]
 % `'type'` ([])::
-%   Numeric value defining the type of the considered magnet: [1,2] => [normal/skew]
+%   Numeric value defining the type of the considered magnet: [1,2] => [skew/normal]
 %
 %
 % EXAMPLES
