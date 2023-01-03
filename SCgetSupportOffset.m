@@ -44,8 +44,10 @@ function off = SCgetSupportOffset(SC,s)
 	off0 = zeros(3,length(s0));
 	
 	% Read elemet lengths from RING
-	lengths = getcellstruct(SC.RING,'Length',1:length(SC.RING),1,1);
-
+	for n=1:length(SC.RING)
+		lengths(n) = SC.RING{n}.Length;
+	end
+	
 	% Circumference
 	C = sum(lengths);    
 	% s-sposition of element center (needed if support structure is defined at element with non-zero length)
