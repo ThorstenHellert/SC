@@ -4,7 +4,7 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 %
 % NAME
 % ----
-% SCBBA - Performs model independend beam based alignment
+% SCBBA - Performs model independent beam based alignment
 %
 % SYNOPSIS
 % --------
@@ -207,7 +207,7 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 	% Calculate all relevant arrays for orbit correction if not supplied by user
 	if strcmp(par.mode,'ORB')
 		if isempty(par.RMstruct)
-			fprintf('Calcualting orbit respone matrix and dispersion.\n')
+			fprintf('Calculating orbit response matrix and dispersion.\n')
 			par.RMstruct.RM        = SCgetModelRM(SC,SC.ORD.BPM,SC.ORD.CM,'trackMode','ORB','useIdealRing',1); 
 			par.RMstruct.eta       = SCgetModelDispersion(SC,SC.ORD.BPM,SC.ORD.Cavity);
 			par.RMstruct.scaleDisp = 1E7;

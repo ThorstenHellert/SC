@@ -213,7 +213,7 @@ function varargout = SClocoLib(funName,varargin)
 % Set up the LOCO fit parameter structure using all `QFA` normal quadrupoles
 % which are powered as a group (one fit parameter), using a strength variation
 % of 1E-4 to calculate the derivatives. The previously described structure
-% `Init` (see `'setupLOCOmodel'`) is used to identify the inital setpoints of
+% `Init` (see `'setupLOCOmodel'`) is used to identify the initial setpoints of
 % the fit parameters and an rf frequency step of 1kHz is assumed.
 % ------------------------------------------------------------------
 % FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,RINGdata,1E3,...
