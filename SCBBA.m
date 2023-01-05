@@ -258,7 +258,7 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 					% Get orbit bump at BBA BPM
 					[CMords,CMvec] = getOrbitBump(SC,mOrd,BPMords(nDim,jBPM),nDim,par);
 					
-					% Perform data measrurment
+					% Perform data measurement
 					[BPMpos,tmpTra] = dataMeasurement(SC,mOrd,BPMind,jBPM,nDim,par,CMords,CMvec);
 
 				case 'TBT'
