@@ -311,7 +311,7 @@ end
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Data measurement
 function [BPMpos,tmpTra] = dataMeasurement(SC,mOrd,BPMind,jBPM,nDim,par,varargin)
-	% This function performs the data measruement by looping through the magnet
+	% This function performs the data measurement by looping through the magnet
 	% setpoints and changing either the injected beam trajectory or the CMs to create 
 	% a local orbit bump.
 	%
