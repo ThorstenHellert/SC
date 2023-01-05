@@ -45,7 +45,7 @@ function roll = SCgetSupportRoll(SC,s)
 	% Initialize rolls along the ring
 	roll0 = zeros(3,length(s0));
 	
-	% Read elemet lengths from RING
+	% Read elements length from RING
 	for n=1:length(SC.RING)
 		lengths(n) = SC.RING{n}.Length;
 	end

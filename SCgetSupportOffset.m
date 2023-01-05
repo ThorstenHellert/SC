@@ -43,7 +43,7 @@ function off = SCgetSupportOffset(SC,s)
 	% Initialize offset along the ring
 	off0 = zeros(3,length(s0));
 	
-	% Read elemet lengths from RING
+	% Read elements length from RING
 	for n=1:length(SC.RING)
 		lengths(n) = SC.RING{n}.Length;
 	end
