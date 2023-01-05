@@ -734,8 +734,8 @@ end
 % Get orbit bump
 function [CMords,CMvec] = getOrbitBump(SC,mOrd,BPMord,nDim,par)
 	% This function is used to create a pseudo orbit bump by running orbit feedback on the actual 
-	% machine with target 
-	% of zero except at the BBA-BPM (here the target is 'par.BBABPMtarget'). The weights 
+	% machine with target of the closed orbit BPM readings
+	% except at the BBA-BPM (here the target is 'par.BBABPMtarget'). The weights
 	% at the BPMs upstream and downstream the BBA BPM as defined by 'par.orbBumpWindow' are set to 
 	% zero in order to give some slack.
 	% Note that this could also be done by creating a 'real' orbit bump using 3 CMs, however we
@@ -767,9 +767,9 @@ function [CMords,CMvec] = getOrbitBump(SC,mOrd,BPMord,nDim,par)
 	% Get actual index-ordinate pairing of BBA BPM and orbit feedback BPMs
 	tmpBPMind = find(BPMord==par.RMstruct.BPMords);
 		
-	% Define reference orbit (zero everywhere except at BBA BPM)
-	R0 = zeros(2,length(par.RMstruct.BPMords));
-	R0(nDim,tmpBPMind) = par.BBABPMtarget;
+	% Define reference orbit (closed orbit BPM readings except at BBA BPM)
+	R0 = SCgetBPMreading(SC);
+	R0(nDim,tmpBPMind) = R0(nDim,tmpBPMind) + par.BBABPMtarget;
 	
 	% Define BPM weighting factors (empirically found to work sufficiently well)
 	W0 = ones(2,length(par.RMstruct.BPMords));
