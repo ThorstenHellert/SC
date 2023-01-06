@@ -101,6 +101,9 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 % `'orbBumpWindow'` (`5`)::
 %	 Number of BPMs adjacent to BBA BPM (upstream and downstream) where the BPM weighting 
 %    in orbit feedback is set to zero to allow for a pseudo orbit bump (orbit mode only).
+% `'useBPMreadingsForOrbBumpRef'` (`0`)::
+%	 If true the actual BPM readings will be used for the reference when generating the
+%    pseudo orbit bump (orbit mode only) instead of zeros. (See github issue #22)
 % `'BBABPMtarget'` (`1E-3`)::
 %	 Desired offset variation at BBA-BPM (BPM adjacent to magnet) which should be
 %    achieved by trajectory change or orbit bump.
@@ -136,6 +139,17 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 % `'verbose'` (0)::
 %	 If true, debug information is printed.
 %
+% ERROR FLAGS
+% -----------
+% The [2 x n] array of error flags specify if and why the measurement failed for each BPM 
+% and may have the following value:
+%
+% (0):: All good
+% (1):: Max. range at BBA-BPM to small (see option 'minBPMrangeAtBBABBPM')
+% (2):: Max. range at downstream BPM to small (see option 'minBPMrangeOtherBPM')
+% (3):: Fitted magnetic centers to far spread out (see option 'maxStdForFittedCenters')
+% (4):: All downstream BPM measurements failed
+% (5):: Unexpected error
 %
 % SEE ALSO
 % --------
@@ -158,6 +172,7 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 	addOptional(p,'switchOffSext',0);
 	addOptional(p,'RMstruct',[]);
 	addOptional(p,'orbBumpWindow',5);
+	addOptional(p,'useBPMreadingsForOrbBumpRef',0);
 	addOptional(p,'BBABPMtarget',1E-3);
 	addOptional(p,'minBPMrangeAtBBABBPM',500E-6);
 	addOptional(p,'minBPMrangeOtherBPM',100E-6);
@@ -762,14 +777,20 @@ function [CMords,CMvec] = getOrbitBump(SC,mOrd,BPMord,nDim,par)
 		par.RMstruct.RM(:,tmpCMind)      = [];
 		par.RMstruct.CMords{1}(tmpCMind) = [];
 	end
-% 	par.RMstruct.CMords{1}(par.RMstruct.CMords{1}==mOrd) = [];
 	
-	% Get actual index-ordinate pairing of BBA BPM and orbit feedback BPMs
+	% Get actual index-ordinate pairing of BBA-BPM and orbit feedback BPMs
 	tmpBPMind = find(BPMord==par.RMstruct.BPMords);
 		
-	% Define reference orbit (zero everywhere except at BBA BPM)
-	R0 = zeros(2,length(par.RMstruct.BPMords));
-	R0(nDim,tmpBPMind) = par.BBABPMtarget;
+	% Define reference orbit 
+	if par.useBPMreadingsForOrbBumpRef
+		% Use actual BPM readings and add BBA-BPM target offset
+		R0 = SCgetBPMreading(SC);
+		R0(nDim,tmpBPMind) = R0(nDim,tmpBPMind) + par.BBABPMtarget;
+	else
+		% Zero everywhere except at BBA-BPM
+		R0 = zeros(2,length(par.RMstruct.BPMords));
+		R0(nDim,tmpBPMind) = par.BBABPMtarget;
+	end
 	
 	% Define BPM weighting factors (empirically found to work sufficiently well)
 	W0 = ones(2,length(par.RMstruct.BPMords));
