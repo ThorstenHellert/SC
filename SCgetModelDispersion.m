@@ -4,7 +4,7 @@ function eta = SCgetModelDispersion(SC,BPMords,CAVords,varargin)
 %
 % NAME
 % ----
-% SCgetModelDispersion - Calculates the lattice dispersion based on current setpints
+% SCgetModelDispersion - Calculates the lattice dispersion based on current setpoints
 %
 % SYNOPSIS
 % --------
@@ -13,7 +13,7 @@ function eta = SCgetModelDispersion(SC,BPMords,CAVords,varargin)
 %
 % DESCRIPTION
 % -----------
-% Calcualtes the dispersion at the ordinates `BPMords` by changing the frequency of the rf cavities
+% Calculates the dispersion at the ordinates `BPMords` by changing the frequency of the rf cavities
 % specified in `CAVords` using the current magnet setpoints without any roll/alignment/calibration
 % errors. Optionally the design lattice is used.
 %
