@@ -149,7 +149,8 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 % (2):: Max. range at downstream BPM to small (see option 'minBPMrangeOtherBPM')
 % (3):: Fitted magnetic centers to far spread out (see option 'maxStdForFittedCenters')
 % (4):: All downstream BPM measurements failed
-% (5):: Unexpected error
+% (5):: Unexpected error during data evaluation
+% (6):: Calculated BPM offset change too large (see option 'outlierRejectionAt')
 %
 % SEE ALSO
 % --------
