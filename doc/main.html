@@ -1635,7 +1635,7 @@ and 1E-4 is used to calculate the derivatives, respectively.</p>
 <pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">CMstep = 1E-4; % [rad]
 RFstep = 1E3;  % [Hz]
 
-[LOCOmodel,LOCOflags,Init] = SClocoLib('setupLOCOmodel',SC,...
+[RINGdata,LOCOflags,Init] = SClocoLib('setupLOCOmodel',SC,...
 	'Dispersion','Yes',...
 	'HorizontalDispersionWeight',.1E2,...
 	'VerticalDispersionWeight',.1E2);
@@ -1646,7 +1646,7 @@ RFstep = 1E3;  % [Hz]
 
 LOCOmeasData =  SClocoLib('getMeasurement',SC,CMstep,RFstep,SC.ORD.BPM,SC.ORD.CM);
 
-FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,LOCOmodel,RFstep,...
+FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,RINGdata,RFstep,...
 	{SCgetOrds(SC.RING,'QF'),'normal','individual',1E-3},... % {Ords, normal/skew, ind/fam, deltaK}
 	{SCgetOrds(SC.RING,'QD'),'normal','individual',1E-4});   % {Ords, normal/skew, ind/fam, deltaK}</code></pre>
 </div>
@@ -1660,7 +1660,7 @@ quadrupole correctors as LOCO fitparameters.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-python hljs" data-lang="python">for n=1:6
-	[~, BPMData, CMData, FitParameters, LOCOflags, LOCOmodel] = loco(LOCOmeasData,  BPMData,  CMData,  FitParameters,  LOCOflags,  LOCOmodel);
+	[~, BPMData, CMData, FitParameters, LOCOflags, RINGdata] = loco(LOCOmeasData,  BPMData,  CMData,  FitParameters,  LOCOflags,  RINGdata);
 
 	SC = SClocoLib('applyLatticeCorrection',SC,FitParameters);
 
@@ -1671,7 +1671,7 @@ quadrupole correctors as LOCO fitparameters.</p>
 	if n==3
 		LOCOflags.Coupling = 'Yes';
 
-		FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,LOCOmodel,RFstep,...
+		FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,RINGdata,RFstep,...
 			{SCgetOrds(SC.RING,'QF'),'normal','individual',1E-3},...
 			{SCgetOrds(SC.RING,'QD'),'normal','individual',1E-4},...
 			{SC.ORD.SkewQuad,'skew','individual',1E-3});
@@ -1897,7 +1897,7 @@ end</code></pre>
 <div class="sect3">
 <h4 id="_name">NAME</h4>
 <div class="paragraph">
-<p>SCBBA - Performs model independend beam based alignment</p>
+<p>SCBBA - Performs model independent beam based alignment</p>
 </div>
 </div>
 <div class="sect3">
@@ -1980,7 +1980,7 @@ is discarted and the BPM offset is not updated.</p>
 <dt class="hdlist1"><code>'fakeMeasForFailures'</code> (<code>1</code>)</dt>
 <dd>
 <p>This option intends to mimic the operater&#8217;s ability to identify errors in the
-measurment procedure and adjust the fine tuning parameters for individual BPMs.
+measurement procedure and adjust the fine tuning parameters for individual BPMs.
 	 After performing the measurement routine, the rms value of the difference between
 the BPM offsets and the magnet centers is calculated for both planes for all
 successful BPMs. If this flag is set to <code>1</code>, all BPM offsets at which the measurement
@@ -2021,6 +2021,11 @@ variation array.</p>
 <p>	 Specify how magnet setpoint as specified by option 'magSPvec' should be changed,
 e.g. relative or absolute (see <a href="#SCsetMags2SetPoints">SCsetMags2SetPoints</a>).</p>
 </dd>
+<dt class="hdlist1"><code>'skewQuadrupole'</code> (<code>0</code>)</dt>
+<dd>
+<p>	 If true, it is assumed that a skew quadrupole is used. Thus, the BPM readings in the
+dimension other than the trajectory/orbit excitation is used for evaluation.</p>
+</dd>
 <dt class="hdlist1"><code>'switchOffSext'</code> (<code>0</code>)</dt>
 <dd>
 <p>	 Flag specifying if sextupole coil in BBA magnet should be switched off
@@ -2036,6 +2041,11 @@ parameters.</p>
 <dd>
 <p>	 Number of BPMs adjacent to BBA BPM (upstream and downstream) where the BPM weighting
 in orbit feedback is set to zero to allow for a pseudo orbit bump (orbit mode only).</p>
+</dd>
+<dt class="hdlist1"><code>'useBPMreadingsForOrbBumpRef'</code> (<code>0</code>)</dt>
+<dd>
+<p>	 If true the actual BPM readings will be used for the reference when generating the
+pseudo orbit bump (orbit mode only) instead of zeros. (See github issue #22)</p>
 </dd>
 <dt class="hdlist1"><code>'BBABPMtarget'</code> (<code>1E-3</code>)</dt>
 <dd>
@@ -2096,6 +2106,41 @@ injection and BBA-BPM (2-turn mode only).</p>
 <dt class="hdlist1"><code>'verbose'</code> (0)</dt>
 <dd>
 <p>If true, debug information is printed.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_error_flags">ERROR FLAGS</h4>
+<div class="paragraph">
+<p>The [2 x n] array of error flags specify if and why the measurement failed for each BPM
+and may have the following value:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">(0)</dt>
+<dd>
+<p>All good</p>
+</dd>
+<dt class="hdlist1">(1)</dt>
+<dd>
+<p>Max. range at BBA-BPM to small (see option 'minBPMrangeAtBBABBPM')</p>
+</dd>
+<dt class="hdlist1">(2)</dt>
+<dd>
+<p>Max. range at downstream BPM to small (see option 'minBPMrangeOtherBPM')</p>
+</dd>
+<dt class="hdlist1">(3)</dt>
+<dd>
+<p>Fitted magnetic centers to far spread out (see option 'maxStdForFittedCenters')</p>
+</dd>
+<dt class="hdlist1">(4)</dt>
+<dd>
+<p>All downstream BPM measurements failed</p>
+</dd>
+<dt class="hdlist1">(5)</dt>
+<dd>
+<p>Unexpected error</p>
 </dd>
 </dl>
 </div>
@@ -2510,13 +2555,13 @@ n&#8594;oo                      n+1                n</p>
 The RMS-values of both, BPM readings and CM settings, are determined by the
 regularization of Mplus.  Successively - during the course of repeated
 application of (1) - more and more transmission is achieved throughout the
-ring, more magnets are traversed near their magnetic center (wich is hopefuly
+ring, more magnets are traversed near their magnetic center (which is hopefully
 at least somewhere near the BPM zero-point), resulting in decreased kicks.
 If, however, the beam encounters a heavily displaced quadrupole magnet this
 approach is bound to fail as correction towards the center of the last
 reached BPM does no good, really. In this case the magnet has to be cleared
 using other means than linear algebra.  In this approach the kicks of an
-increasing number of the last reached CMs are deterministialy ``wiggled''
+increasing number of the last reached CMs are deterministically ``wiggled''
 until transmission to the next BPM is achieved. Then, application of (1) is
 resumed.</p>
 </div>
@@ -2554,7 +2599,7 @@ resumed.</p>
 </dd>
 <dt class="hdlist1"><code>'wiggleAfter'</code> (<code>20</code>)</dt>
 <dd>
-<p>Number of iterations wihtout increased transmission to start wiggling.</p>
+<p>Number of iterations without increased transmission to start wiggling.</p>
 </dd>
 <dt class="hdlist1"><code>'wiggleSteps'</code> (<code>64</code>)</dt>
 <dd>
@@ -2640,7 +2685,7 @@ of wiggling-CMs.</p>
 <h4 id="_description_7">DESCRIPTION</h4>
 <div class="paragraph">
 <p>Iteratively applies orbit corrections using the pseudoinverse of the
-trajcectory response matrix <code>Mplus</code>, until a break-condition specified by one
+trajectory response matrix <code>Mplus</code>, until a break-condition specified by one
 of the 'OPTIONS' is met.
 The dispersion can be included, thus the rf frequency as a correction
 parameter. If the dispersion is to be included, <code>Mplus</code> has to have the size
@@ -2648,7 +2693,7 @@ parameter. If the dispersion is to be included, <code>Mplus</code> has to have t
 <code>(length(SC.ORD.CM{1}) + length(SC.ORD.CM{2})) x length(SC.ORD.BPM)</code>, or correspondingly if the CM
 and/or BPM ordinates for the correction is explicitly given (see options below). <code>SC.RING</code> is
 assumed to be a lattice with transmission through all considered turns. This routine will
-also return, if transmssion is lost.</p>
+also return, if transmission is lost.</p>
 </div>
 </div>
 <div class="sect3">
@@ -2693,7 +2738,7 @@ this value</p>
 </dd>
 <dt class="hdlist1"><code>'scaleDisp'</code> (0)</dt>
 <dd>
-<p>Scaling factor for and flag indicating if the dispersion is included in the respoinse matrix</p>
+<p>Scaling factor for and flag indicating if the dispersion is included in the response matrix</p>
 </dd>
 <dt class="hdlist1"><code>'CMords'</code> (<code>SC.ORD.CM</code>)</dt>
 <dd>
@@ -3113,7 +3158,7 @@ generated particles.</p>
 <div class="sect3">
 <h4 id="_description_11">DESCRIPTION</h4>
 <div class="paragraph">
-<p>This function calculates the particel trajectories based on the current
+<p>This function calculates the particle trajectories based on the current
 injection setup as defined in <code>SC.INJ</code> and calculates the corresponding BPM
 readings. The injection setup is a structure with the fields:</p>
 </div>
@@ -3209,6 +3254,11 @@ BPM readings.</p>
 <dt class="hdlist1"><code>plotFunctionFlag</code></dt>
 <dd>
 <p>If true, each BPM reading is plotted</p>
+</dd>
+<dt class="hdlist1"><code>isExp</code></dt>
+<dd>
+<p>Specify if a real machine is being used, so that a custom user defined
+function is being called instead</p>
 </dd>
 </dl>
 </div>
@@ -3475,7 +3525,7 @@ second BPM reading in order to calculate the dispersion.</p>
 </dd>
 <dt class="hdlist1"><code>RFstep</code></dt>
 <dd>
-<p>Change of rf frequency</p>
+<p>Change of RF frequency in Hz</p>
 </dd>
 </dl>
 </div>
@@ -3493,7 +3543,7 @@ second BPM reading in order to calculate the dispersion.</p>
 </dd>
 <dt class="hdlist1"><code>'CAVords'</code> (<code>SC.ORD.CAV</code>)</dt>
 <dd>
-<p>List of cavity ordinates with which the dispersion should be measrued</p>
+<p>List of cavity ordinates with which the dispersion should be measured</p>
 </dd>
 <dt class="hdlist1"><code>'nSteps'</code> (2)</dt>
 <dd>
@@ -3517,7 +3567,7 @@ specified, the measurement is bi-directional</p>
 <div class="sect3">
 <h4 id="_examples_6">EXAMPLES</h4>
 <div class="paragraph">
-<p>Calculate the dispersion with a 1kHz rf frequency change.</p>
+<p>Calculate the dispersion with a 1 kHz rf frequency change.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3907,7 +3957,7 @@ Tikhonov regularization with regularization parameter of 10.</p>
 <h4 id="_description_21">DESCRIPTION</h4>
 <div class="paragraph">
 <p>Gets the beam based response matrix based on the current injection pattern and using the BPMs and
-CMs specified in <code>BPMords</code> and <code>CMords</code>, respectively. By default the response matrix is measrued
+CMs specified in <code>BPMords</code> and <code>CMords</code>, respectively. By default the response matrix is measured
 using a fixed initial kick amplitude <code>Amp</code> (see options below), which can be given either as a
 single value for all CMs or as a cell array with amplitudes for each CM specified in <code>CMords</code>.</p>
 </div>
@@ -4272,7 +4322,7 @@ detail:</p>
 <div class="sect3">
 <h4 id="_synopsis_27">SYNOPSIS</h4>
 <div class="paragraph">
-<p><code>[LOCOmodel, LOCOflags, Init] = SClocoLib('setupLOCOmodel', SC [, options])</code></p>
+<p><code>[RINGdata, LOCOflags, Init] = SClocoLib('setupLOCOmodel', SC [, options])</code></p>
 </div>
 </div>
 <div class="sect3">
@@ -4306,9 +4356,9 @@ fields in <code>LOCOflags</code>.</p>
 <h4 id="_return_value_12">RETURN VALUE</h4>
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>LOCOmodel</code></dt>
+<dt class="hdlist1"><code>RINGdata</code></dt>
 <dd>
-<p>LOCO model used by <code>locoresponsematrix</code>.</p>
+<p>RING data used by <code>locoresponsematrix</code>.</p>
 </dd>
 <dt class="hdlist1"><code>LOCOflags</code></dt>
 <dd>
@@ -4330,7 +4380,7 @@ dispersion weights to 100.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>[LOCOmodel,LOCOflags,Init] = SClocoLib('setupLOCOmodel',SC,...
+<pre>[RINGdata,LOCOflags,Init] = SClocoLib('setupLOCOmodel',SC,...
 	'Dispersion','Yes',...
 	'HorizontalDispersionWeight',.1E2,...
 	'VerticalDispersionWeight',.1E2);</pre>
@@ -4498,14 +4548,14 @@ of 0.1mm and an rf frequency step of 1kHz, respectively and save the used CM ste
 <div class="sect3">
 <h4 id="_synopsis_30">SYNOPSIS</h4>
 <div class="paragraph">
-<p><code>FitParameters = SClocoLib('setupFitparameters', SC, RING0, LOCOmodel, RFstep [, parameters])</code></p>
+<p><code>FitParameters = SClocoLib('setupFitparameters', SC, RING0, RINGdata, RFstep [, parameters])</code></p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_description_30">DESCRIPTION</h4>
 <div class="paragraph">
 <p>Sets up the fit parameter structure which shall be used by <code>loco</code>.
-Additionally the inital values of the fit parameters are stored, which is
+Additionally the initial values of the fit parameters are stored, which is
 needed in order to eventually apply the lattice correction.</p>
 </div>
 </div>
@@ -4521,9 +4571,9 @@ needed in order to eventually apply the lattice correction.</p>
 <dd>
 <p>Initial (disturbed) lattice cell structure which was used for the response matrix measurement.</p>
 </dd>
-<dt class="hdlist1"><code>LOCOmodel</code></dt>
+<dt class="hdlist1"><code>RINGdata</code></dt>
 <dd>
-<p>LOCO model structure.</p>
+<p>RING data structure.</p>
 </dd>
 <dt class="hdlist1"><code>RFstep</code></dt>
 <dd>
@@ -4537,7 +4587,7 @@ needed in order to eventually apply the lattice correction.</p>
 <div class="paragraph">
 <p>Additional arguments are given as cell arrays and specify the
 fit parameters.  Each cell must be given as {<code>ordinates</code>, <code>normal/skew</code>,
-<code>individual/family</code>, <code>deltaK</code>} quadrupel, see examples.</p>
+<code>individual/family</code>, <code>deltaK</code>} quadrupole, see examples.</p>
 </div>
 </div>
 <div class="sect3">
@@ -4557,14 +4607,14 @@ fit parameters.  Each cell must be given as {<code>ordinates</code>, <code>norma
 <p>Set up the LOCO fit parameter structure using all <code>QF</code> and <code>QD</code> normal
 quadrupoles (see also <a href="#SCgetOrds">SCgetOrds</a>) which are individually powered and using a
 strength variation of 1E-3 and 1E-4 to calculate the derivatives,
-respectively. The disturbed lattice <code>RING0</code> is used to identify the inital
+respectively. The disturbed lattice <code>RING0</code> is used to identify the initial
 setpoints of the fit parameters and an rf frequency step of 1kHz is assumed.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre>ordQF = SCgetOrds(SC.RING,'QF');
 ordQD = SCgetOrds(SC.RING,'QD');
-FitParameters = SClocoLib('setupFitparameters',SC,RING0,LOCOmodel,1E3,...
+FitParameters = SClocoLib('setupFitparameters',SC,RING0,RINGdata,1E3,...
 	{ordQF,'normal','individual',1E-3},...
 	{ordQD,'normal','individual',1E-4});</pre>
 </div>
@@ -4573,12 +4623,12 @@ FitParameters = SClocoLib('setupFitparameters',SC,RING0,LOCOmodel,1E3,...
 <p>Set up the LOCO fit parameter structure using all <code>QFA</code> normal quadrupoles
 which are powered as a group (one fit parameter), using a strength variation
 of 1E-4 to calculate the derivatives. The previously described structure
-<code>Init</code> (see <code>'setupLOCOmodel'</code>) is used to identify the inital setpoints of
+<code>Init</code> (see <code>'setupLOCOmodel'</code>) is used to identify the initial setpoints of
 the fit parameters and an rf frequency step of 1kHz is assumed.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,LOCOmodel,1E3,...
+<pre>FitParameters = SClocoLib('setupFitparameters',SC,Init.SC.RING,RINGdata,1E3,...
 	{SCgetOrds(SC.RING,'QFA'),'normal','family',1E-4},...</pre>
 </div>
 </div>
@@ -4616,6 +4666,27 @@ the fit parameters and an rf frequency step of 1kHz is assumed.</p>
 <dt class="hdlist1"><code>FitParameters</code></dt>
 <dd>
 <p>Fit parameter structure (calculated by <code>loco</code>).</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_options_21">OPTIONS</h4>
+<div class="paragraph">
+<p>The following options can be given as name/value-pairs:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>'dipCompensation'</code> (1)</dt>
+<dd>
+<p>	Used for combined function quadrupoles (see <code>SCsetMags2SetPoints</code>). If this flag is set and if
+there is a horizontal CM registered in the considered magnet, the CM is used to compensate
+the bending angle difference if the applied quadrupole setpoints differs from the design value.</p>
+</dd>
+<dt class="hdlist1"><code>'damping'</code> (1)</dt>
+<dd>
+<p>Damping factor applied to each lattice correction step, e.g. <code>0.7</code> meaning that the correction
+is only applied with 70% of it&#8217;s calculated amplitude.</p>
 </dd>
 </dl>
 </div>
@@ -4682,7 +4753,7 @@ too low.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_21">OPTIONS</h4>
+<h4 id="_options_22">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -4749,7 +4820,7 @@ discarded and not applied to the SC structure.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_22">OPTIONS</h4>
+<h4 id="_options_23">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -4830,7 +4901,7 @@ this is not beam based but assumes the chromaticities can be measured reasonably
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_23">OPTIONS</h4>
+<h4 id="_options_24">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -4922,7 +4993,7 @@ this is not beam based but assumes the tunes can be measured reasonably well.</p
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_24">OPTIONS</h4>
+<h4 id="_options_25">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -5072,7 +5143,7 @@ routine, so a rough guess is good enough.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_25">OPTIONS</h4>
+<h4 id="_options_26">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -5393,7 +5464,7 @@ including CMs and BPMs.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_26">OPTIONS</h4>
+<h4 id="_options_27">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -5494,7 +5565,7 @@ including CMs and BPMs.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_27">OPTIONS</h4>
+<h4 id="_options_28">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -5579,7 +5650,7 @@ corresponding lines in the code are adjusted to the users discretion.</p>
 <div class="sect3">
 <h4 id="_description_44">DESCRIPTION</h4>
 <div class="paragraph">
-<p>Plots the horizontal, vertical and longitudinal turn-by-turn phase space for a bunch of partciles
+<p>Plots the horizontal, vertical and longitudinal turn-by-turn phase space for a bunch of particles
 as specified in the injection pattern <code>SC.INJ</code>. If <code>'RFCavityPass'</code> is the specified cavity pass
 method, the slippage length per turn caused by a potential frequency error is calculated and the
 longitudinal coordinate is adjusted for plotting.</p>
@@ -5597,7 +5668,7 @@ longitudinal coordinate is adjusted for plotting.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_28">OPTIONS</h4>
+<h4 id="_options_29">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name-vale pairs:</p>
 </div>
@@ -5665,7 +5736,7 @@ to adjust plot apperance properties.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_29">OPTIONS</h4>
+<h4 id="_options_30">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -5740,7 +5811,7 @@ are adjusted to match the magnet offsets with an accuracy of <code>postBBAoffset
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_30">OPTIONS</h4>
+<h4 id="_options_31">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be specified as name-value pairs:</p>
 </div>
@@ -5836,7 +5907,7 @@ exceeds 100.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_31">OPTIONS</h4>
+<h4 id="_options_32">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -5931,7 +6002,7 @@ the built in Matlab function randn but allows to specify a cut parameter <code>c
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_32">OPTIONS</h4>
+<h4 id="_options_33">OPTIONS</h4>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>size</code></dt>
@@ -6403,7 +6474,7 @@ respectively.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_33">OPTIONS</h4>
+<h4 id="_options_34">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -6664,7 +6735,7 @@ offsets in the sigma structure <code>SC.SIG.Support</code>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_34">OPTIONS</h4>
+<h4 id="_options_35">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -6684,12 +6755,12 @@ then tilt the structure around it&#8217;s center.
 The actual magnet or BPM offsets resulting from the support structure offsets is calculated in
 <a href="#SCupdateSupport">SCupdateSupport</a> by interpolating on a straight line between girder start- and endpoints. Note
 that the coordinate system change due to bending magnets are ignored in this calculation. Thus,
-the accuracy of the result is limited if dipole magnets are involved. This may be particularily
+the accuracy of the result is limited if dipole magnets are involved. This may be particularly
 true in case of large sections and/or longitudinal offsets.</p>
 </dd>
 <dt class="hdlist1"><code>'Roll'</code></dt>
 <dd>
-<p>[1x3] array [az,ax,ay] defineing roll (around z-axis), pitch (roll around x-axis) and yaw (roll
+<p>[1x3] array [az,ax,ay] defining roll (around z-axis), pitch (roll around x-axis) and yaw (roll
 around y-axis) angle uncertainties.</p>
 </dd>
 </dl>
@@ -6702,7 +6773,7 @@ uncertainty as a cell structure, e.g. {[1x3],nSig}, with nSig being the cutoff (
 <div class="sect3">
 <h4 id="_examples_24">EXAMPLES</h4>
 <div class="paragraph">
-<p>Registers the girder start end endpoints defined in <code>ords</code> and assignes the horiatonal,
+<p>Registers the girder start end endpoints defined in <code>ords</code> and assigns the horizontal,
 vertical and longitudinal girder offset uncertainties <code>dX</code>, <code>dY</code> and <code>dZ</code>, respectively, to the
 girder start points. When the support errors are applied the girder endpoints will get the same
 offset error as the start points, resulting in a paraxial translation of the girder.</p>
@@ -6713,7 +6784,7 @@ offset error as the start points, resulting in a paraxial translation of the gir
 </div>
 </div>
 <div class="paragraph">
-<p>Registers the girder start end endpoints defined in <code>ords</code> and assignes the horiatonal,
+<p>Registers the girder start end endpoints defined in <code>ords</code> and assigns the horizontal,
 vertical and longitudinal girder offset uncertainties <code>dX</code>, <code>dY</code> and <code>dZ</code>, respectively, to the
 girder start points with a cutoff value of 3 sigma. When the support errors are applied the girder
 endpoints will get the same offset error as the start points, resulting in a paraxial translation
@@ -6725,7 +6796,7 @@ of the girder.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Registers the section start- end endpoints defined in <code>ords</code> and assignes the horiatonal and
+<p>Registers the section start- end endpoints defined in <code>ords</code> and assigns the horizontal and
 vertical section offset uncertainties <code>dX</code> and <code>dY</code>, respectively, to the start points. When
 the support errors are applied the section endpoints will get the same offset as the start points.</p>
 </div>
@@ -6735,8 +6806,8 @@ the support errors are applied the section endpoints will get the same offset as
 </div>
 </div>
 <div class="paragraph">
-<p>Registers the girder start end endpoints defined in <code>ords</code>, assignes the roll uncertainty <code>dPhi</code>
-and the horiatonal and vertical girder offset uncertainties <code>dX1</code> and <code>dY1</code>, respectively to the
+<p>Registers the girder start end endpoints defined in <code>ords</code>, assigns the roll uncertainty <code>dPhi</code>
+and the horizontal and vertical girder offset uncertainties <code>dX1</code> and <code>dY1</code>, respectively to the
 start points and <code>dX2</code> and <code>dY2</code> to the endpoints. When the support errors are applied, all
 girder start- and endpoints will get random offset errors and the resulting yaw and pitch angles
 are calculated accordingly.</p>
@@ -6747,10 +6818,10 @@ are calculated accordingly.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Registers the girder start end endpoints defined in <code>ords</code> and assignes the horiatonal,
+<p>Registers the girder start end endpoints defined in <code>ords</code> and assigns the horizontal,
 vertical and longitudinal girder offset uncertainties <code>dX</code>, <code>dY</code> and <code>dZ</code>, respectively, and the
 roll, pitch and yaw angle uncertainties <code>az</code>, <code>ax</code> and <code>ay</code>. When the support errors are applied
-the girders will expirience a paraxial translation according to the offsets plus the proper
+the girders will experience a paraxial translation according to the offsets plus the proper
 rotations around the three x-, y- and z-axes.</p>
 </div>
 <div class="listingblock">
@@ -7129,7 +7200,7 @@ matching the number of magnets specified in <code>MAGords</code>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_35">OPTIONS</h4>
+<h4 id="_options_36">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -7245,7 +7316,7 @@ the specified options.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_36">OPTIONS</h4>
+<h4 id="_options_37">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -7279,7 +7350,7 @@ the lattice elements.</p>
 </dd>
 <dt class="hdlist1"><code>'type'</code> ([])</dt>
 <dd>
-<p>Numeric value defining the type of the considered magnet: [1,2] &#8658; [normal/skew]</p>
+<p>Numeric value defining the type of the considered magnet: [1,2] &#8658; [skew/normal]</p>
 </dd>
 </dl>
 </div>
@@ -7342,8 +7413,8 @@ RING = SCsetMultipoles(RING,ords,AB,'method','sys','order',order,'type',type);</
 turn-by-turn horizontal BPM deviation. A straight line is fitted to the data and the zero crossing
 is identified. It is assumed that the beam is injected relatively close to the synchronous phase.
 Then, for sufficiently small number of turns the synchrotron motion results in a mean turn-by-turn
-energy deviation which is zero if the synchronous energy defined by by the rf frequency matches
-the injected beam energy. The number of evaluated turns should be smaller than sunchrotron period.
+energy deviation which is zero if the synchronous energy defined by the rf frequency matches
+the injected beam energy. The number of evaluated turns should be smaller than synchrotron period.
 Note that if more than one cavity is specified the same frequency steps are
 applied to all cavities. Not also that results might be compromised if the beam transmission
 differs significantly throughout the different applied frequency steps.</p>
@@ -7361,7 +7432,7 @@ differs significantly throughout the different applied frequency steps.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_37">OPTIONS</h4>
+<h4 id="_options_38">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -7464,7 +7535,7 @@ differs significantly throughout the different applied frequency steps.</p>
 <p>Changes the cavity phase within the phase interval [-pi,pi] stepwise and evaluates the mean
 turn-by-turn horizontal BPM deviation. A sinusoidal function is fitted to the data and the zero
 crossing is identified. It is assumed that for sufficiently small number of turns the synchrotron
-motion is negligable and injection at the synchronous phase will result in zero turn-by-turn
+motion is negligible and injection at the synchronous phase will result in zero turn-by-turn
 energy variation. Thus, the horizontal turn-by-turn BPM readings should in first approximation not
 differ. The number of evaluated turns should be significantly smaller than half a sunchrotron
 period. Note that if more than one cavity is specified the same phase steps are applied to all
@@ -7483,7 +7554,7 @@ cavities. Results might be compromised.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_38">OPTIONS</h4>
+<h4 id="_options_39">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -7601,7 +7672,7 @@ resulted in best transmission.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_39">OPTIONS</h4>
+<h4 id="_options_40">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -7832,7 +7903,7 @@ based on the current support errors, by setting the lattice fields <code>T1</cod
 </div>
 </div>
 <div class="sect3">
-<h4 id="_options_40">OPTIONS</h4>
+<h4 id="_options_41">OPTIONS</h4>
 <div class="paragraph">
 <p>The following options can be given as name/value-pairs:</p>
 </div>
@@ -7845,6 +7916,10 @@ based on the current support errors, by setting the lattice fields <code>T1</cod
 <dt class="hdlist1"><code>'MAGstructOffset'</code> (<code>1</code>)</dt>
 <dd>
 <p>If true, magnet offsets are updated.</p>
+</dd>
+<dt class="hdlist1"><code>'ords'</code> ([])</dt>
+<dd>
+<p>List of ordinates at which misalignments should be updated. If empty, all magnets and BPMs are updated.</p>
 </dd>
 </dl>
 </div>
@@ -7873,7 +7948,7 @@ based on the current support errors, by setting the lattice fields <code>T1</cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-07-14 15:14:26 +0200
+Last updated 2023-01-06 12:25:15 +0100
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
