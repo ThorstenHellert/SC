@@ -367,7 +367,7 @@ function [BPMpos,tmpTra] = dataMeasurement(SC,mOrd,BPMind,jBPM,nDim,par,varargin
 			CMords = varargin{1};
 			CMvec  = varargin{2};
 			
-			% Measurment steps per magnet setting
+			% Measurement steps per magnet setting
 			nMsteps = size(CMvec{nDim},1);
 
 			% Prealocate x and y data
