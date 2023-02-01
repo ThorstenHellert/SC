@@ -328,7 +328,7 @@ function SC = storeOrds(SC,MAGords,varargin)
 	if isfield(SC,'ORD') && isfield(SC.ORD,'Magnet')
 		SC.ORD.Magnet = sort(unique([SC.ORD.Magnet MAGords]));
 	else
-		SC.ORD.Magnet = MAGords;
+		SC.ORD.Magnet = sort(unique(MAGords));
 	end
 
 	% Store skew quadrupole ordinates
@@ -336,7 +336,7 @@ function SC = storeOrds(SC,MAGords,varargin)
 		if isfield(SC,'ORD') && isfield(SC.ORD,'SkewQuad')
 			SC.ORD.SkewQuad = sort(unique([SC.ORD.SkewQuad MAGords]));
 		else
-			SC.ORD.SkewQuad = MAGords;
+			SC.ORD.SkewQuad = sort(unique(MAGords));
 		end
 	end
 	% Store horizontal CM ordinates
@@ -344,7 +344,7 @@ function SC = storeOrds(SC,MAGords,varargin)
 		if isfield(SC,'ORD') && isfield(SC.ORD,'CM')
 			SC.ORD.CM{1} = sort(unique([SC.ORD.CM{1} MAGords]));
 		else
-			SC.ORD.CM{1} = MAGords;
+			SC.ORD.CM{1} = sort(unique(MAGords));
 		end
 	end
 	% Define vertical CM ordinates
@@ -352,7 +352,7 @@ function SC = storeOrds(SC,MAGords,varargin)
 		if isfield(SC,'ORD') && isfield(SC.ORD,'CM') && length(SC.ORD.CM)==2
 			SC.ORD.CM{2} = sort(unique([SC.ORD.CM{2} MAGords]));
 		else
-			SC.ORD.CM{2} = MAGords;
+			SC.ORD.CM{2} = sort(unique(MAGords));
 		end
 	end
 end

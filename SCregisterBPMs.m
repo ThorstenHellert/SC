@@ -97,7 +97,7 @@ function SC = SCregisterBPMs(SC,BPMords,varargin)
 	if isfield(SC,'ORD') && isfield(SC.ORD,'BPM')
 		SC.ORD.BPM = sort(unique([SC.ORD.BPM BPMords]));
 	else
-		SC.ORD.BPM = BPMords;
+		SC.ORD.BPM = sort(unique(BPMords));
 	end
 	
 	% Loop over newly registered BPMs
