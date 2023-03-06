@@ -242,7 +242,7 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 
 		% Horizontal/vertical
 		for nDim=1:size(BPMords,1)
-			if par.verbose;fprintf('BBA-BPM %d/%d, nDim = %d',jBPM,size(BPMords,2),nDim);end
+			if par.verbose;fprintf('BBA-BPM %d/%d, nDim = %d\n',jBPM,size(BPMords,2),nDim);end
 
 			% Save initial machine state (for convenience)
 			SC0 = SC;
@@ -274,7 +274,7 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 					% Get orbit bump at BBA BPM
 					[CMords,CMvec] = getOrbitBump(SC,mOrd,BPMords(nDim,jBPM),nDim,par);
 					
-					% Perform data measrurment
+					% Perform data measurement
 					[BPMpos,tmpTra] = dataMeasurement(SC,mOrd,BPMind,jBPM,nDim,par,CMords,CMvec);
 
 				case 'TBT'
@@ -436,7 +436,7 @@ end
 % Data evaluation
 function [OffsetChange,Error] = dataEvaluation(SC,BPMords,jBPM,BPMpos,tmpTra,nDim,mOrd,par)
 	% This function calculates the BPM offset from the measured data by identifying the zero 
-	% crossing of each offset change. If 'par.plotLines=1', measurement details are plotted. 
+	% crossing of each offset change. If 'par.plotLines=1', measurement details are plotted.
 	% Note: it is recommended to comment out the line 'SCplotBPMreading(SC,B,T1);' in the 
 	% function SCgetBPMreading() for performance reasons if detailed plotting is requested.
 	%
