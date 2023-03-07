@@ -130,7 +130,7 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 
 		if any(isnan(B(1,:)))
 			% Fail, if we lose transmission.
-			if par.verbose; fprintf('SCfeedbackRun: FAIL (lost transmission)\n'); end;
+			if par.verbose; fprintf('SCfeedbackRun: FAIL (lost transmission)\n'); end
 			ERROR = 2; return;
 		end
 
@@ -138,13 +138,13 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 			% Succeed, if we are below our RMS BPM-reading 'target'
 			% and the feedback has been stable for the last 10
 			% injections.
-			if par.verbose; fprintf('SCfeedbackRun: Success (target reached)\n'); end;
+			if par.verbose; fprintf('SCfeedbackRun: Success (target reached)\n'); end
 			ERROR = 0; return;
 		end
 
 		if isConverged(3,par.eps)
 			% Succeed, if the RMS BPM-reading has converged.
-			if par.verbose; fprintf('SCfeedbackRun: Success (converged after %d steps)\n',steps); end;
+			if par.verbose; fprintf('SCfeedbackRun: Success (converged after %d steps)\n',steps); end
 			ERROR = 0; return;
 		end
 
@@ -158,12 +158,12 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 	if isStable(min(10,par.maxsteps),par.eps) || par.maxsteps==1
 		% Reaching 'maxsteps' with the feedback being stable is
 		% considered a success.
-		if par.verbose; fprintf('SCfeedbackRun: Success (maxsteps reached)\n'); end;
+		if par.verbose; fprintf('SCfeedbackRun: Success (maxsteps reached)\n'); end
 		ERROR=0; return
 	else
 		% Reaching 'maxsteps' with the feedback being unstable is
 		% considered a failure.
-		if par.verbose; fprintf('SCfeedbackRun: FAIL (maxsteps reached, unstable)\n'); end;
+		if par.verbose; fprintf('SCfeedbackRun: FAIL (maxsteps reached, unstable)\n'); end
 		ERROR=1; return
 	end
 
