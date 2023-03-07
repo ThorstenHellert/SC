@@ -15,7 +15,7 @@ function roll = SCgetSupportRoll(SC,s)
 % -----------
 % This function evaluates the total roll, pitch and yaw angles of the support structures that have
 % been defined via *SCregisterSupport* at the longitudinal positions `s`.
-% The support structure pitch and yaw angles are calcualted from the horizontal and vertical offsets
+% The support structure pitch and yaw angles are calculated from the horizontal and vertical offsets
 % of the start end endpoints of the corresponding top layer support structure 
 % (the order is: girders->plinths->sections). The roll angle is a sum of the roll angles of all
 % underlying support structures.
