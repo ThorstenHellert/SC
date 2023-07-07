@@ -320,6 +320,14 @@ function SC = setOptional(SC,ord,MAGords,varargin)
 		% Fill master field in lattice structure with child ordinates
 		SC.RING{ord}.MasterOf = varargin{find(strcmp(varargin,'MasterOf'))+1}(:,ord==MAGords)';
 	end
+	% Set PolynomBOffset
+	if any(strcmp(varargin,'PolynomBOffset'))
+		SC.RING{ord}.PolynomBOffset = varargin{find(strcmp(varargin,'PolynomBOffset'))+1};
+	end
+	% Set PolynomAOffset
+	if any(strcmp(varargin,'PolynomAOffset'))
+		SC.RING{ord}.PolynomAOffset = varargin{find(strcmp(varargin,'PolynomAOffset'))+1};
+	end
 end
 
 % Store ordinates in SC structure
