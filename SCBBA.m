@@ -13,7 +13,7 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 %
 % DESCRIPTION
 % -----------
-% Perform a model independend beam based alignment procedure using either two-turn
+% Perform a model independent beam based alignment procedure using either two-turn
 % trajectories or closed orbit bumps.
 % In two-turn mode, for each BPM the injected beam trajectory is varied within a
 % user defined range and the corresponding magnet is exercised on a user
