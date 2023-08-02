@@ -592,11 +592,16 @@ function [OffsetChange,Error] = dataEvaluation(SC,BPMords,jBPM,BPMpos,tmpTra,nDi
 		else
 			B = 0;
 		end
+		if SC.RING{mOrd}.Length == 0
+		  L = 1;
+		else
+		  L = SC.RING{mOrd}.Length;
+		end
 		K = SC.RING{mOrd}.NomPolynomB(2);
-		L = SC.RING{mOrd}.Length;
-		
+		KL = K*L;
+
 		% Adjust for design quadrupole offset
-		OffsetChange = OffsetChange + B/L/K;
+		OffsetChange = OffsetChange + B/KL;
 	end
 	
 	
