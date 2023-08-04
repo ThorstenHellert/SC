@@ -59,7 +59,7 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 %    If the calculated BPM offset change is above the specified value, the measurement
 %    is discarted and the BPM offset is not updated.
 % `'fakeMeasForFailures'` (`1`)::
-%    This option intends to mimic the operater's ability to identify errors in the 
+%    This option intends to mimic the operator's ability to identify errors in the
 %    measurement procedure and adjust the fine tuning parameters for individual BPMs.
 %	 After performing the measurement routine, the rms value of the difference between
 %    the BPM offsets and the magnet centers is calculated for both planes for all 
