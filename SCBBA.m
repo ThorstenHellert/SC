@@ -59,7 +59,7 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 %    If the calculated BPM offset change is above the specified value, the measurement
 %    is discarted and the BPM offset is not updated.
 % `'fakeMeasForFailures'` (`1`)::
-%    This option intends to mimic the operater's ability to identify errors in the 
+%    This option intends to mimic the operator's ability to identify errors in the
 %    measurement procedure and adjust the fine tuning parameters for individual BPMs.
 %	 After performing the measurement routine, the rms value of the difference between
 %    the BPM offsets and the magnet centers is calculated for both planes for all 
@@ -592,11 +592,16 @@ function [OffsetChange,Error] = dataEvaluation(SC,BPMords,jBPM,BPMpos,tmpTra,nDi
 		else
 			B = 0;
 		end
+		if SC.RING{mOrd}.Length == 0
+		  L = 1;
+		else
+		  L = SC.RING{mOrd}.Length;
+		end
 		K = SC.RING{mOrd}.NomPolynomB(2);
-		L = SC.RING{mOrd}.Length;
-		
+		KL = K*L;
+
 		% Adjust for design quadrupole offset
-		OffsetChange = OffsetChange + B/L/K;
+		OffsetChange = OffsetChange + B/KL;
 	end
 	
 	
