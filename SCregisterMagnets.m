@@ -29,9 +29,9 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 %   Calibration error of the `PolynomB` fields wrt. the corresponding setpoints.
 % `CalErrorA`::
 %   Calibration error of the `PolynomA` fields wrt. the corresponding setpoints.
-% `PolynomBOffset` (optional)::
+% `PolynomBOffset`::
 %   Offset error of the `PolynomB` fields wrt. the corresponding setpoints.
-% `PolynomAOffset` (optional)::
+% `PolynomAOffset`::
 %   Offset error of the `PolynomA` fields wrt. the corresponding setpoints.
 % `MagnetOffset`::
 %   [1 x 3] array of horizontal, vertical and longitudinal magnet offsets (wrt. the support
@@ -242,6 +242,12 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 	% Loop over magnets
 	for ord = MAGords(:)'
 
+		% PolynomA/B initialisation for corrector elements bookkeeping (sometimes don't have PolynomA/B fields)
+		if strcmp(SC.RING{ord}.PassMethod,'CorrectorPass') && ~isfield(SC.RING{ord},'PolynomA')
+			SC.RING{ord}.PolynomB = 0;
+			SC.RING{ord}.PolynomA = 0;
+		end
+
 		% Set nominal polynom
 		SC.RING{ord}.NomPolynomB = SC.RING{ord}.PolynomB;
 		SC.RING{ord}.NomPolynomA = SC.RING{ord}.PolynomA;
@@ -253,6 +259,10 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 		% Set calibration factors
 		SC.RING{ord}.CalErrorB = zeros(size(SC.RING{ord}.PolynomB));
 		SC.RING{ord}.CalErrorA = zeros(size(SC.RING{ord}.PolynomA));
+
+		% Set field offsets
+		SC.RING{ord}.PolynomBOffset = zeros(size(SC.RING{ord}.PolynomB));
+		SC.RING{ord}.PolynomAOffset = zeros(size(SC.RING{ord}.PolynomA));
 
 		% Set magnet and support offset
 		SC.RING{ord}.MagnetOffset  = [0 0 0];
