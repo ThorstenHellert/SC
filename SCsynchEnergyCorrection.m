@@ -43,6 +43,8 @@ function [deltaF,ERROR] = SCsynchEnergyCorrection(SC,varargin)
 %	Number of frequency steps to be evaluated
 % `'nTurns'` (`150`)::
 %	Number of turns to be evaluated
+% `'BPMords'` (`SC.ORD.BPM`)::
+%	BPM ordinates where the dispersive offset change is evaluated
 % `'minTurns'` (`50`)::
 %	Minimum number of turns the beam has to survive in order to be included in the calculation.
 % `'plotResults'` (`0`)::
@@ -84,6 +86,7 @@ function [deltaF,ERROR] = SCsynchEnergyCorrection(SC,varargin)
 	addOptional(p,'range',[-1E3,1E3]);
 	addOptional(p,'nSteps',15);
 	addOptional(p,'nTurns',150);
+	addOptional(p,'BPMords',SC.ORD.BPM);
 	addOptional(p,'minTurns',0);
 	addOptional(p,'plotResults',0);
 	addOptional(p,'plotProgress',0);
@@ -217,7 +220,7 @@ end
 % Calculate mean turn-by-turn horizontal BPM shift
 function [BPMshift,TBTdE] = getTbTEnergyShift(SC,par)
 	% Calculate beam reading
-	B = SCgetBPMreading(SC);
+	B = SCgetBPMreading(SC,par.BPMords);
 
 	% Reshape horizontal BPM readings turn-by-turn
 	BB = reshape(B(1,:),[],SC.INJ.nTurns);

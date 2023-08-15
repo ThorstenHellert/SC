@@ -40,6 +40,8 @@ function [deltaPhi,ERROR] = SCsynchPhaseCorrection(SC,varargin)
 %	Number of phase steps to be evaluated
 % `'nTurns'` (`30`)::
 %	Number of turns to be evaluated
+% `'BPMords'` (`SC.ORD.BPM`)::
+%	BPM ordinates where the dispersive offset change is evaluated
 % `'plotResults'` (`0`)::
 %	If true, results are plotted.
 % `'plotProgress'` (`0`)::
@@ -78,6 +80,7 @@ function [deltaPhi,ERROR] = SCsynchPhaseCorrection(SC,varargin)
 	addOptional(p,'cavOrd',SC.ORD.Cavity);
 	addOptional(p,'nSteps',15);
 	addOptional(p,'nTurns',20);
+	addOptional(p,'BPMords',SC.ORD.BPM);
 	addOptional(p,'plotResults',0);
 	addOptional(p,'plotProgress',0);
 	addOptional(p,'verbose',0);
@@ -119,7 +122,7 @@ function [deltaPhi,ERROR] = SCsynchPhaseCorrection(SC,varargin)
 		tmpSC = SCsetCavs2SetPoints(SC,par.cavOrd,'TimeLag',lambdaTestVec(nL),'add');
 	
 		% Calculate turn-by-turn horizontal trajectory shift
-		[BPMshift(nL),TBTdE] = getTbTEnergyShift(tmpSC);
+		[BPMshift(nL),TBTdE] = getTbTEnergyShift(tmpSC,par);
 		
 		
 		% Plot current step
@@ -248,9 +251,9 @@ function inputCheck(SC,par)
 	end
 end
 % Calculate mean turn-by-turn horizontal BPM shift
-function [BPMshift,dE] = getTbTEnergyShift(SC)
+function [BPMshift,dE] = getTbTEnergyShift(SC,par)
 	% Calculate beam reading
-	B = SCgetBPMreading(SC);
+	B = SCgetBPMreading(SC,par.BPMords);
 
 	% Reshape horizontal BPM readings turn-by-turn
 	BB = reshape(B(1,:),[],SC.INJ.nTurns);
