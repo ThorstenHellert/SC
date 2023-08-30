@@ -111,7 +111,7 @@ function [SC,ERROR] = SCfeedbackRun(SC,Mplus,varargin)
 	par=p.Results;
 	
 
-	if par.verbose; fprintf('SCfeedbackRun: Start\n'); end;
+	if par.verbose; fprintf('SCfeedbackRun: Start\n'); end
 
 	% Initialize error state
 	ERROR = 1;
