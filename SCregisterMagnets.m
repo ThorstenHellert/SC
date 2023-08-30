@@ -246,6 +246,7 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 		if strcmp(SC.RING{ord}.PassMethod,'CorrectorPass') && ~isfield(SC.RING{ord},'PolynomA')
 			SC.RING{ord}.PolynomB = 0;
 			SC.RING{ord}.PolynomA = 0;
+			SC.RING{ord}.MaxOrder = 0;
 		end
 
 		% Set nominal polynom
