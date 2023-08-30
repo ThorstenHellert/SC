@@ -100,10 +100,10 @@ function [DA,RMAXs,thetas] = SCdynamicAperture(RING,dE,varargin)
 	end
 
 	% Issue warning if nsteps was defined
-	if par.nsteps~=0; warning('nsteps no longer supported; continuing with binary search.'); end;
+	if par.nsteps~=0; warning('nsteps no longer supported; continuing with binary search.'); end
 
 	% If requested, auto generate thetas
-	if par.auto>0; [~,thetas] = autothetas(RING,dE,par.auto,varargin{:}); end;
+	if par.auto>0; [~,thetas] = autothetas(RING,dE,par.auto,varargin{:}); end
 
 
 	[~,sidx] = sort(abs(inibounds)); % Sort bounds w.r.t absolute value
