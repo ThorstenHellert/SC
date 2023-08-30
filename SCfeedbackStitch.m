@@ -95,7 +95,7 @@ function [SC,ERROR] = SCfeedbackStitch(SC,Mplus,varargin)
 	par=p.Results;
 
 
-	if par.verbose; fprintf('SCfeedbackStitch: Start\n'); end;
+	if par.verbose; fprintf('SCfeedbackStitch: Start\n'); end
 
 	% Initialize error value
 	ERROR = 1;
@@ -107,14 +107,14 @@ function [SC,ERROR] = SCfeedbackStitch(SC,Mplus,varargin)
 	% transmission.
 	B = SCgetBPMreading(SC,'BPMords',par.BPMords);
 	if ~isSignal(B,par.nBPMs)
-		if par.verbose; fprintf('SCfeedbackStitch: Wiggling\n'); end;
+		if par.verbose; fprintf('SCfeedbackStitch: Wiggling\n'); end
 		wiggle();
 	end
 
 	% Fail if there is still not enough transmission
 	B = SCgetBPMreading(SC,'BPMords',par.BPMords);
 	if ~isSignal(B,par.nBPMs)
-		if par.verbose; fprintf('SCfeedbackStitch: FAIL Wiggling failed\n'); end;
+		if par.verbose; fprintf('SCfeedbackStitch: FAIL Wiggling failed\n'); end
 		ERROR=2; return;
 	end
 
@@ -128,14 +128,14 @@ function [SC,ERROR] = SCfeedbackStitch(SC,Mplus,varargin)
 
 		if isSetback(BPMhist)
 			% Fail, is we have less transmission than before.
-			if par.verbose; fprintf('SCfeedbackStitch: FAIL Setback\n'); end;
+			if par.verbose; fprintf('SCfeedbackStitch: FAIL Setback\n'); end
 			ERROR=3; return;
 		end
 
 		if isRepro(BPMhist,par.nRepro) && isTransmit(BPMhist)
 			% If we had full transmission in the last 'nRepro' injections
 			% we succeed.
-			if par.verbose; fprintf('SCfeedbackStitch: Success\n'); end;
+			if par.verbose; fprintf('SCfeedbackStitch: Success\n'); end
 			ERROR=0; return; % Success
 		end
 
@@ -144,7 +144,7 @@ function [SC,ERROR] = SCfeedbackStitch(SC,Mplus,varargin)
 
 	% If we have reached 'maxsteps' without producing full transmission,
 	% that is considered a failure.
-	if par.verbose; fprintf('SCfeedbackStitch: FAIL Reached maxsteps\n'); end;
+	if par.verbose; fprintf('SCfeedbackStitch: FAIL Reached maxsteps\n'); end
 	ERROR=1; return;
 
 
