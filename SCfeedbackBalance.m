@@ -88,7 +88,7 @@ function [SC,ERROR] = SCfeedbackBalance(SC,Mplus,varargin)
 	par=p.Results;
 
 
-	if par.verbose; fprintf('SCfeedbackBalance: Start\n'); end;
+	if par.verbose; fprintf('SCfeedbackBalance: Start\n'); end
 
 	% Initialize error state
 	ERROR = 0;
@@ -111,13 +111,13 @@ function [SC,ERROR] = SCfeedbackBalance(SC,Mplus,varargin)
 
 		if isSetback(BPMindHist)
 			% Fail, is we have less transmission than before.
-			if par.verbose; fprintf('SCfeedbackBalance: FAIL (setback)\n'); end;
+			if par.verbose; fprintf('SCfeedbackBalance: FAIL (setback)\n'); end
 			ERROR = 1; return;
 		end
 
 		if ~isTransmit(BPMindHist)
 			% Fail, if we do not have full transmission.
-			if par.verbose; fprintf('SCfeedbackBalance: FAIL (lost transmission)\n'); end;
+			if par.verbose; fprintf('SCfeedbackBalance: FAIL (lost transmission)\n'); end
 			ERROR = 2; return;
 		else
 			ERROR = 0;
@@ -125,7 +125,7 @@ function [SC,ERROR] = SCfeedbackBalance(SC,Mplus,varargin)
 
 		if isConverged(BRMShist,3,par.eps)
 			% Succeed, if the RMS BPM-reading has converged.
-			if par.verbose; fprintf('SCfeedbackBalance: Success (converged after %d steps)\n',steps); end;
+			if par.verbose; fprintf('SCfeedbackBalance: Success (converged after %d steps)\n',steps); end
 			ERROR = 0; return;
 		end
 		cnt = cnt+1;
@@ -137,12 +137,12 @@ function [SC,ERROR] = SCfeedbackBalance(SC,Mplus,varargin)
 	if isStable(min(10,par.maxsteps),par.eps)
 		% Reaching 'maxsteps' with the feedback being stable is
 		% considered a success.
-		if par.verbose; fprintf('SCfeedbackBalance: Success (maxsteps reached)\n'); end;
+		if par.verbose; fprintf('SCfeedbackBalance: Success (maxsteps reached)\n'); end
 		ERROR=0; return
 	else
 		% Reaching 'maxsteps' with the feedback being unstable is
 		% considered a failure.
-		if par.verbose; fprintf('SCfeedbackBalance: FAIL (maxsteps reached, unstable)\n'); end;
+		if par.verbose; fprintf('SCfeedbackBalance: FAIL (maxsteps reached, unstable)\n'); end
 		ERROR=3; return
 	end
 

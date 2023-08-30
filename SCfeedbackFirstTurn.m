@@ -101,7 +101,7 @@ function [SC,ERROR] = SCfeedbackFirstTurn(SC,Mplus,varargin)
 	parse(p,varargin{:});
 	par=p.Results;
 
-	if par.verbose; fprintf('SCfeedbackFirstTurn: Start\n'); end;
+	if par.verbose; fprintf('SCfeedbackFirstTurn: Start\n'); end
 
 	%Initialize history, error value and number of wiggled CMs.
 	BPMhist = -1*ones(1,100);
@@ -122,12 +122,12 @@ function [SC,ERROR] = SCfeedbackFirstTurn(SC,Mplus,varargin)
 		if isRepro(BPMhist,5) && isTransmit(BPMhist)
 			% If we had full transmission in the last 5 injections
 			% we succeed.
-			if par.verbose; fprintf('SCfeedbackFirstTurn: Success\n'); end;
+			if par.verbose; fprintf('SCfeedbackFirstTurn: Success\n'); end
 			ERROR = 0; return;
 		elseif isRepro(BPMhist,par.wiggleAfter)
 			% If the last-reached BPM has not changed over 20 injections,
 			% we start the wiggling procedure.
-			if par.verbose; fprintf('SCfeedbackFirstTurn: Wiggling\n'); end;
+			if par.verbose; fprintf('SCfeedbackFirstTurn: Wiggling\n'); end
 
 			% Determine last-reached BPMs
 			CMidxsH = getLastCMsDim(par,B,1,nWiggleCM); % Last CMs in horz
@@ -185,7 +185,7 @@ function [SC,ERROR] = SCfeedbackFirstTurn(SC,Mplus,varargin)
 
 	% If we have reached 'maxsteps' without producing full transmission,
 	% that is considered a failure.
-	if par.verbose; fprintf('SCfeedbackFirstTurn: FAIL (maxsteps reached)\n'); end;
+	if par.verbose; fprintf('SCfeedbackFirstTurn: FAIL (maxsteps reached)\n'); end
 	ERROR = 1; return;
 
 
