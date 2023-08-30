@@ -125,20 +125,20 @@ function dbounds = SCmomentumAperture(RING,REFPTS,inibounds,varargin)
 		% Scale boundaries up until dp is included
 		while ~check_bounds(local_bounds,SHIFTRING,ZCO,par.nturns)
 			local_bounds = increment_bounds(local_bounds,par.stepsize);
-			if par.debug; fprintf('ord: %d; Incremented: %+0.5e %+0.5e\n',ord,local_bounds(1),local_bounds(2)); end;
+			if par.debug; fprintf('ord: %d; Incremented: %+0.5e %+0.5e\n',ord,local_bounds(1),local_bounds(2)); end
 		end
 
 		% Refine boundaries until requested accuracy is reached
 		while abs((local_bounds(2)-local_bounds(1))/max(local_bounds)) > par.accuracy
 			local_bounds = refine_bounds(local_bounds,SHIFTRING,ZCO,par.nturns);
-			if par.debug; fprintf('ord: %d; Refined: %e %e\n',ord,local_bounds(1),local_bounds(2)); end;
+			if par.debug; fprintf('ord: %d; Refined: %e %e\n',ord,local_bounds(1),local_bounds(2)); end
 		end
 
 		% Store final boundaries
 		dboundHI(i) = local_bounds(1);
 		dboundLO(i) = local_bounds(2);
 
-		if par.debug; fprintf('ord: %d; Found: %+0.5e %+0.5e\n',ord,local_bounds(1),local_bounds(2)); end;
+		if par.debug; fprintf('ord: %d; Found: %+0.5e %+0.5e\n',ord,local_bounds(1),local_bounds(2)); end
 
 	end
 	
