@@ -239,12 +239,12 @@ function SC = applySupportAlignmentError(SC,par)
 					error('Pitch angle errors can not be given explicitly if ''%s'' start and endpoints each have offset uncertainties.',type{1})
 				end
 				
-				% Adjust support structure startpoint vertcial offset
+				% Adjust support structure startpoint vertical offset
 				SC.RING{ordPair(1)}.([type{1} 'Offset'])(2) = SC.RING{ordPair(1)}.([type{1} 'Offset'])(2) - SC.RING{ordPair(1)}.([type{1} 'Roll'])(2)*structLength/2;
-				% Adjust support structure endpoint vertcial offset
+				% Adjust support structure endpoint vertical offset
 				SC.RING{ordPair(2)}.([type{1} 'Offset'])(2) = SC.RING{ordPair(2)}.([type{1} 'Offset'])(2) + SC.RING{ordPair(1)}.([type{1} 'Roll'])(2)*structLength/2;
 			else
-				% Get support structure pitch angle from vertcial start- and endpoint offsets
+				% Get support structure pitch angle from vertical start- and endpoint offsets
 				SC.RING{ordPair(1)}.([type{1} 'Roll'])(2) = (SC.RING{ordPair(2)}.([type{1} 'Offset'])(2) - SC.RING{ordPair(1)}.([type{1} 'Offset'])(2))/structLength;
 			end
 			
