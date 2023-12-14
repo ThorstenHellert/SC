@@ -13,7 +13,7 @@ function SC = SCupdateMagnets(SC,varargin)
 %
 % DESCRIPTION
 % -----------
-% Updates the magnets specified in `RING` as specified in `ords`. If no ordinates are given
+% Updates the magnets specified in `SC.RING` as specified in `ords`. If no ordinates are given
 % explicitly, all registered magnets defined in `SC.ORD.Magnet` are updated. For each magnet the
 % setpoints (`SetPointA/B`) and calibration errors (`CalErrorA/B`) are evaluated.
 % If systematic multipole components are specified, e.g. in `SysPolBFromB` for systematic 
@@ -131,15 +131,11 @@ function SC = updateMagnets(SC,source,target)
 		SC.RING{target}.PolynomB = addPadded(SC.RING{target}.PolynomB, sysPolynomB{end});
 	end
 	
-	
-	
-	
 		
-	% Check for static multipole errors of target magnet
-	if isfield(SC.RING{target},'PolynomBOffset')
-		SC.RING{target}.PolynomB = addPadded(SC.RING{target}.PolynomB,SC.RING{target}.PolynomBOffset);
-		SC.RING{target}.PolynomA = addPadded(SC.RING{target}.PolynomA,SC.RING{target}.PolynomAOffset);
-	end
+	% Add static multipole errors of target magnet
+	SC.RING{target}.PolynomB = addPadded(SC.RING{target}.PolynomB,SC.RING{target}.PolynomBOffset);
+	SC.RING{target}.PolynomA = addPadded(SC.RING{target}.PolynomA,SC.RING{target}.PolynomAOffset);
+	
 
 	% Add bending angle errors
 	if isfield(SC.RING{source},'BendingAngleError')
@@ -168,7 +164,7 @@ function SC = updateMagnets(SC,source,target)
 		SC.RING{target}.KickAngle(2) = SC.RING{target}.PolynomA(1);
 	end
 	
-	% Increase order for tracking
+	% Adjust order for tracking
 	SC.RING{target}.MaxOrder=length(SC.RING{target}.PolynomB)-1;
 
 end
