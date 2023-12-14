@@ -31,6 +31,8 @@ function SC = SCupdateSupport(SC,varargin)
 %	If true, BPM offsets are updated.
 % `'MAGstructOffset'` (`1`)::
 %	If true, magnet offsets are updated.
+% `'ords'` ([])::
+%	List of ordinates at which misalignments should be updated. If empty, all magnets and BPMs are updated.
 %
 %
 % RETURN VALUE
@@ -47,12 +49,20 @@ function SC = SCupdateSupport(SC,varargin)
 	p.KeepUnmatched=true;
 	addParameter(p,'BPMstructOffset',1);
 	addParameter(p,'MAGstructOffset',1);
+	addParameter(p,'ords',[]);
 	parse(p,varargin{:});
 
 	if p.Results.MAGstructOffset
 		% Process Magnets
 		if isfield(SC.ORD,'Magnet')
-			ords    = unique([SC.ORD.Magnet]);
+			if ~isempty(p.Results.ords)
+				ords    = intersect(unique([SC.ORD.Magnet]),p.Results.ords);
+				if isempty(ords)
+					warning('No magnets within user specified range.')
+				end
+			else
+				ords    = unique([SC.ORD.Magnet]);
+			end
 			s       = findspos(SC.RING,ords);
 			offsets = SCgetSupportOffset(SC,s);
 			rolls   = SCgetSupportRoll(SC,s);
@@ -115,7 +125,14 @@ function SC = SCupdateSupport(SC,varargin)
 	if p.Results.BPMstructOffset
 		% Process BPMs`
 		if isfield(SC.ORD,'BPM')
-			ords    = unique([SC.ORD.BPM]);
+			if ~isempty(p.Results.ords)
+				ords    = intersect(unique([SC.ORD.BPM]),p.Results.ords);
+				if isempty(ords)
+					warning('No BPMs within user specified range.')
+				end
+			else
+				ords    = unique([SC.ORD.BPM]);
+			end
 			s       = findspos(SC.RING,ords);
 			offsets = SCgetSupportOffset(SC,s);
 			rolls   = SCgetSupportRoll(SC,s);
