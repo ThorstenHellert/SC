@@ -65,23 +65,23 @@ function roll = SCgetSupportRoll(SC,s)
 		if isfield(supportOrds,type{1})
 			for nEl=1:length(supportOrds.(type{1}))
 				ords = supportOrds.(type{1}){nEl};
-				if diff(ords)>0
-					% Add roll error from current support structure
-					roll0(1,ords(1):ords(2)) = roll0(1,ords(1):ords(2)) + SC.RING{ords(1)}.([type{1} 'Roll'])(1);
-					% Overwrite pitch and yaw angles from current support structure hor. and ver. offsets
-					roll0(2,ords(1):ords(2)) = (off0(2,ords(2))-off0(2,ords(1))) / (s0(ords(2))-s0(ords(1)));
-					roll0(3,ords(1):ords(2)) = (off0(1,ords(2))-off0(1,ords(1))) / (s0(ords(2))-s0(ords(1)));
+				if ords(1)>ords(2)
+					% Injection point is within support structure
+					mask = [ords(1):length(s0) 1:ords(2)];
+					structLength = C+s0(ords(2))-s0(ords(1));
 				else
-					% Add roll error from current support structure
-					roll0(1,ords(1):end) = roll0(1,ords(1):end) + SC.RING{ords(1)}.([type{1} 'Roll'])(1);
-					roll0(1,1:ords(2))   = roll0(1,1:ords(2))   + SC.RING{ords(1)}.([type{1} 'Roll'])(1);
-					% Overwrite pitch angle from current support structure vertical offsets
-					roll0(2,ords(1):end) = (off0(2,ords(2))-off0(2,ords(1))) / (C-s0(ords(1))-s0(ords(2)));
-					roll0(2,1:ords(2))   = (off0(2,ords(2))-off0(2,ords(1))) / (C-s0(ords(1))-s0(ords(2)));
-					% Overwrite yaw angle from current support structure horiaontal offsets
-					roll0(3,ords(1):end) = (off0(1,ords(2))-off0(1,ords(1))) / (C-s0(ords(1))-s0(ords(2)));
-					roll0(3,1:ords(2))   = (off0(1,ords(2))-off0(1,ords(1))) / (C-s0(ords(1))-s0(ords(2)));
+					% Support structure is in regular order
+					mask = ords(1):ords(2);
+					structLength = s0(ords(2))-s0(ords(1));
 				end
+				
+				% Add roll error from current support structure
+				roll0(1,mask) = roll0(1,mask) + SC.RING{ords(1)}.([type{1} 'Roll'])(1);
+				% Overwrite pitch and yaw angles from current support structure hor. and ver. offsets
+				roll0(2,mask) = (off0(2,ords(2))-off0(2,ords(1))) / structLength;
+				roll0(3,mask) = (off0(1,ords(2))-off0(1,ords(1))) / structLength;
+				
+% 				fprintf('%s #%d: %.2fm\n',type{1},nEl,structLength)
 			end
 		end
 	end
