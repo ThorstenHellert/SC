@@ -58,7 +58,6 @@ function [RM, RING] = SCgetModelRM(SC,BPMords,CMords,varargin)
 	nTurns = p.Results.nTurns;
 	dkick = p.Results.dkick;
 
-	fprintf('Calculating model response matrix\n')
 
 	% Check if ideal ring should be used, otherwise get model from current setpoints.
 	if p.Results.useIdealRing
@@ -71,9 +70,11 @@ function [RM, RING] = SCgetModelRM(SC,BPMords,CMords,varargin)
 	switch trackMode
 		case 'TBT'
 			trackmethod = @atpass;
+			fprintf('Calculating model trajectory response matrix for %d turns.\n',nTurns)
 		case 'ORB'
 			trackmethod = @orbpass;
 			nTurns = 1;
+			fprintf('Calculating model orbit response matrix.\n')
 		otherwise
 			error('trackMode "%s" unknown. Valid values are "TBT" and "ORB".',trackMode)
 	end
@@ -84,7 +85,7 @@ function [RM, RING] = SCgetModelRM(SC,BPMords,CMords,varargin)
 
 	% Allocate result matrix
 	RM = nan(2 * nBPM * nTurns, nCM);
-
+	
 	% Calculate initial trajectories
 	Ta = trackmethod(RING, Z0, 1, nTurns, BPMords);
 

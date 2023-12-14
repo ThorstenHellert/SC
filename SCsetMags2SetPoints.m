@@ -166,7 +166,7 @@ end
 % Apply dipole compensation
 function SC = dipCompensation(SC,ord,setpoint)
 	% Check if diple compensation possible
-	if ~(isfield(SC.RING{ord},'BendingAngle') && SC.RING{ord}.BendingAngle ~= 0 && ismember(ord,SC.ORD.CM{1}))
+	if ~(isfield(SC.RING{ord},'BendingAngle') && SC.RING{ord}.BendingAngle ~= 0 && ismember(ord,SC.ORD.CM{1})) % TODO: check for CF magnet
 		return
 	end
 

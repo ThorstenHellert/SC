@@ -83,7 +83,7 @@ T3D = SCparticlesIn3D(T,SC.INJ.nParticles);
 labelStr={'$\Delta x$ [$\mu$m]','$\Delta x''$ [$\mu$rad]','$\Delta y$ [$\mu$m]','$\Delta y''$ [$\mu$rad]','$\Delta S$ [m]','$\delta E$ $[\%]$'};
 titleStr = {'Horizontal','Vertical','Longitudinal'};
 
-% Adjust phase coordinate so it not runs away
+% Adjust phase coordinate so it doesn't run away
 if strcmp(SC.RING{SC.ORD.Cavity(1)}.PassMethod,'RFCavityPass')
 	L0_tot=0;
 	for i=1:length(SC.RING)
