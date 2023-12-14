@@ -102,12 +102,8 @@ function SC = applyCavityError(SC,par)
 
 			% Loop over uncertainties
 			for field=fieldnames(SC.SIG.RF{ord})'
-				% Check if individual cutoff is defined
-				if iscell(SC.SIG.RF{ord}.(field{1}))
-					SC.RING{ord}.(field{1}) = SC.SIG.RF{ord}.(field{1}){1} * SCrandnc(SC.SIG.RF{ord}.(field{1}){2});
-				else
-					SC.RING{ord}.(field{1}) = SC.SIG.RF{ord}.(field{1}) * SCrandnc(par.nSig);
-				end
+				% Apply errors
+				SC.RING{ord}.(field{1}) = rndn_cutoff(SC.SIG.RF{ord}.(field{1}),par.nSig);
 			end
 		end
 	end
@@ -152,12 +148,8 @@ function SC = applyBPMerrors(SC,par)
 			if regexp(field{1},'Noise')
 				SC.RING{ord}.(field{1}) = SC.SIG.BPM{ord}.(field{1});
 			else
-				% Check if individual cutoff is defined
-				if iscell(SC.SIG.BPM{ord}.(field{1}))
-					SC.RING{ord}.(field{1}) = SC.SIG.BPM{ord}.(field{1}){1} .* SCrandnc(SC.SIG.BPM{ord}.(field{1}){2},size(SC.SIG.BPM{ord}.(field{1}){1}));
-				else
-					SC.RING{ord}.(field{1}) = SC.SIG.BPM{ord}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.BPM{ord}.(field{1})));
-				end
+				% Apply errors
+				SC.RING{ord}.(field{1}) = rndn_cutoff(SC.SIG.BPM{ord}.(field{1}),par.nSig);	
 			end
 		end
 	end
@@ -168,8 +160,12 @@ end
 % Circumference error
 function SC = applyCircumferenceError(SC,par)
 	if isfield(SC.SIG,'Circumference')
-		% Define circumference error
-		circScaling = 1 + SC.SIG.Circumference * SCrandnc(par.nSig,1,1);
+		% Check if individual cutoff is defined
+		if iscell(SC.SIG.Circumference)
+			circScaling = 1 + SC.SIG.Circumference{1} * SCrandnc(SC.SIG.Circumference{2},1,1);
+		else
+			circScaling = 1 + SC.SIG.Circumference * SCrandnc(par.nSig,1,1);
+		end
 		% Apply circumference error
 		SC.RING = SCscaleCircumference(SC.RING,circScaling,'rel');
 		fprintf('Circumference error applied.\n');
@@ -182,7 +178,7 @@ end
 function SC = applySupportAlignmentError(SC,par)
 	
 	% Loop over different support types
-	for type = {'Girder','Plinth','Section'}
+	for type = {'Section','Plinth','Girder'}
 		% Check if support type is registered
 		if ~isfield(SC.ORD,type{1})
 			continue;
@@ -201,24 +197,14 @@ function SC = applySupportAlignmentError(SC,par)
 				if isempty(strfind(field{1},type{1}))
 					continue;
 				end
-
+				
 				% Generate random error for support structure beginning
-				if iscell(SC.SIG.Support{ordPair(1)}.(field{1}))
-					% Individual cutoff is given
-					SC.RING{ordPair(1)}.(field{1}) = SC.SIG.Support{ordPair(1)}.(field{1}){1} .* SCrandnc(SC.SIG.Support{ordPair(1)}.(field{1}){2},size(SC.SIG.Support{ordPair(1)}.(field{1}){1}));
-				else
-					SC.RING{ordPair(1)}.(field{1}) = SC.SIG.Support{ordPair(1)}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.Support{ordPair(1)}.(field{1})));
-				end
+				SC.RING{ordPair(1)}.(field{1}) = rndn_cutoff(SC.SIG.Support{ordPair(1)}.(field{1}),par.nSig);		
 
 				% Check if uncertanty is specified for endpoint
 				if length(SC.SIG.Support)>=ordPair(2) && isfield(SC.SIG.Support{ordPair(2)},field{1})
 					% Generate random error for support structure endpoint
-					if iscell(SC.SIG.Support{ordPair(2)}.(field{1}))
-						% Individual cutoff is given
-						SC.RING{ordPair(2)}.(field{1}) = SC.SIG.Support{ordPair(2)}.(field{1}){1} .* SCrandnc(SC.SIG.Support{ordPair(2)}.(field{1}){2},size(SC.SIG.Support{ordPair(2)}.(field{1}){1}));
-					else
-						SC.RING{ordPair(2)}.(field{1}) = SC.SIG.Support{ordPair(2)}.(field{1}) .* SCrandnc(par.nSig,size(SC.SIG.Support{ordPair(2)}.(field{1})));
-					end
+					SC.RING{ordPair(2)}.(field{1}) = rndn_cutoff(SC.SIG.Support{ordPair(2)}.(field{1}),par.nSig);		
 				else
 					% Copy support structure endpoint from structure beginning
 					SC.RING{ordPair(2)}.(field{1}) = SC.RING{ordPair(1)}.(field{1});
@@ -284,20 +270,11 @@ function SC = applyMagnetError(SC,par)
 		end
 		% Loop over uncertanties
 		for field=fieldnames(SC.SIG.Mag{ord})'
-			% Check if individual cutoff is given
-			if iscell(SC.SIG.Mag{ord}.(field{1}))
-				nSig = SC.SIG.Mag{ord}.(field{1}){2};
-				sig = SC.SIG.Mag{ord}.(field{1}){1};
-			else
-				nSig = par.nSig;
-				sig = SC.SIG.Mag{ord}.(field{1});
-			end
-
 			% Bending angle error gets applied differently
 			if strcmp(field{1},'BendingAngle')
-				SC.RING{ord}.BendingAngleError = sig * SCrandnc(nSig,1,1);
+				SC.RING{ord}.BendingAngleError = rndn_cutoff(SC.SIG.Mag{ord}.(field{1}),par.nSig);
 			else
-				SC.RING{ord}.(field{1}) = sig .* SCrandnc(nSig,size(sig));
+				SC.RING{ord}.(field{1}) = rndn_cutoff(SC.SIG.Mag{ord}.(field{1}),par.nSig);
 			end
 		end
 		
@@ -305,3 +282,11 @@ function SC = applyMagnetError(SC,par)
 end
 
 
+function error = rndn_cutoff(field,nSig0)
+	% Check if cutoff is defined explicitly
+	if iscell(field)
+		error = field{1} .* SCrandnc(field{2},size(field{1}));
+	else
+		error = field .* SCrandnc(nSig0,size(field));	
+	end
+end

@@ -93,6 +93,9 @@ function SC = SCregisterBPMs(SC,BPMords,varargin)
 % *SCgetBPMreading*, *SCgetOrds*, *SCsanityCheck*, *SCapplyErrors*, *SCregisterSupport*, *SCupdateSupport*
 
 
+	% Default truncation value for error distribution
+	cutoff = 2; 
+
 	% Store BPM ordinates
 	if isfield(SC,'ORD') && isfield(SC.ORD,'BPM')
 		SC.ORD.BPM = sort(unique([SC.ORD.BPM BPMords]));
@@ -106,10 +109,14 @@ function SC = SCregisterBPMs(SC,BPMords,varargin)
 		% Set name/pair-values in sigma structure
 		if ~isempty(varargin)
 			for i=1:2:(length(varargin)-1)
-				SC.SIG.BPM{ord}.(varargin{i}) = varargin{i+1}(:)';
+				if iscell(varargin{i+1}) || ~isempty(regexp(varargin{i},'Noise'))
+					SC.SIG.BPM{ord}.(varargin{i}) = varargin{i+1};
+				else
+					SC.SIG.BPM{ord}.(varargin{i}) = {varargin{i+1}, cutoff};
+				end
 			end
 		end
-	
+		
 		% Set TBT BPM noise
 		SC.RING{ord}.Noise = zeros(1,2);
 

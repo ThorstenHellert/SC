@@ -113,6 +113,9 @@ function SC = SCregisterSupport(SC,varargin)
 
 	checkInput()
 
+	% Default truncation value for error distribution
+	cutoff = 2; 
+
 	% Make sure that ordinates are within ring
 	Nele = length(SC.RING);
 	ords = mod(varargin{2}-1,Nele)+1;
@@ -143,11 +146,11 @@ function SC = SCregisterSupport(SC,varargin)
 				end
 			else
 				% Define uncertainties for start points
-				SC.SIG.Support{ordPair(1)}.([type varargin{i}]) = varargin{i+1}(1,:);
+				SC.SIG.Support{ordPair(1)}.([type varargin{i}]) = {varargin{i+1}(1,:), cutoff};
 				% Check if endpoint uncertainties are given
 				if size(varargin{i+1},1)==2
 					% Define uncertainties for endpoints
-					SC.SIG.Support{ordPair(2)}.([type varargin{i}]) = varargin{i+1}(2,:);
+					SC.SIG.Support{ordPair(2)}.([type varargin{i}]) = {varargin{i+1}(2,:),cutoff};
 				end
 			end
 		end

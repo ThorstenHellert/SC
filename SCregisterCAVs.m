@@ -93,6 +93,8 @@ function SC = SCregisterCAVs(SC,CAVords,varargin)
 % *SCgetOrds*, *SCsanityCheck*, *SCapplyErrors*
 
 
+	% Default truncation value for error distribution
+	cutoff = 2; 
 
 	% Store cavity ordinates
 	if isfield(SC,'ORD') && isfield(SC.ORD,'Cavity')
@@ -116,7 +118,11 @@ function SC = SCregisterCAVs(SC,CAVords,varargin)
 		% Set name/pair-values in sigma structure
 		if ~isempty(varargin)
 			for i=1:2:(length(varargin)-1)
-				SC.SIG.RF{ord}.(varargin{i}) = varargin{i+1}(:)';
+				if iscell(varargin{i+1})
+					SC.SIG.RF{ord}.(varargin{i}) = varargin{i+1};
+				else
+					SC.SIG.RF{ord}.(varargin{i}) = {varargin{i+1}, cutoff};
+				end	
 			end
 		end
 	end

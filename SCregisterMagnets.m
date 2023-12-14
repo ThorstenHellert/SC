@@ -239,6 +239,9 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 	% Get name/value-pairs for sigma structure
 	[nvpairs] = getSigmaPairs(keywords,varargin{:});
 
+	% Default truncation value for error distribution
+	cutoff = 2; 
+	
 	% Loop over magnets
 	for ord = MAGords(:)'
 
@@ -283,7 +286,11 @@ function SC = SCregisterMagnets(SC,MAGords,varargin)
 
 		% Set name/pair-values in sigma structure
 		for i=1:2:(length(nvpairs)-1)
-			SC.SIG.Mag{ord}.(nvpairs{i}) = nvpairs{i+1};
+			if iscell(nvpairs{i+1})
+				SC.SIG.Mag{ord}.(nvpairs{i}) = nvpairs{i+1};
+			else
+				SC.SIG.Mag{ord}.(nvpairs{i}) = {nvpairs{i+1}, cutoff};
+			end
 		end
 	end
 
