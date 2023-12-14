@@ -16,8 +16,15 @@ function [T1,T2,R1,R2] = SCgetTransformation(dx,dy,dz,ax,ay,az,magTheta,magLengt
 % This function calculates AT's linear rotation and translation elements `T1`, `T2`, and
 % `R1`, `R2` for magnets with arbitrary horizontal, vertical and longitudinal offsets `[dx,dy,dz]`
 % and roll `az` (roll around z-axis), pitch `ax` (roll around x-axis) and yaw `ay` (roll around
-% y-axis), see Tech-Note XXX for more details. By default all errors are defined in the midpoint of
-% a straight line connecting the ideal entrance and exit point of the magnet.
+% y-axis). By default all errors are defined in the midpoint of a straight line connecting the
+% ideal entrance and exit point of the magnet. Rotations are applied in  the following order:
+% first `az`, then `ay`, and then `ax`. For more details see Tech-Note:
+%
+% Marco Venturini, Thorsten Hellert,
+% Particle-ray tracing through misaligned lattice elements in accelerators,
+% Nuclear Instruments and Methods in Physics Research Section A: Accelerators,
+% Spectrometers, Detectors and Associated Equipment, Volume 1044, 2022, 167487, ISSN 0168-9002,
+% https://doi.org/10.1016/j.nima.2022.167487.
 %
 % INPUT
 % -----
