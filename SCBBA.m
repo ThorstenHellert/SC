@@ -1013,7 +1013,7 @@ function SC = fakeMeasurement(SC,BPMords,magOrds,errorFlags)
 					% Write new BPM offset
 					SC.RING{BPMords(nDim,nBPM)}.Offset(nDim) = fakeBPMoffset;
 				else
-					fprint('BPM offset not reasigned, NaN.\n')
+					fprintf('BPM offset not reasigned, NaN.\n')
 				end
 			end
 		end
