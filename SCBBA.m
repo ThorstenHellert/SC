@@ -171,6 +171,7 @@ addOptional(p,'magSPvec',[0.95,1.05]);
 addOptional(p,'magSPflag','rel');
 addOptional(p,'skewQuadrupole',0);
 addOptional(p,'switchOffSext',0);
+addOptional(p,'SingleCorrOrbit',0);
 addOptional(p,'RMstruct',[]);
 addOptional(p,'orbBumpWindow',5);
 addOptional(p,'useBPMreadingsForOrbBumpRef',0);
