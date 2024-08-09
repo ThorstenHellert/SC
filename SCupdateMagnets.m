@@ -20,12 +20,12 @@ function SC = SCupdateMagnets(SC,varargin)
 % PolynomB-multipoles induced by PolynomB entries, the corresponding multipole components are scaled 
 % by the current magnet excitation and added, as well as static field offsets (if specified in 
 % `PolynomA/BOffset`). 
-% If the considered magnet has a bending angle error (from pure bending angle eror or due to a 
+% If the considered magnet has a bending angle error (from pure bending angle error or due to a
 % combined function magnet), the corresponding horizontal dipole magnetic field is calculated and
 % added to the PolynomB(1) term. It is thereby assured that a dipole error doesn't alter the
 % coordinate system.
 %
-% If the considered magnet is registered as a slpit magnet (`'MasterOf'`), the errors and setpoints 
+% If the considered magnet is registered as a split magnet (`'MasterOf'`), the errors and setpoints
 % of the master magnet are applied to the fields of the child magnets. Note that split quadrupole
 % magnets with different gradients, however, or split CMs can currently not be updated correctly.
 %
