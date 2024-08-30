@@ -91,6 +91,11 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 % `'skewQuadrupole'` (`0`)::
 %	 If true, it is assumed that a skew quadrupole is used. Thus, the BPM readings in the
 %    dimension other than the trajectory/orbit excitation is used for evaluation.
+% `'SingleCorrOrbit'` (`0`)::
+%	 If true, the most efective single corrector based on the response matrix
+%	 is used. This method is usually faster but less acurate than the orbit
+%	 bump metod since the extra orbit around the machine adds non
+%	 linearities.
 % `'switchOffSext'` (`0`)::
 %	 Flag specifying if sextupole coil in BBA magnet should be switched off
 %    (e.g. if quadrupole trim coils are used).
