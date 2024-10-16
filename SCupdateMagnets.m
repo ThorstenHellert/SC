@@ -142,7 +142,7 @@ function SC = updateMagnets(SC,source,target)
 		SC.RING{target}.PolynomB(1) = SC.RING{target}.PolynomB(1) + SC.RING{source}.BendingAngleError * SC.RING{target}.BendingAngle/SC.RING{target}.Length;
 	end
 
-	% Include bending angle error from combinded function magnets
+	% Include bending angle error from combined function magnets
 	if isfield(SC.RING{source},'BendingAngle')
 		% Check if magnet is registered as combined function (bending angle depends on quad component)
 		if isfield(SC.RING{source},'CombinedFunction') && SC.RING{source}.CombinedFunction==1
