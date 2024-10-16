@@ -495,8 +495,8 @@ function varargout = SClocoLib(funName,varargin)
 	function setupLOCOmodel(SC,varargin)
 
 		% Create LOCO model from ideal ring
-		RINGdata.CavityFrequency   = SC.IDEALRING{SC.ORD.Cavity}.Frequency;
-		RINGdata.CavityHarmNumber  = SC.IDEALRING{SC.ORD.Cavity}.HarmNumber;
+		RINGdata.CavityFrequency   = mean(atgetfieldvalues(SC.IDEALRING,SC.ORD.Cavity,'Frequency'));
+		RINGdata.CavityHarmNumber  = round(mean(atgetfieldvalues(SC.IDEALRING,SC.ORD.Cavity,'HarmNumber')));
 		RINGdata.Lattice           = SC.IDEALRING;
 		
 		% Calculate disturbed lattice properties and save initial machine state
