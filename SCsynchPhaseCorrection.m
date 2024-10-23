@@ -100,7 +100,8 @@ function [deltaPhi,ERROR] = SCsynchPhaseCorrection(SC,varargin)
 	BPMshift = nan(1,par.nSteps);
 
 	% RF wavelength [m]
-	lambda = 299792458/SC.RING{par.cavOrd}.Frequency;
+    meanfreq = mean(atgetfieldvalues(SC.IDEALRING,par.cavOrd,'Frequency'));
+    lambda = 299792458/meanfreq;
 
 	% Define phase scan range
 	lambdaTestVec = 1/2 * lambda * linspace(-1,1,par.nSteps);
@@ -242,13 +243,17 @@ function inputCheck(SC,par)
 	end
 	if par.nSteps<2 || par.nTurns<2
 		error('Number of steps and number of turns must be larger than 2.')
-	end
-	if ~isfield(SC.RING{par.cavOrd},'Frequency')
-		error('This is not a cavity (ord: %d)',par.cavOrd)
-	end
-	if ~any(strcmp(SC.RING{par.cavOrd}.PassMethod,{'CavityPass','RFCavityPass'}))
-		warning('Cavity (ord: %d) seemed to be switched off.',par.cavOrd)
-	end
+    end
+    for cavOrd = par.cavOrd
+	    if ~isfield(SC.RING{cavOrd},'Frequency')
+		    error('This is not a cavity (ord: %d)',cavOrd)
+        end
+    end
+    for cavOrd = par.cavOrd
+	    if ~any(strcmp(SC.RING{cavOrd}.PassMethod,{'CavityPass','RFCavityPass'}))
+		    warning('Cavity (ord: %d) seemed to be switched off.',cavOrd)
+        end
+    end
 end
 % Calculate mean turn-by-turn horizontal BPM shift
 function [BPMshift,dE] = getTbTEnergyShift(SC,par)
