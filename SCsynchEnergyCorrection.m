@@ -208,13 +208,17 @@ function inputCheck(SC,par)
 	end
 	if par.minTurns>=par.nTurns
 		error('Minimum number of turns (%d) must be smaller than overal number of turns (%d).', par.minTurns,par.nTurns)
-	end
-	if ~isfield(SC.RING{par.cavOrd},'Frequency')
-		error('This is not a cavity (ord: %d)',par.cavOrd)
-	end
-	if ~any(strcmp(SC.RING{par.cavOrd}.PassMethod,{'CavityPass','RFCavityPass'}))
-		warning('Cavity (ord: %d) seemed to be switched off.',par.cavOrd)
-	end
+    end
+    for cavOrd = par.cavOrd
+	    if ~isfield(SC.RING{cavOrd},'Frequency')
+		    error('This is not a cavity (ord: %d)',par.cavOrd)
+        end
+    end
+    for cavOrd = par.cavOrd
+	    if ~any(strcmp(SC.RING{cavOrd}.PassMethod,{'CavityPass','RFCavityPass'}))
+		    warning('Cavity (ord: %d) seemed to be switched off.',cavOrd)
+        end
+    end
 end
 
 % Calculate mean turn-by-turn horizontal BPM shift
