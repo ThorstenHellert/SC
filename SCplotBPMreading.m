@@ -14,7 +14,7 @@ function SCplotBPMreading(SC,B,T)
 % DESCRIPTION
 % -----------
 % `SCplotBPMreading` is a plotting function used by *SCgetBPMreading* and plots the BPM readings and
-% particel trajectories including the aperture model. Note that the BPM readings mus include all 
+% particle trajectories including the aperture model. Note that the BPM readings must include all
 % registered BPMs and the trajectories must be evaluated at all lattice elements.
 % 
 %
