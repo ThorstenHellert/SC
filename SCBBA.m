@@ -23,7 +23,7 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 % considered BBA-BPM is below a user defined threshold, a quadrupole may be
 % exercised to change the phase advance between the injection point and the
 % BPM (see option `'quadOrdPhaseAdvance'`).
-% In orbit mode an orbit bump is generated at each considerded BPM using orbit feedback
+% In orbit mode an orbit bump is generated at each considered BPM using orbit feedback
 % with weighting factors on a user defined window around the BBA BPM.
 % Finally, for each injected beam trajectory or orbit bump step the offset variation due
 % the change in magnet strength (see option `'magOrder'`) is recorded at the BPMs used
