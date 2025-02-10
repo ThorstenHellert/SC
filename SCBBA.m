@@ -23,7 +23,7 @@ function [SC,errorFlags] = SCBBA(SC,BPMords,magOrds,varargin)
 % considered BBA-BPM is below a user defined threshold, a quadrupole may be
 % exercised to change the phase advance between the injection point and the
 % BPM (see option `'quadOrdPhaseAdvance'`).
-% In orbit mode an orbit bump is generated at each considerded BPM using orbit feedback
+% In orbit mode an orbit bump is generated at each considered BPM using orbit feedback
 % with weighting factors on a user defined window around the BBA BPM.
 % Finally, for each injected beam trajectory or orbit bump step the offset variation due
 % the change in magnet strength (see option `'magOrder'`) is recorded at the BPMs used
@@ -913,7 +913,8 @@ fom(:,jBPM+1:end) = nan;
 if size(BPMords,2)==1
     nSteps = 1;
 else
-    nSteps = 1.1*max(abs(fom0(:)))*linspace(-1,1,floor(size(BPMords,2)/3));
+    nSteps = 1.1 * max(abs(([fom0(:); fom(:)]))) *...
+                linspace(-1,1,floor(size(BPMords,2)));
 end
 
 figure(90),clf;tmpCol=get(gca,'colororder');
@@ -921,15 +922,26 @@ subplot(3,1,1);hold on
 
 % Plot histogram of new BPM offsets
 for nDim=1:size(BPMords,1)
-    [a,b] = hist(fom(nDim,:),nSteps);
-    plot(1E6*b,a,'LineWidth',2);
+    [bin_values, edges] = histcounts (fom(nDim,:),nSteps);
+    hpositions = edges(1:end-1) + diff(edges) / 2;
+    plot(1E6*hpositions,bin_values,'LineWidth',2);
 end
 % Plot histogram of initial BPM offsets
-[a,b] = hist(fom0(:),nSteps);
-plot(1E6*b,a,'k-','LineWidth',2)
+[bin_values, edges] = histcounts(fom0(:),nSteps);
+hpositions = edges(1:end-1) + diff(edges) / 2;
+plot(1E6*hpositions,bin_values,'k-','LineWidth',2)
 
 if size(BPMords,1)>1
-    legend({sprintf('Horizontal rms: $%.0f\\mu m$',1E6*sqrt(mean(fom(1,:).^2,'omitnan'))),sprintf('Vertical rms: $%.0f\\mu m$',1E6*sqrt(mean(fom(2,:).^2,'omitnan'))),sprintf('Initial rms: $%.0f\\mu m$',1E6*sqrt(mean(fom0(:).^2,'omitnan')))},'Interpreter','latex')
+    legend({...
+        sprintf( ...
+        'Horizontal rms: $%.0f\\mu m$',1E6*sqrt(mean(fom(1,:).^2, 'omitnan'))), ...
+        sprintf( ...
+        'Vertical rms: $%.0f\\mu m$',1E6*sqrt(mean(fom(2,:).^2,'omitnan'))), ...
+        sprintf( ...
+        'Initial rms: $%.0f\\mu m$',1E6*sqrt(mean(fom0(:).^2,'omitnan')))},...
+        'Interpreter', ...
+        'latex' ...
+        )
 end
 xlabel('Final BPM offset w.r.t. magnet [$\mu$m]'),ylabel('Number of counts');set(gca,'box','on')
 
