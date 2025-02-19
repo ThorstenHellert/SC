@@ -78,7 +78,7 @@ function [deltaPhis,maxTurns,ERROR] = SCsynchRFcavities(SC,varargin)
 
 	% Parse input
     p = inputParser;
-    addOptional(p,'cavOrds',SC.ORD.Cavity);
+    addOptional(p,'cavOrd',SC.ORD.Cavity);
     addOptional(p,'nSteps',20);
     addOptional(p,'nturns',SC.INJ.nTurns);
     addOptional(p,'verbose',0);
@@ -99,7 +99,7 @@ function [deltaPhis,maxTurns,ERROR] = SCsynchRFcavities(SC,varargin)
     doverbose = par.verbose;
 
     % get the cavities Ords
-    cavOrds = par.cavOrds;
+    cavOrds = par.cavOrd;
 
     % get the total number of cavities
     ncav = numel(cavOrds);
@@ -178,11 +178,19 @@ function [deltaPhis,maxTurns,ERROR] = SCsynchRFcavities(SC,varargin)
 
     % plot
     if doplot
-        figure(90);
+        figure(89);
+        clf(89);
+        cmp = hsv(ncav);
         hold on;
         for idxcav = 1:ncav
-            plot(lambdaTestVec,maxTurns(idxcav,:),'-o', ...
-                'DisplayName',sprintf('Cavity %d',idxcav));
+            plot(lambdaTestVec,maxTurns(idxcav,:), ...
+                '-o', ...
+                'DisplayName',sprintf('Cavity %d',idxcav), ...
+                'Color',cmp(idxcav,:));
+            plot(lambdaTestVec(mi(idxcav)),maxTurns(idxcav,mi(idxcav)), ...
+                'x', ...
+                'Color',cmp(idxcav,:), 'MarkerSize', 24, ...
+                'HandleVisibility','off');
         end
         xlabel('$\Delta \phi$ [m]');
         ylabel('Max. Number of Turns');
