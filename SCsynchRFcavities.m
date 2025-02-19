@@ -16,8 +16,9 @@ function [deltaPhis,maxTurns,ERROR] = SCsynchRFcavities(SC,varargin)
 %
 %  
 % This function is useful when commissioning multiple cavities in TBT mode.
-% It scans the phase interval [-pi,pi] stepwise one cavity at the time and
-% returns the phases achieving the maximum number of turns.
+% It scans the phase interval [-pi,pi] stepwise one cavity at the time,
+% while other cavities are switched off, and returns the phase offset
+% achieving the maximum number of turns per cavity.
 %
 %
 % INPUTS
